@@ -54,3 +54,45 @@ def plot_energy(trajectory, path, time_unit=1.0, time_label="s"):
     ax.plot(t, (E - E[0]) / (abs(E[0]) or 1), lw=1)
     ax.set_xlabel(time_label); ax.set_ylabel("relative energy error")
     fig.tight_layout(); fig.savefig(path); plt.close(fig)
+
+
+def animate3d(trajectory, system, path, unit=1.0, unit_label="m", fps=20, max_frames=120, title=None,
+              rotate=True):
+    """3D scatter animation with a slowly rotating camera."""
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.animation import FuncAnimation, PillowWriter
+
+    if system.dim != 3:
+        raise ValueError("animate3d needs a 3D system")
+    frames = list(range(0, len(trajectory.positions), max(1, len(trajectory.positions) // max_frames)))
+    allpos = np.vstack([trajectory.positions[i] for i in frames]) / unit
+    lo, hi = allpos.min(0), allpos.max(0)
+    if system.box is not None:
+        lo, hi = np.zeros(3), system.box / unit
+    half = max(np.max(hi - lo) / 2, 1e-300)
+    mid = (lo + hi) / 2
+    cmap = plt.get_cmap("tab10")
+    fig = plt.figure(figsize=(5, 5), dpi=80)
+    ax = fig.add_subplot(projection="3d")
+    sc = ax.scatter([], [], [], s=10)
+    for k, setter in enumerate((ax.set_xlim, ax.set_ylim, ax.set_zlim)):
+        setter(mid[k] - half, mid[k] + half)
+    ax.set_xlabel(unit_label)
+    for i, sp in enumerate(system.species):
+        ax.scatter([], [], [], color=cmap(i % 10), label=sp.name, s=10)
+    ax.legend(loc="upper right", fontsize=7)
+
+    def update(k):
+        i = frames[k]
+        p = trajectory.positions[i] / unit
+        sc._offsets3d = (p[:, 0], p[:, 1], p[:, 2])
+        sc.set_color([cmap(j % 10) for j in trajectory.species[i]])
+        if rotate:
+            ax.view_init(elev=25, azim=30 + 120 * k / max(len(frames), 1))
+        ax.set_title(f"{title or ''}  t = {trajectory.t[i]:.3g} s")
+        return (sc,)
+
+    FuncAnimation(fig, update, frames=len(frames), blit=False).save(path, writer=PillowWriter(fps=fps))
+    plt.close(fig)

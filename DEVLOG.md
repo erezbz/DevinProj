@@ -77,3 +77,8 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Example model: `examples/models/ozone.json`, toy ozone chemistry with real masses.
   - Run result: O = 112, O2 = 262, O3 = 38; energy drift 3e-15; every check PASS.
   - 43/43 tests pass.
+- **05:45**: Added `calibrate_dt(sim, trial_duration, energy_tol)`, which halves dt until a trial run meets an energy tolerance.
+  This is "ask for accuracy, not a step size". Test: an eccentric Kepler orbit at a requested 1e-5 tolerance holds over 3 orbits.
+  Added a Langevin thermostat test: 125 argon atoms heated from 50 K to a 200 K target land within 8%,
+  and the report correctly marks energy "n/a".
+- **05:45**: Added `viz.animate3d` (rotating 3D scatter animation) and `--3d` for the CLI, plus a viz smoke test (2D GIF, 3D GIF, energy plot).

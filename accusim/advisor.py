@@ -45,3 +45,27 @@ def suggest_dt(sim, steps_per_timescale: int = 100) -> float:
     if not ts:
         raise ValueError("no timescale found; choose dt manually")
     return min(ts.values()) / steps_per_timescale
+
+
+def calibrate_dt(sim, trial_duration, energy_tol=1e-6, max_halvings=12):
+    """Halve dt until a trial run conserves energy to `energy_tol`; sets and returns sim.dt.
+
+    Only meaningful for conservative, deterministic physics. Returns (dt, measured_drift).
+    """
+    from .units import si
+    if sim.integrator.stochastic or sim.integrator.thermostat or not all(f.conservative for f in sim.forces):
+        raise ValueError("calibrate_dt needs conservative, deterministic physics")
+    T = si(trial_duration, "s")
+    dt = sim.dt if sim.dt is not None else suggest_dt(sim)
+    for _ in range(max_halvings + 1):
+        trial = sim.clone(dt=dt)
+        n = max(int(round(T / dt)), 1)
+        tr = trial.run(steps=n, record_every=max(1, n // 200), positions=False)
+        E = tr.total_energy
+        scale = max(abs(E[0]), max(abs(x) for x in tr.kinetic), max(abs(x) for x in tr.potential), 1e-300)
+        drift = float(np.max(np.abs(E - E[0])) / scale)
+        if drift <= energy_tol:
+            sim.dt = dt
+            return dt, drift
+        dt /= 2
+    raise RuntimeError(f"energy drift {drift:.2e} still above {energy_tol:.0e} after {max_halvings} halvings")

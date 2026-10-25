@@ -69,3 +69,31 @@ def test_advisor_suggests_fraction_of_orbit():
     sim, period = kepler(VelocityVerlet())
     dt = suggest_dt(sim)
     assert period / 1000 < dt < period / 50
+
+
+def test_calibrate_dt_reaches_requested_energy_tolerance():
+    from accusim import calibrate_dt
+    sim, period = kepler(VelocityVerlet(), steps_per_orbit=20, e=0.6)
+    dt, drift = calibrate_dt(sim, trial_duration=period, energy_tol=1e-5)
+    assert drift <= 1e-5 and dt < period / 20
+    sim.run(duration=3 * period, positions=False)
+    assert sim.accuracy_report()["energy"].value <= 2e-5
+
+
+def test_langevin_thermostat_reaches_target_temperature():
+    from accusim import Langevin, LennardJones
+    rng = np.random.default_rng(0)
+    s = System(3, box=Q(3, "nm"), periodic=True)
+    s.add_species("Ar", Q(39.948, "u"))
+    g = (np.arange(5) + 0.5) / 5 * 3e-9
+    s.add("Ar", np.stack(np.meshgrid(g, g, g), -1).reshape(-1, 3))
+    s.maxwell_boltzmann(Q(50, "K"), rng)
+    sim = Simulation(s, [LennardJones({"Ar": (1.654e-21, 3.405e-10)})],
+                     integrator=Langevin(Q(200, "K"), Q(5, "1/ps")), dt=Q(5, "fs"), seed=3)
+    sim.run(duration=Q(4, "ps"), positions=False)
+    temps = []
+    for _ in range(40):
+        sim.run(steps=20, positions=False)
+        temps.append(s.temperature())
+    assert np.mean(temps) == pytest.approx(200, rel=0.08)
+    assert sim.accuracy_report()["energy"].status == "n/a"

@@ -8,6 +8,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(prog="accusim", description="Run a JSON model and print the accuracy report.")
     ap.add_argument("model")
     ap.add_argument("--gif", help="write an animation")
+    ap.add_argument("--3d", dest="three_d", action="store_true", help="3D rotating animation")
     ap.add_argument("--convergence", action="store_true", help="estimate timestep error (3 extra runs)")
     a = ap.parse_args(argv)
     sim, model = load(a.model)
@@ -18,8 +19,8 @@ def main(argv=None):
     conv = duration if a.convergence else None
     print(sim.accuracy_report(convergence_duration=conv))
     if a.gif:
-        from .viz import animate
-        animate(tr, sim.system, a.gif, title=a.model)
+        from .viz import animate, animate3d
+        (animate3d if a.three_d else animate)(tr, sim.system, a.gif, title=a.model)
     return sim
 
 
