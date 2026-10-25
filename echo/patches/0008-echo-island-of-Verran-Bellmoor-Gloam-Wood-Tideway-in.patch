@@ -1,0 +1,1899 @@
+From dfa5d2119ca3ce7d906e73adae480bffe1ee8630 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:42:22 +0000
+Subject: [PATCH 8/8] echo: island of Verran - Bellmoor, Gloam Wood, Tideway,
+ interiors, schedules, compass mystery, Kit, shards
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ data/event_scripts.s                          |   6 +
+ data/layouts/VerranBellmoor/border.bin        | Bin 0 -> 8 bytes
+ data/layouts/VerranBellmoor/map.bin           | Bin 0 -> 960 bytes
+ data/layouts/VerranGloamWood/border.bin       | Bin 0 -> 8 bytes
+ data/layouts/VerranGloamWood/map.bin          | Bin 0 -> 1440 bytes
+ data/layouts/VerranTideway/border.bin         | Bin 0 -> 8 bytes
+ data/layouts/VerranTideway/map.bin            | Bin 0 -> 1152 bytes
+ data/layouts/layouts.json                     |  33 ++++
+ data/maps/VerranBellmoor/map.json             | 103 +++++++++++
+ data/maps/VerranBellmoor/scripts.inc          |  81 ++++++++
+ data/maps/VerranBellmoor_BellHall/map.json    |  63 +++++++
+ data/maps/VerranBellmoor_BellHall/scripts.inc |  39 ++++
+ data/maps/VerranBellmoor_OdetteHouse/map.json |  50 +++++
+ .../VerranBellmoor_OdetteHouse/scripts.inc    |  61 ++++++
+ data/maps/VerranBellmoor_TobinHouse/map.json  |  50 +++++
+ .../VerranBellmoor_TobinHouse/scripts.inc     |  30 +++
+ data/maps/VerranGloamWood/map.json            |  92 ++++++++++
+ data/maps/VerranGloamWood/scripts.inc         | 173 ++++++++++++++++++
+ data/maps/VerranTideway/map.json              |  82 +++++++++
+ data/maps/VerranTideway/scripts.inc           |  99 ++++++++++
+ data/maps/map_groups.json                     |  13 +-
+ data/scripts/echo.inc                         |  26 +++
+ data/specials.inc                             |   4 +
+ include/config/echo.h                         |   8 +-
+ include/constants/flags.h                     |  30 +--
+ include/constants/opponents.h                 |   3 +-
+ include/constants/vars.h                      |   2 +-
+ include/echo_loop.h                           |   4 +
+ src/data/region_map/region_map_sections.json  |  32 +++-
+ src/data/trainers.party                       |  17 ++
+ src/echo_loop.c                               |  37 ++++
+ src/echo_timing.c                             |   9 +-
+ src/new_game.c                                |   1 -
+ tools/echo/gen_maps.py                        | 153 ++++++++++++++++
+ tools/echo/gen_world.py                       |  85 +++++++++
+ tools/echo/mapkit.py                          |  72 ++++++++
+ 36 files changed, 1429 insertions(+), 29 deletions(-)
+ create mode 100644 data/layouts/VerranBellmoor/border.bin
+ create mode 100644 data/layouts/VerranBellmoor/map.bin
+ create mode 100644 data/layouts/VerranGloamWood/border.bin
+ create mode 100644 data/layouts/VerranGloamWood/map.bin
+ create mode 100644 data/layouts/VerranTideway/border.bin
+ create mode 100644 data/layouts/VerranTideway/map.bin
+ create mode 100644 data/maps/VerranBellmoor/map.json
+ create mode 100644 data/maps/VerranBellmoor/scripts.inc
+ create mode 100644 data/maps/VerranBellmoor_BellHall/map.json
+ create mode 100644 data/maps/VerranBellmoor_BellHall/scripts.inc
+ create mode 100644 data/maps/VerranBellmoor_OdetteHouse/map.json
+ create mode 100644 data/maps/VerranBellmoor_OdetteHouse/scripts.inc
+ create mode 100644 data/maps/VerranBellmoor_TobinHouse/map.json
+ create mode 100644 data/maps/VerranBellmoor_TobinHouse/scripts.inc
+ create mode 100644 data/maps/VerranGloamWood/map.json
+ create mode 100644 data/maps/VerranGloamWood/scripts.inc
+ create mode 100644 data/maps/VerranTideway/map.json
+ create mode 100644 data/maps/VerranTideway/scripts.inc
+ create mode 100644 tools/echo/gen_maps.py
+ create mode 100644 tools/echo/gen_world.py
+ create mode 100644 tools/echo/mapkit.py
+
+diff --git a/data/event_scripts.s b/data/event_scripts.s
+index 41658d9d..a6adbdac 100644
+--- a/data/event_scripts.s
++++ b/data/event_scripts.s
+@@ -140,6 +140,12 @@ gStdScripts_End::
+ 	.include "data/maps/SootopolisCity/scripts.inc"
+ 	.include "data/maps/EverGrandeCity/scripts.inc"
+ 	.include "data/maps/LittlerootTown/scripts.inc"
++	.include "data/maps/VerranBellmoor/scripts.inc"
++	.include "data/maps/VerranGloamWood/scripts.inc"
++	.include "data/maps/VerranTideway/scripts.inc"
++	.include "data/maps/VerranBellmoor_OdetteHouse/scripts.inc"
++	.include "data/maps/VerranBellmoor_TobinHouse/scripts.inc"
++	.include "data/maps/VerranBellmoor_BellHall/scripts.inc"
+ 	.include "data/maps/OldaleTown/scripts.inc"
+ 	.include "data/maps/DewfordTown/scripts.inc"
+ 	.include "data/maps/LavaridgeTown/scripts.inc"
+diff --git a/data/layouts/VerranBellmoor/border.bin b/data/layouts/VerranBellmoor/border.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..03bcafef11c023f00c3224c266e39a2dfd4aaa44
+GIT binary patch
+literal 8
+Pcmcb@c$M)E<6TAo5a0u6
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/VerranBellmoor/map.bin b/data/layouts/VerranBellmoor/map.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..1c5bac27e32a0c8e7d08849cb0846628f14218b8
+GIT binary patch
+literal 960
+zcmaJ<SxbX45ah#V(Be%!A3VXkkc0~AlgEq4pI52Sih_#%53`%b%`PfKzGNq}Lo)gL
+z?#cDd7=-6wxl+HlSNG|@)F8d(s3tA-HC}`Cn#mPusi*Pdae~o~v?F@qTZtF{S<Er!
+zq4k;<|7EN&R*hcs;=hFmk8^Aq{YK(K+S_Jc{10%36I^58==TzLn)VKv7yo?!`|!XR
+zhT&*M_2W-g;!n44{9AZukUp>I`@wphPxdcg$+Iwd7XQY#63TAYPsYo56{i@}{4VzV
+zTHnDf?y$gEH2D-|p0j^vq@|9m|KEQNGYLnyKo{$O`j7R>|FeUogdT2ijNM=JFQ*!)
+i{N)WKpE@1#uk)8TDCeiXdeD9Ax?WR{9i+EhslNfD{sMIX
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/VerranGloamWood/border.bin b/data/layouts/VerranGloamWood/border.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..03bcafef11c023f00c3224c266e39a2dfd4aaa44
+GIT binary patch
+literal 8
+Pcmcb@c$M)E<6TAo5a0u6
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/VerranGloamWood/map.bin b/data/layouts/VerranGloamWood/map.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..29884eab8e2c2bdb0fdfbba06b7afdc5fff2bda6
+GIT binary patch
+literal 1440
+zcmb7?QECD)6h#>{pYA1r?tcwdEI6fww$y!;>v))BOtB?|`zCYlea|?@@=}if*l*>%
+zu)oW>j5hD1&YtRcnXz}JH&1IlRWtT3%(iYXebA|zvDcZd&Dc9#lg*}=8GFsS&Yi*8
+z+t=~z+o45y7vJd4a~AH@UN5}!-Mg>D@9OR*zi0dm-{<e!^Ki}Ac|3pePHk?V!}T?s
+zpT3#Z^HAUCFTd+IzMp@TPo_1#W&ZnoGOh8#Gb`#`YUjhD&ZS=SXWjqpH$!%m{14qd
+z|B=6|KA#z)xvOaImPHTpAMwt|8~sZ@UV4q@fpK=9?-}9np`OP)@A0ALIkVzJ&2wh`
+E0ocgHTmS$7
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/VerranTideway/border.bin b/data/layouts/VerranTideway/border.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..03bcafef11c023f00c3224c266e39a2dfd4aaa44
+GIT binary patch
+literal 8
+Pcmcb@c$M)E<6TAo5a0u6
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/VerranTideway/map.bin b/data/layouts/VerranTideway/map.bin
+new file mode 100644
+index 0000000000000000000000000000000000000000..0bf269ae4f4e2bc5ed67acee7f13fb02df53e2bc
+GIT binary patch
+literal 1152
+zcmcJNQ3}E^5JU->&q9xq9N8PFU*av47FtnI(R=7LOfw0MRza3!H@mYhAxUFf+lU)y
+zT<4D-QR~c4_H5NvuXW~}V^lqB8ac<Pde$`REOOQ7J*+W%w~x_PuXW_mk_jD+_fxrO
+z=#g*S;$>9F`;6*p=>E=+Y-FYLeB!4RJ%8FEKdl;9=J$S|*kSxnn8`Vv@BKBg+n_J=
+z!~e`V@&41!#Rr~N@jm3Q>h*+eYSkkre_JmnY&Yoj-N}Ea*FEO&gFgJP|M9~v<l|g(
+I9W&qf6FCb~pa1{>
+
+literal 0
+HcmV?d00001
+
+diff --git a/data/layouts/layouts.json b/data/layouts/layouts.json
+index 2b25587a..4919b4ed 100644
+--- a/data/layouts/layouts.json
++++ b/data/layouts/layouts.json
+@@ -9323,6 +9323,39 @@
+       "border_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/border.bin",
+       "blockdata_filepath": "data/layouts/OneIsland_KindleRoad_EmberSpa_Frlg/map.bin",
+       "layout_version": "frlg"
++    },
++    {
++      "id": "LAYOUT_VERRAN_BELLMOOR",
++      "name": "VerranBellmoor_Layout",
++      "width": 24,
++      "height": 20,
++      "primary_tileset": "gTileset_General",
++      "secondary_tileset": "gTileset_Petalburg",
++      "border_filepath": "data/layouts/VerranBellmoor/border.bin",
++      "blockdata_filepath": "data/layouts/VerranBellmoor/map.bin",
++      "layout_version": "emerald"
++    },
++    {
++      "id": "LAYOUT_VERRAN_GLOAM_WOOD",
++      "name": "VerranGloamWood_Layout",
++      "width": 24,
++      "height": 30,
++      "primary_tileset": "gTileset_General",
++      "secondary_tileset": "gTileset_Petalburg",
++      "border_filepath": "data/layouts/VerranGloamWood/border.bin",
++      "blockdata_filepath": "data/layouts/VerranGloamWood/map.bin",
++      "layout_version": "emerald"
++    },
++    {
++      "id": "LAYOUT_VERRAN_TIDEWAY",
++      "name": "VerranTideway_Layout",
++      "width": 24,
++      "height": 24,
++      "primary_tileset": "gTileset_General",
++      "secondary_tileset": "gTileset_Petalburg",
++      "border_filepath": "data/layouts/VerranTideway/border.bin",
++      "blockdata_filepath": "data/layouts/VerranTideway/map.bin",
++      "layout_version": "emerald"
+     }
+   ]
+ }
+diff --git a/data/maps/VerranBellmoor/map.json b/data/maps/VerranBellmoor/map.json
+new file mode 100644
+index 00000000..a227a53f
+--- /dev/null
++++ b/data/maps/VerranBellmoor/map.json
+@@ -0,0 +1,103 @@
++{
++  "id": "MAP_VERRAN_BELLMOOR",
++  "name": "VerranBellmoor",
++  "layout": "LAYOUT_VERRAN_BELLMOOR",
++  "music": "MUS_DEWFORD",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_BELLMOOR",
++  "requires_flash": false,
++  "weather": "WEATHER_SUNNY",
++  "map_type": "MAP_TYPE_TOWN",
++  "allow_cycling": true,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": true,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": [
++    {
++      "map": "MAP_VERRAN_GLOAM_WOOD",
++      "offset": 0,
++      "direction": "up"
++    },
++    {
++      "map": "MAP_VERRAN_TIDEWAY",
++      "offset": 0,
++      "direction": "down"
++    }
++  ],
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_GIRL_2",
++      "x": 14,
++      "y": 11,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_EventScript_Mira",
++      "flag": "0"
++    },
++    {
++      "graphics_id": "OBJ_EVENT_GFX_GENTLEMAN",
++      "x": 19,
++      "y": 13,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_EventScript_Elder",
++      "flag": "0"
++    },
++    {
++      "graphics_id": "OBJ_EVENT_GFX_BOY_1",
++      "x": 4,
++      "y": 13,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_EventScript_Boy",
++      "flag": "0"
++    }
++  ],
++  "warp_events": [
++    {
++      "x": 6,
++      "y": 7,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR_ODETTE_HOUSE",
++      "dest_warp_id": "0"
++    },
++    {
++      "x": 16,
++      "y": 7,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR_TOBIN_HOUSE",
++      "dest_warp_id": "0"
++    },
++    {
++      "x": 17,
++      "y": 15,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR_BELL_HALL",
++      "dest_warp_id": "0"
++    }
++  ],
++  "coord_events": [],
++  "bg_events": [
++    {
++      "type": "sign",
++      "x": 8,
++      "y": 15,
++      "elevation": 0,
++      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
++      "script": "VerranBellmoor_EventScript_Sign"
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranBellmoor/scripts.inc b/data/maps/VerranBellmoor/scripts.inc
+new file mode 100644
+index 00000000..7e1e5d4e
+--- /dev/null
++++ b/data/maps/VerranBellmoor/scripts.inc
+@@ -0,0 +1,81 @@
++VerranBellmoor_MapScripts::
++	map_script MAP_SCRIPT_ON_FRAME_TABLE, VerranBellmoor_OnFrame
++	.byte 0
++
++VerranBellmoor_OnFrame:
++	map_script_2 VAR_ECHO_INTRO, 0, VerranBellmoor_EventScript_Intro
++	.2byte 0
++
++VerranBellmoor_EventScript_Intro::
++	lockall
++	setvar VAR_ECHO_INTRO, 1
++	goto_if_ne VAR_ECHO_LOOP, 1, VerranBellmoor_EventScript_IntroEnd
++	msgbox VerranBellmoor_Text_Intro, MSGBOX_DEFAULT
++VerranBellmoor_EventScript_IntroEnd:
++	releaseall
++	end
++
++VerranBellmoor_EventScript_Mira::
++	lock
++	faceplayer
++	goto_if_set FLAG_ECHO_GOT_BALLS, VerranBellmoor_EventScript_MiraAfter
++	msgbox VerranBellmoor_Text_MiraGive, MSGBOX_DEFAULT
++	giveitem ITEM_POKE_BALL, 3
++	setflag FLAG_ECHO_GOT_BALLS
++	release
++	end
++
++VerranBellmoor_EventScript_MiraAfter::
++	msgbox VerranBellmoor_Text_MiraAfter, MSGBOX_DEFAULT
++	release
++	end
++
++VerranBellmoor_EventScript_Elder::
++	msgbox VerranBellmoor_Text_Elder, MSGBOX_NPC
++	end
++
++VerranBellmoor_EventScript_Boy::
++	lock
++	faceplayer
++	msgbox VerranBellmoor_Text_Boy, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 8
++	call EventScript_EchoNote
++	release
++	end
++
++VerranBellmoor_EventScript_Sign::
++	msgbox VerranBellmoor_Text_Sign, MSGBOX_SIGN
++	end
++
++VerranBellmoor_Text_Intro:
++	.string "VERRAN ISLAND.\n"
++	.string "The festival of the Great Bell.\p"
++	.string "Your partner TICKIT ticks softly\n"
++	.string "on your shoulder, like a clock.\p"
++	.string "Somewhere north, in GLOAM WOOD,\n"
++	.string "the old bell waits for the third night.$"
++
++VerranBellmoor_Text_MiraGive:
++	.string "MIRA: You're new! Here, festival gift.\n"
++	.string "Wild ones here don't hide in grass.\p"
++	.string "You can see them coming. Pick your\n"
++	.string "fights, and time your moves!$"
++
++VerranBellmoor_Text_MiraAfter:
++	.string "MIRA: Press A when the marker hits\n"
++	.string "the middle. Attacking AND defending!$"
++
++VerranBellmoor_Text_Elder:
++	.string "Every change of light, the bell tolls.\n"
++	.string "Dawn, day, dusk, night.\p"
++	.string "Old ODETTE keeps it. Three days of\n"
++	.string "festival, then she rings it herself.$"
++
++VerranBellmoor_Text_Boy:
++	.string "There's a fox in GLOAM WOOD at dawn.\n"
++	.string "Fire one day, water the next, then\l"
++	.string "spooky! Same fox, I swear!$"
++
++VerranBellmoor_Text_Sign:
++	.string "BELLMOOR\n"
++	.string "“Where every hour is called home.”$"
+diff --git a/data/maps/VerranBellmoor_BellHall/map.json b/data/maps/VerranBellmoor_BellHall/map.json
+new file mode 100644
+index 00000000..8b3930fc
+--- /dev/null
++++ b/data/maps/VerranBellmoor_BellHall/map.json
+@@ -0,0 +1,63 @@
++{
++  "id": "MAP_VERRAN_BELLMOOR_BELL_HALL",
++  "name": "VerranBellmoor_BellHall",
++  "layout": "LAYOUT_LITTLEROOT_TOWN_PROFESSOR_BIRCHS_LAB",
++  "music": "MUS_DEWFORD",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_BELLMOOR",
++  "requires_flash": false,
++  "weather": "WEATHER_NONE",
++  "map_type": "MAP_TYPE_INDOOR",
++  "allow_cycling": false,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": false,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": null,
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_OLD_WOMAN",
++      "x": 6,
++      "y": 5,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_UP",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_BellHall_EventScript_Odette",
++      "flag": "FLAG_ECHO_HIDE_ODETTE_HALL"
++    },
++    {
++      "graphics_id": "OBJ_EVENT_GFX_SCIENTIST_1",
++      "x": 9,
++      "y": 7,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_BellHall_EventScript_Archivist",
++      "flag": "0"
++    }
++  ],
++  "warp_events": [
++    {
++      "x": 6,
++      "y": 12,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "2"
++    },
++    {
++      "x": 7,
++      "y": 12,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "2"
++    }
++  ],
++  "coord_events": [],
++  "bg_events": []
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranBellmoor_BellHall/scripts.inc b/data/maps/VerranBellmoor_BellHall/scripts.inc
+new file mode 100644
+index 00000000..f0f20e41
+--- /dev/null
++++ b/data/maps/VerranBellmoor_BellHall/scripts.inc
+@@ -0,0 +1,39 @@
++VerranBellmoor_BellHall_MapScripts::
++	map_script MAP_SCRIPT_ON_TRANSITION, VerranBellmoor_BellHall_OnTransition
++	.byte 0
++
++VerranBellmoor_BellHall_OnTransition:
++	special EchoLoop_BufferDayTime
++	setflag FLAG_ECHO_HIDE_ODETTE_HALL
++	call_if_eq VAR_0x8001, 2, VerranBellmoor_BellHall_EventScript_Show
++	end
++
++VerranBellmoor_BellHall_EventScript_Show::
++	clearflag FLAG_ECHO_HIDE_ODETTE_HALL
++	return
++
++VerranBellmoor_BellHall_EventScript_Odette::
++	lock
++	faceplayer
++	msgbox VerranBellmoor_BellHall_Text_Odette, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 2
++	call EventScript_EchoNote
++	release
++	end
++
++VerranBellmoor_BellHall_EventScript_Archivist::
++	msgbox VerranBellmoor_BellHall_Text_Archivist, MSGBOX_NPC
++	end
++
++VerranBellmoor_BellHall_Text_Odette:
++	.string "ODETTE: Each dusk I read his last\n"
++	.string "letter here. “Back before the bell.”\p"
++	.string "On the third night I'll ring it so\n"
++	.string "loud the whole sea hears.$"
++
++VerranBellmoor_BellHall_Text_Archivist:
++	.string "The Great Bell was cast from a fallen\n"
++	.string "star. A CHIMELL sleeps inside it.\p"
++	.string "Old records say a bell rung in grief\n"
++	.string "can fold time back on itself…\p"
++	.string "Superstition, surely. Ha ha.$"
+diff --git a/data/maps/VerranBellmoor_OdetteHouse/map.json b/data/maps/VerranBellmoor_OdetteHouse/map.json
+new file mode 100644
+index 00000000..f128debd
+--- /dev/null
++++ b/data/maps/VerranBellmoor_OdetteHouse/map.json
+@@ -0,0 +1,50 @@
++{
++  "id": "MAP_VERRAN_BELLMOOR_ODETTE_HOUSE",
++  "name": "VerranBellmoor_OdetteHouse",
++  "layout": "LAYOUT_HOUSE1",
++  "music": "MUS_DEWFORD",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_BELLMOOR",
++  "requires_flash": false,
++  "weather": "WEATHER_NONE",
++  "map_type": "MAP_TYPE_INDOOR",
++  "allow_cycling": false,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": false,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": null,
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_OLD_WOMAN",
++      "x": 6,
++      "y": 4,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_OdetteHouse_EventScript_Odette",
++      "flag": "FLAG_ECHO_HIDE_ODETTE_HOME"
++    }
++  ],
++  "warp_events": [
++    {
++      "x": 3,
++      "y": 8,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "0"
++    },
++    {
++      "x": 4,
++      "y": 8,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "0"
++    }
++  ],
++  "coord_events": [],
++  "bg_events": []
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranBellmoor_OdetteHouse/scripts.inc b/data/maps/VerranBellmoor_OdetteHouse/scripts.inc
+new file mode 100644
+index 00000000..6b761aa7
+--- /dev/null
++++ b/data/maps/VerranBellmoor_OdetteHouse/scripts.inc
+@@ -0,0 +1,61 @@
++VerranBellmoor_OdetteHouse_MapScripts::
++	map_script MAP_SCRIPT_ON_TRANSITION, VerranBellmoor_OdetteHouse_OnTransition
++	.byte 0
++
++VerranBellmoor_OdetteHouse_OnTransition:
++	special EchoLoop_BufferDayTime
++	setflag FLAG_ECHO_HIDE_ODETTE_HOME
++	call_if_le VAR_0x8001, 1, VerranBellmoor_OdetteHouse_EventScript_Show
++	goto_if_ne VAR_0x8001, 3, VerranBellmoor_OdetteHouse_EventScript_Done
++	call_if_le VAR_0x8000, 1, VerranBellmoor_OdetteHouse_EventScript_Show
++VerranBellmoor_OdetteHouse_EventScript_Done:
++	end
++
++VerranBellmoor_OdetteHouse_EventScript_Show::
++	clearflag FLAG_ECHO_HIDE_ODETTE_HOME
++	return
++
++VerranBellmoor_OdetteHouse_EventScript_Odette::
++	lock
++	faceplayer
++	goto_if_set FLAG_ECHO_GAVE_COMPASS, VerranBellmoor_OdetteHouse_EventScript_After
++	goto_if_set FLAG_ECHO_HAS_COMPASS, VerranBellmoor_OdetteHouse_EventScript_Give
++	msgbox VerranBellmoor_OdetteHouse_Text_Ritual, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 2
++	call EventScript_EchoNote
++	release
++	end
++
++VerranBellmoor_OdetteHouse_EventScript_Give::
++	msgbox VerranBellmoor_OdetteHouse_Text_Give, MSGBOX_DEFAULT
++	setflag FLAG_ECHO_GAVE_COMPASS
++	clearflag FLAG_ECHO_HAS_COMPASS
++	setvar VAR_0x8004, 9
++	call EventScript_EchoNote
++	release
++	end
++
++VerranBellmoor_OdetteHouse_EventScript_After::
++	msgbox VerranBellmoor_OdetteHouse_Text_After, MSGBOX_DEFAULT
++	release
++	end
++
++VerranBellmoor_OdetteHouse_Text_Ritual:
++	.string "ODETTE: The Great Bell was cast to\n"
++	.string "call lost ships home through fog.\p"
++	.string "On the third night, I ring it with\n"
++	.string "all my strength. For my brother.\p"
++	.string "Maybe this time CORIN hears it.$"
++
++VerranBellmoor_OdetteHouse_Text_Give:
++	.string "ODETTE: That compass… CORIN!\n"
++	.string "Where did you… The shore? Truly?\p"
++	.string "…Ten years I've rung that bell,\n"
++	.string "begging the sea to give him back.\p"
++	.string "And it did. Just not how I hoped.\p"
++	.string "On the third night I'll go to the bell.\n"
++	.string "Not to call him. To let him go.$"
++
++VerranBellmoor_OdetteHouse_Text_After:
++	.string "ODETTE: Third night, at the bell.\n"
++	.string "Will you come with me?$"
+diff --git a/data/maps/VerranBellmoor_TobinHouse/map.json b/data/maps/VerranBellmoor_TobinHouse/map.json
+new file mode 100644
+index 00000000..77a39404
+--- /dev/null
++++ b/data/maps/VerranBellmoor_TobinHouse/map.json
+@@ -0,0 +1,50 @@
++{
++  "id": "MAP_VERRAN_BELLMOOR_TOBIN_HOUSE",
++  "name": "VerranBellmoor_TobinHouse",
++  "layout": "LAYOUT_HOUSE1",
++  "music": "MUS_DEWFORD",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_BELLMOOR",
++  "requires_flash": false,
++  "weather": "WEATHER_NONE",
++  "map_type": "MAP_TYPE_INDOOR",
++  "allow_cycling": false,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": false,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": null,
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_FISHERMAN",
++      "x": 6,
++      "y": 4,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranBellmoor_TobinHouse_EventScript_Tobin",
++      "flag": "FLAG_ECHO_HIDE_TOBIN_HOME"
++    }
++  ],
++  "warp_events": [
++    {
++      "x": 3,
++      "y": 8,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "1"
++    },
++    {
++      "x": 4,
++      "y": 8,
++      "elevation": 0,
++      "dest_map": "MAP_VERRAN_BELLMOOR",
++      "dest_warp_id": "1"
++    }
++  ],
++  "coord_events": [],
++  "bg_events": []
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranBellmoor_TobinHouse/scripts.inc b/data/maps/VerranBellmoor_TobinHouse/scripts.inc
+new file mode 100644
+index 00000000..156e35ee
+--- /dev/null
++++ b/data/maps/VerranBellmoor_TobinHouse/scripts.inc
+@@ -0,0 +1,30 @@
++VerranBellmoor_TobinHouse_MapScripts::
++	map_script MAP_SCRIPT_ON_TRANSITION, VerranBellmoor_TobinHouse_OnTransition
++	.byte 0
++
++VerranBellmoor_TobinHouse_OnTransition:
++	special EchoLoop_BufferDayTime
++	setflag FLAG_ECHO_HIDE_TOBIN_HOME
++	call_if_le VAR_0x8001, 1, VerranBellmoor_TobinHouse_EventScript_Show
++	end
++
++VerranBellmoor_TobinHouse_EventScript_Show::
++	clearflag FLAG_ECHO_HIDE_TOBIN_HOME
++	return
++
++VerranBellmoor_TobinHouse_EventScript_Tobin::
++	lock
++	faceplayer
++	msgbox VerranBellmoor_TobinHouse_Text_Tobin, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 3
++	call EventScript_EchoNote
++	release
++	end
++
++VerranBellmoor_TobinHouse_Text_Tobin:
++	.string "TOBIN: Odette? Her little brother\n"
++	.string "CORIN took his boat out in a storm.\p"
++	.string "Ten years back. Never came home.\n"
++	.string "That's why she rings that bell.\p"
++	.string "I fish TIDEWAY every evening.\n"
++	.string "Come find me there if you like.$"
+diff --git a/data/maps/VerranGloamWood/map.json b/data/maps/VerranGloamWood/map.json
+new file mode 100644
+index 00000000..368541f5
+--- /dev/null
++++ b/data/maps/VerranGloamWood/map.json
+@@ -0,0 +1,92 @@
++{
++  "id": "MAP_VERRAN_GLOAM_WOOD",
++  "name": "VerranGloamWood",
++  "layout": "LAYOUT_VERRAN_GLOAM_WOOD",
++  "music": "MUS_PETALBURG_WOODS",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_GLOAM_WOOD",
++  "requires_flash": false,
++  "weather": "WEATHER_SHADE",
++  "map_type": "MAP_TYPE_ROUTE",
++  "allow_cycling": true,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": true,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": [
++    {
++      "map": "MAP_VERRAN_BELLMOOR",
++      "offset": 0,
++      "direction": "down"
++    }
++  ],
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_BUG_CATCHER",
++      "x": 5,
++      "y": 14,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NORMAL",
++      "trainer_sight_or_berry_tree_id": "4",
++      "script": "VerranGloamWood_EventScript_Kit",
++      "flag": "0"
++    },
++    {
++      "local_id": "LOCALID_GLOAM_SOLUNE",
++      "graphics_id": "OBJ_EVENT_GFX_POOCHYENA",
++      "x": 13,
++      "y": 4,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_LOOK_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranGloamWood_EventScript_Solune",
++      "flag": "FLAG_ECHO_HIDE_SOLUNE"
++    },
++    {
++      "local_id": "LOCALID_GLOAM_GLOAMOTH",
++      "graphics_id": "OBJ_EVENT_GFX_SKITTY",
++      "x": 16,
++      "y": 23,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranGloamWood_EventScript_Gloamoth",
++      "flag": "FLAG_ECHO_HIDE_GLOAMOTH"
++    },
++    {
++      "local_id": "LOCALID_GLOAM_ODETTE",
++      "graphics_id": "OBJ_EVENT_GFX_OLD_WOMAN",
++      "x": 11,
++      "y": 5,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_UP",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranGloamWood_EventScript_Odette",
++      "flag": "FLAG_ECHO_HIDE_ODETTE_SHRINE"
++    }
++  ],
++  "warp_events": [],
++  "coord_events": [],
++  "bg_events": [
++    {
++      "type": "sign",
++      "x": 11,
++      "y": 3,
++      "elevation": 0,
++      "player_facing_dir": "BG_EVENT_PLAYER_FACING_ANY",
++      "script": "VerranGloamWood_EventScript_Bell"
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranGloamWood/scripts.inc b/data/maps/VerranGloamWood/scripts.inc
+new file mode 100644
+index 00000000..9dda0ca9
+--- /dev/null
++++ b/data/maps/VerranGloamWood/scripts.inc
+@@ -0,0 +1,173 @@
++VerranGloamWood_MapScripts::
++	map_script MAP_SCRIPT_ON_TRANSITION, VerranGloamWood_OnTransition
++	.byte 0
++
++VerranGloamWood_OnTransition:
++	special EchoLoop_BufferDayTime
++	setflag FLAG_ECHO_HIDE_SOLUNE
++	setflag FLAG_ECHO_HIDE_GLOAMOTH
++	setflag FLAG_ECHO_HIDE_ODETTE_SHRINE
++	call_if_eq VAR_ECHO_PHASE, 11, VerranGloamWood_EventScript_ShowOdette
++	call_if_unset FLAG_ECHO_SOLUNE_DONE, VerranGloamWood_EventScript_TrySolune
++	call_if_unset FLAG_ECHO_GLOAMOTH_DONE, VerranGloamWood_EventScript_TryGloamoth
++	end
++
++VerranGloamWood_EventScript_ShowOdette::
++	clearflag FLAG_ECHO_HIDE_ODETTE_SHRINE
++	return
++
++VerranGloamWood_EventScript_TrySolune::
++	call_if_eq VAR_0x8001, 0, VerranGloamWood_EventScript_ShowSolune
++	return
++
++VerranGloamWood_EventScript_ShowSolune::
++	clearflag FLAG_ECHO_HIDE_SOLUNE
++	return
++
++VerranGloamWood_EventScript_TryGloamoth::
++	call_if_ge VAR_0x8001, 2, VerranGloamWood_EventScript_ShowGloamoth
++	return
++
++VerranGloamWood_EventScript_ShowGloamoth::
++	clearflag FLAG_ECHO_HIDE_GLOAMOTH
++	return
++
++VerranGloamWood_EventScript_Kit::
++	trainerbattle_single TRAINER_ECHO_KIT, VerranGloamWood_Text_KitIntro, VerranGloamWood_Text_KitDefeat, VerranGloamWood_EventScript_KitShard
++	msgbox VerranGloamWood_Text_KitAfter, MSGBOX_AUTOCLOSE
++	end
++
++VerranGloamWood_EventScript_KitShard::
++	setvar VAR_0x8004, 6
++	call EventScript_EchoShard
++	msgbox VerranGloamWood_Text_KitAfter, MSGBOX_DEFAULT
++	release
++	end
++
++VerranGloamWood_EventScript_Solune::
++	lock
++	faceplayer
++	special EchoLoop_BufferDayTime
++	setvar VAR_0x8004, 8
++	call EventScript_EchoNote
++	playmoncry SPECIES_SOLUNE, CRY_MODE_ENCOUNTER
++	waitmoncry
++	goto_if_eq VAR_0x8000, 1, VerranGloamWood_EventScript_SoluneTide
++	goto_if_eq VAR_0x8000, 2, VerranGloamWood_EventScript_SoluneDusk
++	setwildbattle SPECIES_SOLUNE, 13
++	goto VerranGloamWood_EventScript_SoluneBattle
++VerranGloamWood_EventScript_SoluneTide:
++	setwildbattle SPECIES_SOLUNE_TIDE, 13
++	goto VerranGloamWood_EventScript_SoluneBattle
++VerranGloamWood_EventScript_SoluneDusk:
++	setwildbattle SPECIES_SOLUNE_DUSK, 13
++VerranGloamWood_EventScript_SoluneBattle:
++	setflag FLAG_SYS_CTRL_OBJ_DELETE
++	dowildbattle
++	clearflag FLAG_SYS_CTRL_OBJ_DELETE
++	setflag FLAG_ECHO_SOLUNE_DONE
++	setflag FLAG_ECHO_HIDE_SOLUNE
++	removeobject LOCALID_GLOAM_SOLUNE
++	release
++	end
++
++VerranGloamWood_EventScript_Gloamoth::
++	lock
++	faceplayer
++	playmoncry SPECIES_GLOAMOTH, CRY_MODE_ENCOUNTER
++	waitmoncry
++	setwildbattle SPECIES_GLOAMOTH, 16
++	setflag FLAG_SYS_CTRL_OBJ_DELETE
++	dowildbattle
++	clearflag FLAG_SYS_CTRL_OBJ_DELETE
++	specialvar VAR_RESULT, GetBattleOutcome
++	setflag FLAG_ECHO_GLOAMOTH_DONE
++	setflag FLAG_ECHO_HIDE_GLOAMOTH
++	removeobject LOCALID_GLOAM_GLOAMOTH
++	goto_if_eq VAR_RESULT, B_OUTCOME_RAN, VerranGloamWood_EventScript_GloamothEnd
++	setvar VAR_0x8004, 7
++	call EventScript_EchoShard
++VerranGloamWood_EventScript_GloamothEnd:
++	release
++	end
++
++VerranGloamWood_EventScript_Bell::
++	msgbox VerranGloamWood_Text_Bell, MSGBOX_SIGN
++	end
++
++VerranGloamWood_EventScript_Odette::
++	lock
++	faceplayer
++	goto_if_set FLAG_ECHO_GAVE_COMPASS, VerranGloamWood_EventScript_Farewell
++	msgbox VerranGloamWood_Text_OdetteRing, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 2
++	call EventScript_EchoNote
++	closemessage
++	goto EventScript_EchoLoopEnd
++
++VerranGloamWood_EventScript_Farewell::
++	msgbox VerranGloamWood_Text_Farewell, MSGBOX_DEFAULT
++	playse SE_ORB
++	waitse
++	playmoncry SPECIES_CHIMELL, CRY_MODE_ENCOUNTER
++	msgbox VerranGloamWood_Text_TollWakes, MSGBOX_DEFAULT
++	waitmoncry
++	setwildbattle SPECIES_CHIMELL, 22
++	dowildbattle
++	specialvar VAR_RESULT, GetBattleOutcome
++	goto_if_eq VAR_RESULT, B_OUTCOME_WON, VerranGloamWood_EventScript_Freed
++	goto_if_eq VAR_RESULT, B_OUTCOME_CAUGHT, VerranGloamWood_EventScript_Freed
++	msgbox VerranGloamWood_Text_TollHolds, MSGBOX_DEFAULT
++	release
++	end
++
++VerranGloamWood_EventScript_Freed::
++	special EchoLoop_Break
++	playfanfare MUS_OBTAIN_ITEM
++	msgbox VerranGloamWood_Text_Freed, MSGBOX_DEFAULT
++	waitfanfare
++	release
++	end
++
++VerranGloamWood_Text_KitIntro:
++	.string "KIT: No grinding on Verran! Just\n"
++	.string "your timing against mine. Go!$"
++
++VerranGloamWood_Text_KitDefeat:
++	.string "KIT: Your timing's unreal!$"
++
++VerranGloamWood_Text_KitAfter:
++	.string "KIT: Watch what a foe plans to do,\n"
++	.string "then pick the move that answers it.$"
++
++VerranGloamWood_Text_Bell:
++	.string "THE GREAT BELL OF VERRAN\n"
++	.string "Cast to call lost ships home.$"
++
++VerranGloamWood_Text_OdetteRing:
++	.string "ODETTE: Ring, bell… Bring him home!\n"
++	.string "CORIN, can you hear me?$"
++
++VerranGloamWood_Text_Farewell:
++	.string "ODETTE: You came. Thank you.\p"
++	.string "CORIN… I'm done calling you back.\n"
++	.string "Rest now.\p"
++	.string "She touches the bell, but does not\n"
++	.string "ring it. The bell shudders anyway…$"
++
++VerranGloamWood_Text_TollWakes:
++	.string "The CHIMELL inside the bell wakes,\n"
++	.string "clinging to ten years of grief!$"
++
++VerranGloamWood_Text_TollHolds:
++	.string "The bell's hum grows louder…\n"
++	.string "Time won't let go. Not yet.$"
++
++VerranGloamWood_Text_Freed:
++	.string "The CHIMELL rings one last, soft note\n"
++	.string "and drifts into the night sky.\p"
++	.string "The bell is silent.\p"
++	.string "…And for the first time,\n"
++	.string "a fourth morning dawns on Verran.\p"
++	.string "THE LOOP IS BROKEN.\n"
++	.string "Thanks for playing this slice!$"
+diff --git a/data/maps/VerranTideway/map.json b/data/maps/VerranTideway/map.json
+new file mode 100644
+index 00000000..17068119
+--- /dev/null
++++ b/data/maps/VerranTideway/map.json
+@@ -0,0 +1,82 @@
++{
++  "id": "MAP_VERRAN_TIDEWAY",
++  "name": "VerranTideway",
++  "layout": "LAYOUT_VERRAN_TIDEWAY",
++  "music": "MUS_ROUTE104",
++  "region": "REGION_HOENN",
++  "region_map_section": "MAPSEC_TIDEWAY",
++  "requires_flash": false,
++  "weather": "WEATHER_SUNNY",
++  "map_type": "MAP_TYPE_ROUTE",
++  "allow_cycling": true,
++  "allow_escaping": false,
++  "allow_running": true,
++  "show_map_name": true,
++  "battle_scene": "MAP_BATTLE_SCENE_NORMAL",
++  "connections": [
++    {
++      "map": "MAP_VERRAN_BELLMOOR",
++      "offset": 0,
++      "direction": "up"
++    }
++  ],
++  "object_events": [
++    {
++      "graphics_id": "OBJ_EVENT_GFX_FISHERMAN",
++      "x": 8,
++      "y": 15,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranTideway_EventScript_Tobin",
++      "flag": "FLAG_ECHO_HIDE_TOBIN_SHORE"
++    },
++    {
++      "local_id": "LOCALID_TIDEWAY_COMPASS",
++      "graphics_id": "OBJ_EVENT_GFX_ITEM_BALL",
++      "x": 3,
++      "y": 15,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_DOWN",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranTideway_EventScript_Compass",
++      "flag": "FLAG_ECHO_HIDE_COMPASS"
++    },
++    {
++      "local_id": "LOCALID_TIDEWAY_TIDEPUP",
++      "graphics_id": "OBJ_EVENT_GFX_ZIGZAGOON_1",
++      "x": 17,
++      "y": 17,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_WANDER_AROUND",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranTideway_EventScript_Tidepup",
++      "flag": "FLAG_ECHO_HIDE_TIDEPUP"
++    },
++    {
++      "graphics_id": "OBJ_EVENT_GFX_SAILOR",
++      "x": 16,
++      "y": 8,
++      "elevation": 3,
++      "movement_type": "MOVEMENT_TYPE_FACE_LEFT",
++      "movement_range_x": 1,
++      "movement_range_y": 1,
++      "trainer_type": "TRAINER_TYPE_NONE",
++      "trainer_sight_or_berry_tree_id": "0",
++      "script": "VerranTideway_EventScript_Sailor",
++      "flag": "0"
++    }
++  ],
++  "warp_events": [],
++  "coord_events": [],
++  "bg_events": []
++}
+\ No newline at end of file
+diff --git a/data/maps/VerranTideway/scripts.inc b/data/maps/VerranTideway/scripts.inc
+new file mode 100644
+index 00000000..033cd341
+--- /dev/null
++++ b/data/maps/VerranTideway/scripts.inc
+@@ -0,0 +1,99 @@
++VerranTideway_MapScripts::
++	map_script MAP_SCRIPT_ON_TRANSITION, VerranTideway_OnTransition
++	.byte 0
++
++VerranTideway_OnTransition:
++	special EchoLoop_BufferDayTime
++	setflag FLAG_ECHO_HIDE_TOBIN_SHORE
++	setflag FLAG_ECHO_HIDE_COMPASS
++	setflag FLAG_ECHO_HIDE_TIDEPUP
++	call_if_ge VAR_0x8001, 2, VerranTideway_EventScript_ShowTobin
++	call_if_eq VAR_ECHO_PHASE, 4, VerranTideway_EventScript_TryCompass
++	call_if_unset FLAG_ECHO_TIDEPUP_DONE, VerranTideway_EventScript_TryTidepup
++	end
++
++VerranTideway_EventScript_ShowTobin::
++	clearflag FLAG_ECHO_HIDE_TOBIN_SHORE
++	return
++
++VerranTideway_EventScript_TryCompass::
++	goto_if_set FLAG_ECHO_HAS_COMPASS, VerranTideway_EventScript_Ret
++	goto_if_set FLAG_ECHO_GAVE_COMPASS, VerranTideway_EventScript_Ret
++	clearflag FLAG_ECHO_HIDE_COMPASS
++VerranTideway_EventScript_Ret:
++	return
++
++VerranTideway_EventScript_TryTidepup::
++	call_if_eq VAR_0x8001, 1, VerranTideway_EventScript_ShowTidepup
++	return
++
++VerranTideway_EventScript_ShowTidepup::
++	clearflag FLAG_ECHO_HIDE_TIDEPUP
++	return
++
++VerranTideway_EventScript_Tobin::
++	lock
++	faceplayer
++	goto_if_set FLAG_ECHO_HAS_COMPASS, VerranTideway_EventScript_TobinCompass
++	msgbox VerranTideway_Text_Tobin, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 4
++	call EventScript_EchoNote
++	release
++	end
++
++VerranTideway_EventScript_TobinCompass::
++	msgbox VerranTideway_Text_TobinCompass, MSGBOX_DEFAULT
++	release
++	end
++
++VerranTideway_EventScript_Compass::
++	lock
++	playfanfare MUS_OBTAIN_ITEM
++	msgbox VerranTideway_Text_Compass, MSGBOX_DEFAULT
++	waitfanfare
++	setflag FLAG_ECHO_HAS_COMPASS
++	setflag FLAG_ECHO_HIDE_COMPASS
++	removeobject LOCALID_TIDEWAY_COMPASS
++	setvar VAR_0x8004, 5
++	call EventScript_EchoNote
++	release
++	end
++
++VerranTideway_EventScript_Tidepup::
++	lock
++	faceplayer
++	playmoncry SPECIES_TIDEPUP, CRY_MODE_ENCOUNTER
++	waitmoncry
++	setwildbattle SPECIES_TIDEPUP, 13
++	setflag FLAG_SYS_CTRL_OBJ_DELETE
++	dowildbattle
++	clearflag FLAG_SYS_CTRL_OBJ_DELETE
++	setflag FLAG_ECHO_TIDEPUP_DONE
++	setflag FLAG_ECHO_HIDE_TIDEPUP
++	removeobject LOCALID_TIDEWAY_TIDEPUP
++	release
++	end
++
++VerranTideway_EventScript_Sailor::
++	msgbox VerranTideway_Text_Sailor, MSGBOX_NPC
++	end
++
++VerranTideway_Text_Tobin:
++	.string "TOBIN: Tide's high. Nothing biting.\p"
++	.string "This season the low tide comes just\n"
++	.string "once: at dawn on the second day.\p"
++	.string "The shore gives back all sorts then.\n"
++	.string "Things the sea's kept for years.$"
++
++VerranTideway_Text_TobinCompass:
++	.string "TOBIN: That's… CORIN's compass!\n"
++	.string "Take it to Odette. Please.$"
++
++VerranTideway_Text_Compass:
++	.string "Half-buried in the wet sand: a\n"
++	.string "tarnished compass. Engraved: CORIN.$"
++
++VerranTideway_Text_Sailor:
++	.string "Ships keep sailing around this island\n"
++	.string "and somehow end up right back here.\p"
++	.string "Must be the fog. Or the bell.$"
+diff --git a/data/maps/map_groups.json b/data/maps/map_groups.json
+index d6320f48..390db61c 100644
+--- a/data/maps/map_groups.json
++++ b/data/maps/map_groups.json
+@@ -74,7 +74,8 @@
+     "gMapGroup_IndoorFiveIslandRoute_Frlg",
+     "gMapGroup_IndoorTwoIslandRoute_Frlg",
+     "gMapGroup_IndoorSixIslandRoute_Frlg",
+-    "gMapGroup_IndoorSevenIslandRoute_Frlg"
++    "gMapGroup_IndoorSevenIslandRoute_Frlg",
++    "gMapGroup_Verran"
+   ],
+   "gMapGroup_TownsAndRoutes": [
+     "PetalburgCity",
+@@ -1160,5 +1161,13 @@
+   ],
+   "gMapGroup_IndoorSevenIslandRoute_Frlg": [
+     "SevenIsland_SevaultCanyon_House_Frlg"
++  ],
++  "gMapGroup_Verran": [
++    "VerranBellmoor",
++    "VerranGloamWood",
++    "VerranTideway",
++    "VerranBellmoor_OdetteHouse",
++    "VerranBellmoor_TobinHouse",
++    "VerranBellmoor_BellHall"
+   ]
+-}
++}
+\ No newline at end of file
+diff --git a/data/scripts/echo.inc b/data/scripts/echo.inc
+index 974fd3ef..5b019296 100644
+--- a/data/scripts/echo.inc
++++ b/data/scripts/echo.inc
+@@ -38,3 +38,29 @@ EchoText_LoopEnd:
+ 
+ EchoText_Wake:
+ 	.string "…You wake with a start.\n{STR_VAR_1}, {STR_VAR_2}. Again.\pLoop {STR_VAR_3}.\nYou remember everything.$"
++
++@ VAR_0x8004 = journal index. Notes the entry once.
++EventScript_EchoNote::
++	special EchoJournal_Learn
++	goto_if_eq VAR_RESULT, FALSE, EventScript_EchoNoteEnd
++	playse SE_SELECT
++	msgbox EchoText_Noted, MSGBOX_DEFAULT
++EventScript_EchoNoteEnd:
++	return
++
++@ VAR_0x8004 = journal index guarding the shard.
++EventScript_EchoShard::
++	special EchoShard_Award
++	goto_if_eq VAR_RESULT, FALSE, EventScript_EchoNoteEnd
++	playfanfare MUS_OBTAIN_ITEM
++	msgbox EchoText_Shard, MSGBOX_DEFAULT
++	waitfanfare
++	return
++
++EchoText_Noted:
++	.string "(You note it in your Echo Journal.)$"
++
++EchoText_Shard:
++	.string "An ECHO SHARD hums into your hand.\n"
++	.string "It will stay with you across loops.\p"
++	.string "Your sense of timing feels sharper.$"
+diff --git a/data/specials.inc b/data/specials.inc
+index 47625c83..db168d37 100644
+--- a/data/specials.inc
++++ b/data/specials.inc
+@@ -642,3 +642,7 @@ gSpecials::
+ 	def_special EchoLoop_EndLoop
+ 	def_special EchoJournal_Buffer
+ 	def_special EchoJournal_Unlock
++	def_special EchoJournal_Learn
++	def_special EchoShard_Award
++	def_special EchoLoop_BufferDayTime
++	def_special EchoLoop_Break
+diff --git a/include/config/echo.h b/include/config/echo.h
+index b7d219a7..1e006a2f 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -11,11 +11,13 @@
+ #define ECHO_NO_RANDOM_WILD   TRUE  // No random grass/water/cave encounters; battles are visible and authored.
+ #define ECHO_NO_DYNAMAX       TRUE  // Smart wild AI would otherwise Dynamax; Echo has no Dynamax.
+ #define ECHO_STEPS_PER_PHASE  100   // Steps between bell tolls (12 phases per loop).
++#define ECHO_JOURNAL_FREED    15
++#define ECHO_MAX_SHARD_BONUS  4
+ #define ECHO_JOURNAL_COUNT    16
+ #define ECHO_LOOP_START_MONEY 500
+-#define ECHO_LOOP_START_MAP   MAP_ROUTE102  // TODO: Verran start map.
+-#define ECHO_LOOP_START_X     40
+-#define ECHO_LOOP_START_Y     6
++#define ECHO_LOOP_START_MAP   MAP_VERRAN_BELLMOOR
++#define ECHO_LOOP_START_X     10
++#define ECHO_LOOP_START_Y     11
+ #define ECHO_DEV_QUICKSTART   TRUE  // DEV ONLY: New Game skips the intro and drops you on Route 102 next to a trainer with a test party.
+ 
+ #endif // GUARD_CONFIG_ECHO_H
+diff --git a/include/constants/flags.h b/include/constants/flags.h
+index 44bbb581..95a95c38 100644
+--- a/include/constants/flags.h
++++ b/include/constants/flags.h
+@@ -69,21 +69,21 @@
+ #define FLAG_ECHO_JOURNAL_15    0x2F // Echo: journal entry (kept across loops)
+ #define FLAG_ECHO_LOOP_ACTIVE    0x30 // Echo: time loop running
+ #define FLAG_ECHO_JOURNAL_START FLAG_ECHO_JOURNAL_00
+-#define FLAG_UNUSED_0x031    0x31 // Unused Flag
+-#define FLAG_UNUSED_0x032    0x32 // Unused Flag
+-#define FLAG_UNUSED_0x033    0x33 // Unused Flag
+-#define FLAG_UNUSED_0x034    0x34 // Unused Flag
+-#define FLAG_UNUSED_0x035    0x35 // Unused Flag
+-#define FLAG_UNUSED_0x036    0x36 // Unused Flag
+-#define FLAG_UNUSED_0x037    0x37 // Unused Flag
+-#define FLAG_UNUSED_0x038    0x38 // Unused Flag
+-#define FLAG_UNUSED_0x039    0x39 // Unused Flag
+-#define FLAG_UNUSED_0x03A    0x3A // Unused Flag
+-#define FLAG_UNUSED_0x03B    0x3B // Unused Flag
+-#define FLAG_UNUSED_0x03C    0x3C // Unused Flag
+-#define FLAG_UNUSED_0x03D    0x3D // Unused Flag
+-#define FLAG_UNUSED_0x03E    0x3E // Unused Flag
+-#define FLAG_UNUSED_0x03F    0x3F // Unused Flag
++#define FLAG_ECHO_HIDE_ODETTE_HOME 0x31 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_ODETTE_HALL 0x32 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_ODETTE_SHRINE 0x33 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_TOBIN_HOME  0x34 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_TOBIN_SHORE 0x35 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_COMPASS     0x36 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_SOLUNE      0x37 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_GLOAMOTH    0x38 // Echo: per-loop state
++#define FLAG_ECHO_HIDE_TIDEPUP     0x39 // Echo: per-loop state
++#define FLAG_ECHO_HAS_COMPASS      0x3A // Echo: per-loop state
++#define FLAG_ECHO_GAVE_COMPASS     0x3B // Echo: per-loop state
++#define FLAG_ECHO_GOT_BALLS        0x3C // Echo: per-loop state
++#define FLAG_ECHO_SOLUNE_DONE      0x3D // Echo: per-loop state
++#define FLAG_ECHO_GLOAMOTH_DONE    0x3E // Echo: per-loop state
++#define FLAG_ECHO_TIDEPUP_DONE     0x3F // Echo: per-loop state
+ #define FLAG_UNUSED_0x040    0x40 // Unused Flag
+ #define FLAG_UNUSED_0x041    0x41 // Unused Flag
+ #define FLAG_UNUSED_0x042    0x42 // Unused Flag
+diff --git a/include/constants/opponents.h b/include/constants/opponents.h
+index 0724da54..5d3b2f9c 100644
+--- a/include/constants/opponents.h
++++ b/include/constants/opponents.h
+@@ -859,12 +859,13 @@
+ #define TRAINER_LEAF                        852
+ #define TRAINER_BRENDAN_PLACEHOLDER         853
+ #define TRAINER_MAY_PLACEHOLDER             854
++#define TRAINER_ECHO_KIT                    855
+ 
+ // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for 9 additional trainers before trainer flag space overflows
+ //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
+ //       MAX_TRAINERS_COUNT can be increased but will take up additional saveblock space
+ 
+-#define TRAINERS_COUNT_EMERALD     855
++#define TRAINERS_COUNT_EMERALD     856
+ #define MAX_TRAINERS_COUNT_EMERALD 864
+ 
+ #if IS_FRLG
+diff --git a/include/constants/vars.h b/include/constants/vars.h
+index 0deae179..ff2bd26a 100644
+--- a/include/constants/vars.h
++++ b/include/constants/vars.h
+@@ -97,7 +97,7 @@
+ #define VAR_POKELOT_RND1                                 0x404B // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
+ #define VAR_POKELOT_RND2                                 0x404C // Unused if OW_USE_DAILY_SEED_FOR_VANILLA_VARIABLES is TRUE
+ #define VAR_POKELOT_PRIZE_PLACE                          0x404D
+-#define VAR_UNUSED_0x404E                                0x404E // Unused Var
++#define VAR_ECHO_INTRO                                   0x404E // Echo: intro shown this loop
+ #define VAR_LOTAD_SIZE_RECORD                            0x404F
+ #define VAR_LITTLEROOT_TOWN_STATE                        0x4050
+ #define VAR_OLDALE_TOWN_STATE                            0x4051
+diff --git a/include/echo_loop.h b/include/echo_loop.h
+index 41fafa03..9be3f460 100644
+--- a/include/echo_loop.h
++++ b/include/echo_loop.h
+@@ -15,5 +15,9 @@ void EchoLoop_BufferPhase(void);
+ void EchoLoop_EndLoop(void);
+ void EchoJournal_Buffer(void);
+ void EchoJournal_Unlock(void);
++void EchoJournal_Learn(void);
++void EchoShard_Award(void);
++void EchoLoop_BufferDayTime(void);
++void EchoLoop_Break(void);
+ 
+ #endif // GUARD_ECHO_LOOP_H
+diff --git a/src/data/region_map/region_map_sections.json b/src/data/region_map/region_map_sections.json
+index e1703383..8f416862 100644
+--- a/src/data/region_map/region_map_sections.json
++++ b/src/data/region_map/region_map_sections.json
+@@ -1072,7 +1072,7 @@
+     },
+     {
+       "id": "MAPSEC_POKEMON_MANSION",
+-      "name": "POKéMON MANSION",
++      "name": "POK\u00e9MON MANSION",
+       "x": 4,
+       "y": 14,
+       "width": 1,
+@@ -1088,7 +1088,7 @@
+     },
+     {
+       "id": "MAPSEC_POKEMON_LEAGUE",
+-      "name": "POKéMON LEAGUE",
++      "name": "POK\u00e9MON LEAGUE",
+       "x": 2,
+       "y": 3,
+       "width": 1,
+@@ -1112,7 +1112,7 @@
+     },
+     {
+       "id": "MAPSEC_POKEMON_TOWER",
+-      "name": "POKéMON TOWER",
++      "name": "POK\u00e9MON TOWER",
+       "x": 18,
+       "y": 6,
+       "width": 1,
+@@ -1630,6 +1630,30 @@
+       "y": 4,
+       "width": 1,
+       "height": 1
++    },
++    {
++      "id": "MAPSEC_BELLMOOR",
++      "name": "BELLMOOR",
++      "x": 0,
++      "y": 0,
++      "width": 1,
++      "height": 1
++    },
++    {
++      "id": "MAPSEC_GLOAM_WOOD",
++      "name": "GLOAM WOOD",
++      "x": 0,
++      "y": 0,
++      "width": 1,
++      "height": 1
++    },
++    {
++      "id": "MAPSEC_TIDEWAY",
++      "name": "TIDEWAY PATH",
++      "x": 0,
++      "y": 0,
++      "width": 1,
++      "height": 1
+     }
+   ]
+-}
++}
+\ No newline at end of file
+diff --git a/src/data/trainers.party b/src/data/trainers.party
+index fbe4a37f..156f6279 100644
+--- a/src/data/trainers.party
++++ b/src/data/trainers.party
+@@ -16877,3 +16877,20 @@ Double Battle: No
+ Kyogre
+ Level: 5
+ IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
++
++=== TRAINER_ECHO_KIT ===
++Name: KIT
++Class: Bug Catcher
++Pic: Bug Catcher
++Gender: Male
++Music: Male
++Double Battle: No
++AI: Check Bad Move / Try To Faint / Check Viability
++
++Bramblit
++Level: 15
++IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
++
++Gloamoth
++Level: 14
++IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+diff --git a/src/echo_loop.c b/src/echo_loop.c
+index d0f0d7f2..9ce3a6f4 100644
+--- a/src/echo_loop.c
++++ b/src/echo_loop.c
+@@ -35,6 +35,16 @@ static const u8 *const sJournalEntries[ECHO_JOURNAL_COUNT] =
+ {
+     COMPOUND_STRING("The bell tolls at every change of\nlight. After three days, it breaks."),
+     COMPOUND_STRING("Wake. Remember. Change something.\nThe island forgets. I don't."),
++    COMPOUND_STRING("Odette rings the Great Bell in\nGloam Wood on the third night."),
++    COMPOUND_STRING("Tobin: Odette's brother Corin was\nlost at sea ten years ago."),
++    COMPOUND_STRING("Low tide comes once: dawn of Day 2.\nThe shore gives things back then."),
++    COMPOUND_STRING("Corin's compass lies on Tideway\nshore at the Day 2 low tide."),
++    COMPOUND_STRING("Beat Kit in Gloam Wood.\nShard: timing windows widen."),
++    COMPOUND_STRING("Bested the Gloamoth at dusk.\nShard: timing windows widen."),
++    COMPOUND_STRING("Solune walks the wood at dawn.\nIts form follows the day."),
++    COMPOUND_STRING("Odette has the compass. On the\nthird night, she will say goodbye."),
++    NULL, NULL, NULL, NULL, NULL,
++    COMPOUND_STRING("The bell is silent. A fourth day\ndawned. The loop is broken."),
+ };
+ 
+ static const u16 sSoluneForms[ECHO_DAYS_PER_LOOP] = {SPECIES_SOLUNE, SPECIES_SOLUNE_TIDE, SPECIES_SOLUNE_DUSK};
+@@ -234,3 +244,30 @@ void EchoJournal_Buffer(void)
+         s = StringCopy(s, sJournalEntries[i]);
+     }
+ }
++
++void EchoLoop_BufferDayTime(void)
++{
++    u32 phase = VarGet(VAR_ECHO_PHASE);
++    gSpecialVar_0x8000 = phase / ECHO_PHASES_PER_DAY;
++    gSpecialVar_0x8001 = phase % ECHO_PHASES_PER_DAY;
++}
++
++void EchoJournal_Learn(void)
++{
++    u32 flag = FLAG_ECHO_JOURNAL_START + gSpecialVar_0x8004;
++    gSpecialVar_Result = !FlagGet(flag);
++    FlagSet(flag);
++}
++
++void EchoShard_Award(void)
++{
++    EchoJournal_Learn();
++    if (gSpecialVar_Result)
++        VarSet(VAR_ECHO_SHARDS, VarGet(VAR_ECHO_SHARDS) + 1);
++}
++
++void EchoLoop_Break(void)
++{
++    FlagSet(FLAG_ECHO_JOURNAL_START + ECHO_JOURNAL_FREED);
++    FlagClear(FLAG_ECHO_LOOP_ACTIVE);
++}
+diff --git a/src/echo_timing.c b/src/echo_timing.c
+index 3bbb1bcc..f099de7c 100644
+--- a/src/echo_timing.c
++++ b/src/echo_timing.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "event_data.h"
+ #include "battle.h"
+ #include "battle_ai_main.h"
+ #include "battle_controllers.h"
+@@ -218,11 +219,15 @@ void EchoTiming_SetResult(enum EchoTimingKind kind, enum EchoTimingResult result
+ enum EchoTimingResult EchoTiming_Grade(s32 cursorX)
+ {
+     s32 d = cursorX - BAR_CENTER;
++    s32 bonus;
+     if (d < 0)
+         d = -d;
+-    if (d <= PERFECT_RANGE)
++    bonus = VarGet(VAR_ECHO_SHARDS);
++    if (bonus > ECHO_MAX_SHARD_BONUS)
++        bonus = ECHO_MAX_SHARD_BONUS;
++    if (d <= PERFECT_RANGE + bonus)
+         return ECHO_RESULT_PERFECT;
+-    if (d <= GOOD_RANGE)
++    if (d <= GOOD_RANGE + 2 * bonus)
+         return ECHO_RESULT_GOOD;
+     return ECHO_RESULT_MISS;
+ }
+diff --git a/src/new_game.c b/src/new_game.c
+index bc7c53db..7e0f5eae 100644
+--- a/src/new_game.c
++++ b/src/new_game.c
+@@ -217,7 +217,6 @@ void NewGameInitData(void)
+     FlagSet(FLAG_SYS_POKEMON_GET);
+     EchoLoop_Begin();
+     ScriptGiveMon(SPECIES_TICKIT, 15, ITEM_NONE);
+-    ScriptGiveMon(SPECIES_SOLUNE, 15, ITEM_NONE);
+     SetWarpDestination(MAP_GROUP(ECHO_LOOP_START_MAP), MAP_NUM(ECHO_LOOP_START_MAP), WARP_ID_NONE, ECHO_LOOP_START_X, ECHO_LOOP_START_Y);
+     WarpIntoMap();
+ #else
+diff --git a/tools/echo/gen_maps.py b/tools/echo/gen_maps.py
+new file mode 100644
+index 00000000..ad8705a4
+--- /dev/null
++++ b/tools/echo/gen_maps.py
+@@ -0,0 +1,153 @@
++#!/usr/bin/env python3
++"""Pokémon Echo: island of Verran map layouts, authored as carved terrain + building stamps.
++
++Run from repo root: python3 tools/echo/gen_maps.py [--preview DIR]
++Writes data/layouts/<Map>/{map,border}.bin and registers layouts in layouts.json.
++"""
++import json, os, struct, sys
++
++GRASS, TALL, FLOWER = 0x3001, 0x300D, 0x3004
++TREE = ((0x05D4, 0x05D5), (0x05DC, 0x05DD))
++TREE_EDGE = (0x05E4, 0x05E5)          # bottom half of a tree with open ground below
++PATH = ((0x31D0, 0x31D1, 0x31D2), (0x31D8, 0x31D9, 0x31DA), (0x31E0, 0x31E1, 0x31E2))
++SIGN = 0x3403
++STAMPS = {
++    'houseA': [[0x3208, 0x3209, 0x3209, 0x3209, 0x320A], [0x0610, 0x0611, 0x0611, 0x0611, 0x0612],
++               [0x0618, 0x0619, 0x0619, 0x0619, 0x061A], [0x0622, 0x0632, 0x0630, 0x0640, 0x0621],
++               [0x062A, 0x063A, 0x0638, 0x0648, 0x0629]],
++    'houseB': [[0x3208, 0x3209, 0x3209, 0x3209, 0x320A], [0x0610, 0x0611, 0x0611, 0x0611, 0x0612],
++               [0x0618, 0x0619, 0x0619, 0x0619, 0x061A], [0x0620, 0x0640, 0x0631, 0x0632, 0x0623],
++               [0x0628, 0x0648, 0x0639, 0x063A, 0x062B]],
++    'hall':   [[0x320C, 0x3242, 0x3243, 0x320D, 0x320D, 0x320D, 0x320E], [0x0614, 0x064A, 0x064B, 0x0615, 0x0615, 0x0615, 0x0616],
++               [0x0614, 0x0615, 0x0615, 0x0615, 0x0615, 0x0615, 0x0616], [0x061E, 0x060F, 0x060F, 0x062C, 0x0641, 0x062D, 0x061F],
++               [0x0626, 0x0617, 0x0617, 0x0634, 0x0649, 0x0635, 0x0627]],
++}
++DOORS = {'houseA': (3, 4), 'houseB': (1, 4), 'hall': (4, 4)}
++
++
++class Map:
++    def __init__(self, name, w, h):
++        self.name, self.w, self.h = name, w, h
++        self.cells = [['T'] * w for _ in range(h)]
++        self.stamps = []
++        self.raw = {}
++
++    def rect(self, x0, y0, x1, y1, ch):
++        for y in range(y0, y1 + 1):
++            for x in range(x0, x1 + 1):
++                self.cells[y][x] = ch
++        return self
++
++    def put(self, pts, ch):
++        for x, y in pts:
++            self.cells[y][x] = ch
++        return self
++
++    def stamp(self, kind, x, y):
++        self.stamps.append((kind, x, y))
++        dx, dy = DOORS[kind]
++        return (x + dx, y + dy)
++
++    def at(self, x, y):
++        if 0 <= x < self.w and 0 <= y < self.h:
++            return self.cells[y][x]
++        return None
++
++    def block(self, x, y):
++        c = self.cells[y][x]
++        if c == 'T':
++            half = TREE[y % 2][x % 2]
++            below = self.at(x, y + 1)
++            if y % 2 == 1 and below not in ('T', None):
++                return TREE_EDGE[x % 2]
++            return half
++        if c == '.': return GRASS
++        if c == ',': return TALL
++        if c == 'f': return FLOWER
++        if c == 's': return SIGN
++        if c == 'p':
++            same = lambda xx, yy: self.at(xx, yy) in ('p', None)
++            r = 0 if not same(x, y - 1) else 2 if not same(x, y + 1) else 1
++            q = 0 if not same(x - 1, y) else 2 if not same(x + 1, y) else 1
++            return PATH[r][q]
++        if c == 'w':
++            same = lambda xx, yy: self.at(xx, yy) == 'w'
++            top = not same(x, y - 1)
++            if not same(x - 1, y): return 0x10B0 if top else 0x10B8
++            if not same(x + 1, y): return 0x10B2 if top else 0x10BA
++            return 0x10B1 if top else 0x10A1
++        raise ValueError(c)
++
++    def blocks(self):
++        out = [[self.block(x, y) for x in range(self.w)] for y in range(self.h)]
++        for kind, sx, sy in self.stamps:
++            for j, row in enumerate(STAMPS[kind]):
++                for i, v in enumerate(row):
++                    out[sy + j][sx + i] = v
++        for (x, y), v in self.raw.items():
++            out[y][x] = v
++        return out
++
++
++def bellmoor():
++    m = Map('VerranBellmoor', 24, 20)
++    m.rect(2, 2, 21, 17, '.').rect(10, 0, 11, 19, 'p').rect(6, 8, 17, 9, 'p').rect(12, 16, 19, 17, 'p')
++    m.put([(3, 9), (20, 9), (4, 11), (5, 11), (18, 11), (19, 11), (3, 17), (4, 17), (20, 3)], 'f')
++    m.doors = {'odette': m.stamp('houseA', 3, 3), 'tobin': m.stamp('houseB', 15, 3), 'hall': m.stamp('hall', 13, 11)}
++    m.raw[(8, 15)] = SIGN
++    return m
++
++
++def gloamwood():
++    m = Map('VerranGloamWood', 24, 30)
++    for r in [(6, 2, 17, 7), (14, 8, 19, 15), (2, 10, 19, 15), (2, 14, 13, 23), (8, 18, 13, 29), (12, 22, 19, 27)]:
++        m.rect(*r, '.')
++    m.rect(6, 14, 9, 17, ',').rect(14, 22, 19, 25, ',').rect(18, 10, 19, 11, ',')
++    for r in [(16, 8, 17, 11), (4, 12, 17, 13), (4, 14, 5, 19), (4, 20, 11, 21), (10, 22, 11, 29)]:
++        m.rect(*r, 'p')
++    m.put([(9, 4), (10, 4), (13, 4), (14, 4), (7, 6), (16, 6)], 'f')
++    m.raw[(11, 3)] = SIGN
++    return m
++
++
++def tideway():
++    m = Map('VerranTideway', 24, 24)
++    m.rect(8, 0, 13, 5, '.').rect(2, 6, 21, 21, '.').rect(2, 16, 13, 21, 'w')
++    m.rect(10, 0, 11, 15, 'p').rect(12, 12, 19, 13, 'p').rect(14, 6, 19, 9, ',')
++    m.put([(3, 7), (4, 7), (20, 15), (19, 19), (20, 19), (16, 17)], 'f')
++    return m
++
++
++MAPS = [bellmoor, gloamwood, tideway]
++
++
++def write(m):
++    d = f'data/layouts/{m.name}'
++    os.makedirs(d, exist_ok=True)
++    b = m.blocks()
++    open(f'{d}/map.bin', 'wb').write(b''.join(struct.pack('<H', v) for row in b for v in row))
++    open(f'{d}/border.bin', 'wb').write(struct.pack('<4H', 0x1D4, 0x1D5, 0x1DC, 0x1DD))
++    path = 'data/layouts/layouts.json'
++    j = json.load(open(path))
++    lid = 'LAYOUT_' + ''.join('_' + c if c.isupper() else c.upper() for c in m.name).lstrip('_')
++    j['layouts'] = [l for l in j['layouts'] if l.get('id') != lid]
++    j['layouts'].append({'id': lid, 'name': m.name + '_Layout', 'width': m.w, 'height': m.h,
++                         'primary_tileset': 'gTileset_General', 'secondary_tileset': 'gTileset_Petalburg',
++                         'border_filepath': f'{d}/border.bin', 'blockdata_filepath': f'{d}/map.bin',
++                         'layout_version': 'emerald'})
++    json.dump(j, open(path, 'w'), indent=2)
++    open(path, 'a').write('\n')
++    return lid
++
++
++if __name__ == '__main__':
++    built = [f() for f in MAPS]
++    for m in built:
++        print(m.name, write(m), getattr(m, 'doors', ''))
++    if '--preview' in sys.argv:
++        sys.path.insert(0, 'tools/echo')
++        from mapkit import Tileset, render_map
++        ts = Tileset('data/tilesets/primary/general', 'data/tilesets/secondary/petalburg')
++        out = sys.argv[sys.argv.index('--preview') + 1]
++        for m in built:
++            render_map(ts, f'data/layouts/{m.name}/map.bin', m.w, m.h, f'{out}/{m.name}.png')
+diff --git a/tools/echo/gen_world.py b/tools/echo/gen_world.py
+new file mode 100644
+index 00000000..3ef7176e
+--- /dev/null
++++ b/tools/echo/gen_world.py
+@@ -0,0 +1,85 @@
++#!/usr/bin/env python3
++"""Pokémon Echo: island of Verran map headers/events + map group and map section registration."""
++import json, os
++
++def obj(gfx, x, y, script, flag='0', move='MOVEMENT_TYPE_FACE_DOWN', local_id=None, trainer=False, sight=0, elev=3):
++    o = {'graphics_id': 'OBJ_EVENT_GFX_' + gfx, 'x': x, 'y': y, 'elevation': elev, 'movement_type': move,
++         'movement_range_x': 1, 'movement_range_y': 1,
++         'trainer_type': 'TRAINER_TYPE_NORMAL' if trainer else 'TRAINER_TYPE_NONE',
++         'trainer_sight_or_berry_tree_id': str(sight), 'script': script, 'flag': flag}
++    if local_id: o = {'local_id': local_id, **o}
++    return o
++
++def warp(x, y, dest, wid):
++    return {'x': x, 'y': y, 'elevation': 0, 'dest_map': dest, 'dest_warp_id': str(wid)}
++
++def sign(x, y, script):
++    return {'type': 'sign', 'x': x, 'y': y, 'elevation': 0, 'player_facing_dir': 'BG_EVENT_PLAYER_FACING_ANY', 'script': script}
++
++def conn(m, d):
++    return {'map': m, 'offset': 0, 'direction': d}
++
++B, G, T = 'VerranBellmoor', 'VerranGloamWood', 'VerranTideway'
++MAPS = {
++    B: dict(id='MAP_VERRAN_BELLMOOR', layout='LAYOUT_VERRAN_BELLMOOR', music='MUS_DEWFORD', mapsec='MAPSEC_BELLMOOR',
++            type='MAP_TYPE_TOWN', weather='WEATHER_SUNNY', connections=[conn('MAP_VERRAN_GLOAM_WOOD', 'up'), conn('MAP_VERRAN_TIDEWAY', 'down')],
++            objects=[obj('GIRL_2', 14, 11, f'{B}_EventScript_Mira', move='MOVEMENT_TYPE_LOOK_AROUND'),
++                     obj('GENTLEMAN', 19, 13, f'{B}_EventScript_Elder', move='MOVEMENT_TYPE_WANDER_AROUND'),
++                     obj('BOY_1', 4, 13, f'{B}_EventScript_Boy', move='MOVEMENT_TYPE_WANDER_AROUND')],
++            warps=[warp(6, 7, 'MAP_VERRAN_BELLMOOR_ODETTE_HOUSE', 0), warp(16, 7, 'MAP_VERRAN_BELLMOOR_TOBIN_HOUSE', 0),
++                   warp(17, 15, 'MAP_VERRAN_BELLMOOR_BELL_HALL', 0)],
++            bg=[sign(8, 15, f'{B}_EventScript_Sign')]),
++    G: dict(id='MAP_VERRAN_GLOAM_WOOD', layout='LAYOUT_VERRAN_GLOAM_WOOD', music='MUS_PETALBURG_WOODS', mapsec='MAPSEC_GLOAM_WOOD',
++            type='MAP_TYPE_ROUTE', weather='WEATHER_SHADE', connections=[conn('MAP_VERRAN_BELLMOOR', 'down')],
++            objects=[obj('BUG_CATCHER', 5, 14, f'{G}_EventScript_Kit', trainer=True, sight=4),
++                     obj('POOCHYENA', 13, 4, f'{G}_EventScript_Solune', 'FLAG_ECHO_HIDE_SOLUNE', 'MOVEMENT_TYPE_LOOK_AROUND', 'LOCALID_GLOAM_SOLUNE'),
++                     obj('SKITTY', 16, 23, f'{G}_EventScript_Gloamoth', 'FLAG_ECHO_HIDE_GLOAMOTH', 'MOVEMENT_TYPE_WANDER_AROUND', 'LOCALID_GLOAM_GLOAMOTH'),
++                     obj('OLD_WOMAN', 11, 5, f'{G}_EventScript_Odette', 'FLAG_ECHO_HIDE_ODETTE_SHRINE', 'MOVEMENT_TYPE_FACE_UP', 'LOCALID_GLOAM_ODETTE')],
++            warps=[], bg=[sign(11, 3, f'{G}_EventScript_Bell')]),
++    T: dict(id='MAP_VERRAN_TIDEWAY', layout='LAYOUT_VERRAN_TIDEWAY', music='MUS_ROUTE104', mapsec='MAPSEC_TIDEWAY',
++            type='MAP_TYPE_ROUTE', weather='WEATHER_SUNNY', connections=[conn('MAP_VERRAN_BELLMOOR', 'up')],
++            objects=[obj('FISHERMAN', 8, 15, f'{T}_EventScript_Tobin', 'FLAG_ECHO_HIDE_TOBIN_SHORE'),
++                     obj('ITEM_BALL', 3, 15, f'{T}_EventScript_Compass', 'FLAG_ECHO_HIDE_COMPASS', local_id='LOCALID_TIDEWAY_COMPASS'),
++                     obj('ZIGZAGOON_1', 17, 17, f'{T}_EventScript_Tidepup', 'FLAG_ECHO_HIDE_TIDEPUP', 'MOVEMENT_TYPE_WANDER_AROUND', 'LOCALID_TIDEWAY_TIDEPUP'),
++                     obj('SAILOR', 16, 8, f'{T}_EventScript_Sailor', move='MOVEMENT_TYPE_FACE_LEFT')],
++            warps=[], bg=[]),
++    B + '_OdetteHouse': dict(id='MAP_VERRAN_BELLMOOR_ODETTE_HOUSE', layout='LAYOUT_HOUSE1', music='MUS_DEWFORD', mapsec='MAPSEC_BELLMOOR',
++            type='MAP_TYPE_INDOOR', weather='WEATHER_NONE', connections=None,
++            objects=[obj('OLD_WOMAN', 6, 4, f'{B}_OdetteHouse_EventScript_Odette', 'FLAG_ECHO_HIDE_ODETTE_HOME', 'MOVEMENT_TYPE_FACE_DOWN')],
++            warps=[warp(3, 8, 'MAP_VERRAN_BELLMOOR', 0), warp(4, 8, 'MAP_VERRAN_BELLMOOR', 0)], bg=[]),
++    B + '_TobinHouse': dict(id='MAP_VERRAN_BELLMOOR_TOBIN_HOUSE', layout='LAYOUT_HOUSE1', music='MUS_DEWFORD', mapsec='MAPSEC_BELLMOOR',
++            type='MAP_TYPE_INDOOR', weather='WEATHER_NONE', connections=None,
++            objects=[obj('FISHERMAN', 6, 4, f'{B}_TobinHouse_EventScript_Tobin', 'FLAG_ECHO_HIDE_TOBIN_HOME', 'MOVEMENT_TYPE_FACE_DOWN')],
++            warps=[warp(3, 8, 'MAP_VERRAN_BELLMOOR', 1), warp(4, 8, 'MAP_VERRAN_BELLMOOR', 1)], bg=[]),
++    B + '_BellHall': dict(id='MAP_VERRAN_BELLMOOR_BELL_HALL', layout='LAYOUT_LITTLEROOT_TOWN_PROFESSOR_BIRCHS_LAB', music='MUS_DEWFORD', mapsec='MAPSEC_BELLMOOR',
++            type='MAP_TYPE_INDOOR', weather='WEATHER_NONE', connections=None,
++            objects=[obj('OLD_WOMAN', 6, 5, f'{B}_BellHall_EventScript_Odette', 'FLAG_ECHO_HIDE_ODETTE_HALL', 'MOVEMENT_TYPE_FACE_UP'),
++                     obj('SCIENTIST_1', 9, 7, f'{B}_BellHall_EventScript_Archivist', move='MOVEMENT_TYPE_WANDER_AROUND')],
++            warps=[warp(6, 12, 'MAP_VERRAN_BELLMOOR', 2), warp(7, 12, 'MAP_VERRAN_BELLMOOR', 2)], bg=[]),
++}
++SECTIONS = [('MAPSEC_BELLMOOR', 'BELLMOOR'), ('MAPSEC_GLOAM_WOOD', 'GLOAM WOOD'), ('MAPSEC_TIDEWAY', 'TIDEWAY PATH')]
++
++for name, m in MAPS.items():
++    j = {'id': m['id'], 'name': name, 'layout': m['layout'], 'music': m['music'], 'region': 'REGION_HOENN',
++         'region_map_section': m['mapsec'], 'requires_flash': False, 'weather': m['weather'], 'map_type': m['type'],
++         'allow_cycling': m['type'] != 'MAP_TYPE_INDOOR', 'allow_escaping': False, 'allow_running': True,
++         'show_map_name': m['type'] != 'MAP_TYPE_INDOOR', 'battle_scene': 'MAP_BATTLE_SCENE_NORMAL',
++         'connections': m['connections'], 'object_events': m['objects'], 'warp_events': m['warps'],
++         'coord_events': [], 'bg_events': m['bg']}
++    os.makedirs(f'data/maps/{name}', exist_ok=True)
++    json.dump(j, open(f'data/maps/{name}/map.json', 'w'), indent=2)
++
++g = json.load(open('data/maps/map_groups.json'))
++if 'gMapGroup_Verran' not in g['group_order']:
++    g['group_order'].append('gMapGroup_Verran')
++g['gMapGroup_Verran'] = list(MAPS)
++json.dump(g, open('data/maps/map_groups.json', 'w'), indent=2)
++
++p = 'src/data/region_map/region_map_sections.json'
++r = json.load(open(p))
++have = {s['id'] for s in r['map_sections']}
++for sid, nm in SECTIONS:
++    if sid not in have:
++        r['map_sections'].append({'id': sid, 'name': nm, 'x': 0, 'y': 0, 'width': 1, 'height': 1})
++json.dump(r, open(p, 'w'), indent=2)
++print('ok', list(MAPS))
+diff --git a/tools/echo/mapkit.py b/tools/echo/mapkit.py
+new file mode 100644
+index 00000000..a2b5e007
+--- /dev/null
++++ b/tools/echo/mapkit.py
+@@ -0,0 +1,72 @@
++#!/usr/bin/env python3
++"""Pokémon Echo map kit: render tileset metatiles and map layouts to PNG (for authoring/preview)."""
++import struct, sys
++from PIL import Image
++
++def load_pal(path):
++    ln = open(path).read().split('\n')[3:19]
++    return [tuple(int(v) for v in l.split()) for l in ln]
++
++class Tileset:
++    def __init__(self, primary, secondary):
++        self.tiles = []
++        self.pals = [None] * 16
++        self.metas = []
++        for i, d in enumerate((primary, secondary)):
++            im = Image.open(d + '/tiles.png'); w, h = im.size; px = im.load()
++            tiles = []
++            for ty in range(h // 8):
++                for tx in range(w // 8):
++                    tiles.append([[px[tx * 8 + x, ty * 8 + y] & 15 for x in range(8)] for y in range(8)])
++            if i == 0: tiles = (tiles + [tiles[0]] * 512)[:512]
++            self.tiles += tiles
++            for p in range(16):
++                try:
++                    pal = load_pal(f'{d}/palettes/{p:02d}.pal')
++                except Exception: continue
++                if (i == 0 and p < 6) or (i == 1 and p >= 6): self.pals[p] = pal
++            m = open(d + '/metatiles.bin', 'rb').read()
++            metas = [struct.unpack_from('<8H', m, 16 * k) for k in range(len(m) // 16)]
++            if i == 0: metas = (metas + [metas[0]] * 512)[:512]
++            self.metas += metas
++
++    def meta_img(self, mid):
++        im = Image.new('RGB', (16, 16))
++        px = im.load()
++        for layer in range(2):
++            for q in range(4):
++                v = self.metas[mid][layer * 4 + q]
++                t = self.tiles[v & 0x3ff] if (v & 0x3ff) < len(self.tiles) else self.tiles[0]
++                pal = self.pals[v >> 12] or [(255, 0, 255)] * 16
++                for y in range(8):
++                    for x in range(8):
++                        sx = 7 - x if v & 0x400 else x; sy = 7 - y if v & 0x800 else y
++                        c = t[sy][sx]
++                        if layer == 0 or c:
++                            px[(q % 2) * 8 + x, (q // 2) * 8 + y] = pal[c]
++        return im
++
++def atlas(ts, start, count, cols=16, out='atlas.png'):
++    rows = (count + cols - 1) // cols
++    im = Image.new('RGB', (cols * 16, rows * 16))
++    for k in range(count):
++        if start + k < len(ts.metas): im.paste(ts.meta_img(start + k), ((k % cols) * 16, (k // cols) * 16))
++    im.resize((im.width * 2, im.height * 2), Image.NEAREST).save(out)
++
++def render_map(ts, binpath, w, h, out, scale=1):
++    d = open(binpath, 'rb').read(); cache = {}
++    im = Image.new('RGB', (w * 16, h * 16))
++    for y in range(h):
++        for x in range(w):
++            mid = struct.unpack_from('<H', d, 2 * (y * w + x))[0] & 0x3ff
++            if mid not in cache: cache[mid] = ts.meta_img(mid)
++            im.paste(cache[mid], (x * 16, y * 16))
++    if scale != 1: im = im.resize((im.width * scale, im.height * scale), Image.NEAREST)
++    im.save(out)
++
++if __name__ == '__main__':
++    ts = Tileset('data/tilesets/primary/general', 'data/tilesets/secondary/' + (sys.argv[2] if len(sys.argv) > 2 else 'petalburg'))
++    if sys.argv[1] == 'atlas':
++        atlas(ts, 0, 512, out='/home/ubuntu/rom/atlas_primary.png'); atlas(ts, 512, len(ts.metas) - 512, out='/home/ubuntu/rom/atlas_secondary.png')
++    else:
++        render_map(ts, sys.argv[1], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5])
+-- 
+2.34.1
+

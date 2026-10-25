@@ -24,6 +24,11 @@ arm-none-eabi toolchain (Arm GNU Toolchain 13.3 is known to work; pass
 - **New species (drawn by code, no AI):** Tickit (Bug/Steel), Chimell (Steel/Psychic), Gloamoth
   (Bug/Dark), Tidepup (Water), Bramblit (Grass/Fighting) and Solune, whose form, type and moves
   change each day of the loop (Fire -> Water -> Ghost). Regenerate with `tools/echo/gen_species.py`.
+- **Island of Verran (new maps, authored from code):** Bellmoor town, Gloam Wood and Tideway Path
+  (`tools/echo/gen_maps.py`, `tools/echo/gen_world.py`), plus three interiors.
+- **Schedules + mystery:** NPCs and visible wild Pokémon appear by day/phase. Learn why Odette rings the
+  Great Bell, find Corin's compass at the one Day 2 dawn low tide, and break the loop on the third night.
+- **Echo Shards:** earned once (Kit, the dusk Gloamoth) and kept forever; each widens the timing windows.
 - Settings live in `include/config/echo.h`. `ECHO_DEV_QUICKSTART` is a development shortcut.
 
 ## Testing

@@ -1,0 +1,26 @@
+From 60967b040889cb182f2db58fa8c09d1548ff3d3d Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:38:53 +0000
+Subject: [PATCH 7/8] echo: 100 steps per phase
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ include/config/echo.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/config/echo.h b/include/config/echo.h
+index f39f666e..b7d219a7 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -10,7 +10,7 @@
+ #define ECHO_ALWAYS_OBEY      TRUE  // Fixed story levels: party Pokémon never disobey.
+ #define ECHO_NO_RANDOM_WILD   TRUE  // No random grass/water/cave encounters; battles are visible and authored.
+ #define ECHO_NO_DYNAMAX       TRUE  // Smart wild AI would otherwise Dynamax; Echo has no Dynamax.
+-#define ECHO_STEPS_PER_PHASE  5   // Steps between bell tolls (12 phases per loop).
++#define ECHO_STEPS_PER_PHASE  100   // Steps between bell tolls (12 phases per loop).
+ #define ECHO_JOURNAL_COUNT    16
+ #define ECHO_LOOP_START_MONEY 500
+ #define ECHO_LOOP_START_MAP   MAP_ROUTE102  // TODO: Verran start map.
+-- 
+2.34.1
+
