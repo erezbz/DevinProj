@@ -205,3 +205,5 @@ No contact with humans and no money spent. I can make my own decisions about the
   - First run printed "0.00e-5". That was my unit slip (×1e4 instead of ×1e9 for "e-5 cm²/s"), so I fixed it and re-ran the full 95 s example.
   - Result: VACF-integral D = **2.44e-5 cm²/s**, against the MSD block estimate (2.54 ± 0.13)e-5 and Rahman/experiment 2.43e-5.
   - Two independent estimators now agree within the error bar.
+- **06:23**: Added an 11th benchmark to the scorecard: **Green–Kubo** D for free Langevin particles against the exact kT/(mγ), relative error 1.3e-2 (PASS, tolerance 6%). `python -m accusim.validate`: all
+  benchmarks passed. Full suite: **84 passed in 26.54s**.

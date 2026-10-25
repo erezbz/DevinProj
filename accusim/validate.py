@@ -137,7 +137,20 @@ def madelung_dsf():
     return "NaCl Madelung, cutoff DSF (approximate)", 1.747564594633, float(-2 * U / s.n), "", 2e-3
 
 
-BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, madelung_dsf, dt_fusion, decay, mass_action, diffusion, lj_dimer]
+def green_kubo():
+    from .analysis import green_kubo_diffusion
+    from .integrators import Langevin
+    s = System(3)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add("Ar", np.zeros((400, 3)))
+    s.maxwell_boltzmann(300, rng=np.random.default_rng(8))
+    gamma = 1e12
+    tr = Simulation(s, [], integrator=Langevin(300, gamma), dt=Q(20, "fs"), seed=8).run(steps=4000, record_every=5)
+    kT_m = 1.380649e-23 * 300 / s.species[0].mass
+    return "Green-Kubo D = kT/(m gamma), Langevin", kT_m / gamma * 1e4, green_kubo_diffusion(tr, 120) * 1e4, "cm2/s", 0.06
+
+
+BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, madelung_dsf, dt_fusion, decay, mass_action, diffusion, green_kubo, lj_dimer]
 
 
 def main():
