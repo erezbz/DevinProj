@@ -1,0 +1,84 @@
+From 31c4fcc1ad139ac44ab29a407bf4d72a07327a04 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 17:02:10 +0000
+Subject: [PATCH 10/11] echo: balance - Kit lv13/12 without Drain Punch,
+ stronger timing rewards (175/125/75, defend 25/60), dev auto-perfect flag
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ include/config/echo.h   |  1 +
+ src/data/trainers.party |  9 +++++----
+ src/echo_timing.c       | 12 ++++++------
+ 3 files changed, 12 insertions(+), 10 deletions(-)
+
+diff --git a/include/config/echo.h b/include/config/echo.h
+index 4d97e0d9..78e2294c 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -18,6 +18,7 @@
+ #define ECHO_LOOP_START_MAP   MAP_VERRAN_BELLMOOR
+ #define ECHO_LOOP_START_X     10
+ #define ECHO_LOOP_START_Y     11
++#define ECHO_DEV_AUTOPERFECT  FALSE  // Test builds only: meter grades itself Perfect (balance checks).
+ #define ECHO_DEV_QUICKSTART   TRUE  // DEV ONLY: New Game skips the intro and drops you on Route 102 next to a trainer with a test party.
+ 
+ #endif // GUARD_CONFIG_ECHO_H
+diff --git a/src/data/trainers.party b/src/data/trainers.party
+index 156f6279..958ebfaa 100644
+--- a/src/data/trainers.party
++++ b/src/data/trainers.party
+@@ -16888,9 +16888,10 @@ Double Battle: No
+ AI: Check Bad Move / Try To Faint / Check Viability
+ 
+ Bramblit
+-Level: 15
+-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
++Level: 13
++- Mach Punch
++- Vine Whip
++- Bullet Seed
+ 
+ Gloamoth
+-Level: 14
+-IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
++Level: 12
+diff --git a/src/echo_timing.c b/src/echo_timing.c
+index f099de7c..966d9618 100644
+--- a/src/echo_timing.c
++++ b/src/echo_timing.c
+@@ -238,9 +238,9 @@ u32 EchoTiming_DamagePercent(enum EchoTimingKind kind, enum EchoTimingResult res
+     {
+         switch (result)
+         {
+-        case ECHO_RESULT_PERFECT: return 150;
+-        case ECHO_RESULT_GOOD:    return 120;
+-        case ECHO_RESULT_MISS:    return 80;
++        case ECHO_RESULT_PERFECT: return 175;
++        case ECHO_RESULT_GOOD:    return 125;
++        case ECHO_RESULT_MISS:    return 75;
+         default:                  return 100;
+         }
+     }
+@@ -248,8 +248,8 @@ u32 EchoTiming_DamagePercent(enum EchoTimingKind kind, enum EchoTimingResult res
+     {
+         switch (result)
+         {
+-        case ECHO_RESULT_PERFECT: return 50;
+-        case ECHO_RESULT_GOOD:    return 75;
++        case ECHO_RESULT_PERFECT: return 25;
++        case ECHO_RESULT_GOOD:    return 60;
+         default:                  return 100;
+         }
+     }
+@@ -372,7 +372,7 @@ void BS_EchoTiming(void)
+         break;
+     case STATE_SWEEP:
+         cursor = &gSprites[sEcho.spriteIds[3]];
+-        if (JOY_NEW(A_BUTTON))
++        if (ECHO_DEV_AUTOPERFECT ? (sEcho.x >= BAR_CENTER - 1 && sEcho.x <= BAR_CENTER + 1) : JOY_NEW(A_BUTTON))
+         {
+             FinishSweep(EchoTiming_Grade(sEcho.x));
+             break;
+-- 
+2.34.1
+

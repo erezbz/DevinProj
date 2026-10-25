@@ -1,0 +1,46 @@
+From 1c0395446401438aff861448af20ea9759a0c57e Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 17:04:12 +0000
+Subject: [PATCH 11/11] echo: Chimell lv20 + Sitrus Berry; dev auto-perfect
+ test moveset
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ data/maps/VerranGloamWood/scripts.inc | 2 +-
+ src/new_game.c                        | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/data/maps/VerranGloamWood/scripts.inc b/data/maps/VerranGloamWood/scripts.inc
+index 06e425ae..329d16ad 100644
+--- a/data/maps/VerranGloamWood/scripts.inc
++++ b/data/maps/VerranGloamWood/scripts.inc
+@@ -126,7 +126,7 @@ VerranGloamWood_EventScript_Farewell::
+ 	playmoncry SPECIES_CHIMELL, CRY_MODE_ENCOUNTER
+ 	msgbox VerranGloamWood_Text_TollWakes, MSGBOX_DEFAULT
+ 	waitmoncry
+-	setwildbattle SPECIES_CHIMELL, 19
++	setwildbattle SPECIES_CHIMELL, 20, ITEM_SITRUS_BERRY
+ 	dowildbattle
+ 	specialvar VAR_RESULT, GetBattleOutcome
+ 	goto_if_eq VAR_RESULT, B_OUTCOME_WON, VerranGloamWood_EventScript_Freed
+diff --git a/src/new_game.c b/src/new_game.c
+index 7e0f5eae..ce8c9159 100644
+--- a/src/new_game.c
++++ b/src/new_game.c
+@@ -217,6 +217,13 @@ void NewGameInitData(void)
+     FlagSet(FLAG_SYS_POKEMON_GET);
+     EchoLoop_Begin();
+     ScriptGiveMon(SPECIES_TICKIT, 15, ITEM_NONE);
++#if ECHO_DEV_AUTOPERFECT
++    {
++        u16 first = GetMonData(&gPlayerParty[0], MON_DATA_MOVE1);
++        SetMonMoveSlot(&gPlayerParty[0], GetMonData(&gPlayerParty[0], MON_DATA_MOVE4), 0);
++        SetMonMoveSlot(&gPlayerParty[0], first, 3);
++    }
++#endif
+     SetWarpDestination(MAP_GROUP(ECHO_LOOP_START_MAP), MAP_NUM(ECHO_LOOP_START_MAP), WARP_ID_NONE, ECHO_LOOP_START_X, ECHO_LOOP_START_Y);
+     WarpIntoMap();
+ #else
+-- 
+2.34.1
+

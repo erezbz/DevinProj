@@ -14,8 +14,8 @@ arm-none-eabi toolchain (Arm GNU Toolchain 13.3 is known to work; pass
 ```
 
 ## What's in so far
-- **Timing combat:** attacking opens a timing bar (Perfect 150% / Good 120% / Miss 80% damage);
-  foe attacks open a guard bar (Perfect 50% / Good 75% damage taken).
+- **Timing combat:** attacking opens a timing bar (Perfect 175% / Good 125% / Miss 75% damage);
+  foe attacks open a guard bar (Perfect 25% / Good 60% damage taken).
 - **Foe intents:** the action prompt shows what the foe plans this turn.
 - **No grinding:** no EXP, no random encounters, Pokémon always obey; no Dynamax.
 - **Three-day loop:** a bell tolls every 100 steps (Dawn/Day/Dusk/Night x 3 days, with
