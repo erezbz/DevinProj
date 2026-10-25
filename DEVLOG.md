@@ -221,3 +221,4 @@ No contact with humans and no money spent. I can make my own decisions about the
     - NH starting at 120 K (no heating transient): 6.7e-5.
   - Conclusion: it's integration error, about 10x larger than VV, partly from the transient. The test now asserts the convergence ratio (> 2.5x per halving) and < 1e-3, instead of an arbitrary threshold.
   - Full suite: **85 passed in 39.97s**.
+- **06:30**: JSON models accept `"integrator": {"type": "NoseHoover", "temperature": ..., "period": ...}` (unit-checked). Test: the model builds, runs, and its report has the extended-energy row. Full suite: **86 passed in 39.15s**.

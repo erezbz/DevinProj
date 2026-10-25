@@ -55,7 +55,7 @@ from .tree import BarnesHut
 FORCE_TYPES = {"BarnesHut": BarnesHut, "Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "DampedShiftedCoulomb": F.DampedShiftedCoulomb, "LennardJones": F.LennardJones,
                "HarmonicBond": F.HarmonicBond, "HarmonicAngle": F.HarmonicAngle, "UniformField": F.UniformField, "Drag": F.Drag}
 INTEGRATORS = {"VelocityVerlet": I.VelocityVerlet, "Yoshida4": I.Yoshida4, "Langevin": I.Langevin,
-               "Brownian": I.Brownian}
+               "Brownian": I.Brownian, "NoseHoover": I.NoseHoover}
 
 
 def _random_rotation(rng, dim):

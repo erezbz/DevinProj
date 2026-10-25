@@ -52,3 +52,19 @@ def test_json_molecules_build_bonds_angles_and_exclusions():
     rep = sim.accuracy_report()
     assert rep["momentum"].status == "PASS" and rep["angular momentum"].status == "PASS"
     assert rep["energy"].value < 1e-3
+
+
+def test_json_nose_hoover_integrator():
+    model = {
+        "box": "3 nm", "periodic": True, "seed": 1,
+        "species": {"Ar": {"mass": "39.948 u"}},
+        "particles": [{"species": "Ar", "count": 50, "random": True}],
+        "temperature": "150 K",
+        "forces": [{"type": "LennardJones", "params": {"Ar": ["0.996 kJ/mol", "3.405 A"]}}],
+        "integrator": {"type": "NoseHoover", "temperature": "150 K", "period": "0.5 ps"},
+        "dt": "2 fs",
+    }
+    sim, _ = build(json.loads(json.dumps(model)))
+    assert abs(sim.integrator.tau - 0.5e-12) < 1e-18
+    sim.run(steps=20, positions=False)
+    assert "extended energy" in {c.name for c in sim.accuracy_report().checks}
