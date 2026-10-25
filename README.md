@@ -80,6 +80,20 @@ Accuracy report (no failures, 1 warning)
   [WARN] reaction timestep        5.00e-02  max rate*dt of contact reactions: rates biased low by ~2%
 ```
 
+### Molecules in JSON
+
+A `"molecules"` section places copies of a template, either at given centres (`"at"`) or randomly (`"count"`), each with a random orientation.
+Bonds, angles and same-molecule Coulomb exclusions are generated automatically. See `examples/models/water.json` (27 flexible SPC/Fw waters):
+
+```json
+"molecules": [{
+  "atoms":  [["O", ["0 A","0 A","0 A"]], ["H", ["1.012 A","0 A","0 A"]], ["H", ["-0.399 A","0.930 A","0 A"]]],
+  "bonds":  [[0, 1, "735.9 N/m", "1.012 A"], [0, 2, "735.9 N/m", "1.012 A"]],
+  "angles": [[1, 0, 2, "317.6 kJ/mol", 113.24]],
+  "count": 27, "random": true
+}]
+```
+
 ## Preparing and analysing systems
 
 - `minimize(sim)`: FIRE energy minimisation, to relax hand-built structures before dynamics. Tested: it finds the LJ dimer minimum
@@ -119,7 +133,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 71 tests cover:
+`python -m pytest`. The 74 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.

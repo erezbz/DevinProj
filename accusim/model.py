@@ -56,6 +56,48 @@ INTEGRATORS = {"VelocityVerlet": I.VelocityVerlet, "Yoshida4": I.Yoshida4, "Lang
                "Brownian": I.Brownian}
 
 
+def _random_rotation(rng, dim):
+    q, r = np.linalg.qr(rng.normal(size=(dim, dim)))
+    return q * np.sign(np.diag(r))
+
+
+def _molecules(s, specs, rng):
+    """Place copies of molecule templates; return their bond/angle forces and intramolecular exclusions.
+
+    Template: {"atoms": [[species, [x, y, z]], ...] (positions with units, relative),
+               "bonds": [[i, j, k, r0], ...], "angles": [[i, j, l, k, theta0_degrees], ...],
+               "count": n, "random": true}  or  "at": [[x, y, z], ...] instead of count/random.
+    Atoms in the same molecule never interact through Coulomb (standard force-field exclusion).
+    """
+    forces, exclude = [], []
+    for m in specs:
+        species = [a[0] for a in m["atoms"]]
+        rel = np.array([np.asarray(_si(qty(a[1])), dtype=float) for a in m["atoms"]])
+        rel -= rel.mean(axis=0)
+        if "at" in m:
+            centres = np.array([_si(qty(c)) for c in m["at"]], dtype=float)
+        else:
+            if s.box is None:
+                raise ValueError("random molecule placement needs a box")
+            centres = rng.uniform(0, 1, (m["count"], s.dim)) * s.box
+        bond_groups, angle_groups = {}, {}
+        for c in centres:
+            R = _random_rotation(rng, s.dim) if m.get("random", "at" not in m) else np.eye(s.dim)
+            ids = [int(s.add(sp, [c + R @ r])[0]) for sp, r in zip(species, rel)]
+            for i, j, k, r0 in m.get("bonds", []):
+                bond_groups.setdefault((float(_si(qty(k))), float(_si(qty(r0)))), []).append((ids[i], ids[j]))
+            for i, j, l, k, th in m.get("angles", []):
+                angle_groups.setdefault((float(_si(_energy(k))), float(np.deg2rad(th))), []).append((ids[i], ids[j], ids[l]))
+            exclude += [(ids[a], ids[b]) for a in range(len(ids)) for b in range(a + 1, len(ids))]
+        forces += [F.HarmonicBond(b, k=k, r0=r0) for (k, r0), b in bond_groups.items()]
+        forces += [F.HarmonicAngle(a, k=k, theta0=th) for (k, th), a in angle_groups.items()]
+    return forces, exclude
+
+
+def _si(x):
+    return x.value if isinstance(x, Quantity) else x
+
+
 def build(model: dict) -> tuple[Simulation, dict]:
     s = System(model.get("dim", 3), box=qty(model["box"]) if "box" in model else None,
                periodic=model.get("periodic", False))
@@ -69,6 +111,7 @@ def build(model: dict) -> tuple[Simulation, dict]:
             s.add(p["species"], rng.uniform(0, 1, (p["count"], s.dim)) * s.box)
         else:
             s.add(p["species"], qty(p["pos"]), qty(p["vel"]) if "vel" in p else None)
+    mol_forces, exclude = _molecules(s, model.get("molecules", []), rng)
     if "temperature" in model:
         s.maxwell_boltzmann(qty(model["temperature"]), rng)
     forces = []
@@ -79,7 +122,10 @@ def build(model: dict) -> tuple[Simulation, dict]:
             f["params"] = {k: (_energy(e), qty(sg)) for k, (e, sg) in f["params"].items()}
         else:
             f = {k: qty(v) for k, v in f.items()}
+        if kind is F.Coulomb and exclude:
+            f["exclude"] = list(f.get("exclude", [])) + exclude
         forces.append(kind(**f))
+    forces += mol_forces
     reactions = [Reaction(**{k: (qty(v) if k in ("rate", "radius", "separation") else
                                  _energy(v) if k == "energy" else v) for k, v in r.items()})
                  for r in model.get("reactions", [])]

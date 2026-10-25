@@ -1,0 +1,30 @@
+{
+  "_comment": "27 flexible SPC/Fw water molecules in vacuum (Wu, Tepper & Voth 2006). Same-molecule Coulomb pairs are excluded automatically.",
+  "dim": 3, "seed": 3,
+  "species": {
+    "O": {"mass": "15.9994 u", "charge": "-0.82 e"},
+    "H": {"mass": "1.008 u", "charge": "0.41 e"}
+  },
+  "molecules": [{
+    "atoms": [["O", ["0 A", "0 A", "0 A"]], ["H", ["1.012 A", "0 A", "0 A"]], ["H", ["-0.3990 A", "0.9300 A", "0 A"]]],
+    "bonds": [[0, 1, "735.9 N/m", "1.012 A"], [0, 2, "735.9 N/m", "1.012 A"]],
+    "angles": [[1, 0, 2, "317.6 kJ/mol", 113.24]],
+    "at": [["0 nm","0 nm","0 nm"],["0.31 nm","0 nm","0 nm"],["0.62 nm","0 nm","0 nm"],
+           ["0 nm","0.31 nm","0 nm"],["0.31 nm","0.31 nm","0 nm"],["0.62 nm","0.31 nm","0 nm"],
+           ["0 nm","0.62 nm","0 nm"],["0.31 nm","0.62 nm","0 nm"],["0.62 nm","0.62 nm","0 nm"],
+           ["0 nm","0 nm","0.31 nm"],["0.31 nm","0 nm","0.31 nm"],["0.62 nm","0 nm","0.31 nm"],
+           ["0 nm","0.31 nm","0.31 nm"],["0.31 nm","0.31 nm","0.31 nm"],["0.62 nm","0.31 nm","0.31 nm"],
+           ["0 nm","0.62 nm","0.31 nm"],["0.31 nm","0.62 nm","0.31 nm"],["0.62 nm","0.62 nm","0.31 nm"],
+           ["0 nm","0 nm","0.62 nm"],["0.31 nm","0 nm","0.62 nm"],["0.62 nm","0 nm","0.62 nm"],
+           ["0 nm","0.31 nm","0.62 nm"],["0.31 nm","0.31 nm","0.62 nm"],["0.62 nm","0.31 nm","0.62 nm"],
+           ["0 nm","0.62 nm","0.62 nm"],["0.31 nm","0.62 nm","0.62 nm"],["0.62 nm","0.62 nm","0.62 nm"]],
+    "random": true
+  }],
+  "temperature": "300 K",
+  "forces": [
+    {"type": "LennardJones", "params": {"O": ["0.6502 kJ/mol", "3.165492 A"]}, "cutoff": 4},
+    {"type": "Coulomb"}
+  ],
+  "integrator": {"type": "VelocityVerlet"},
+  "dt": "0.2 fs", "duration": "0.5 ps"
+}
