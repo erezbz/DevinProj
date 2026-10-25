@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import numpy as np
 
-from .units import c as C_LIGHT, si
+from .units import c as C_LIGHT
+from .units import si
 
 C2 = C_LIGHT.value ** 2
 

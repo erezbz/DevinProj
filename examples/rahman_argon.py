@@ -12,8 +12,8 @@ from types import SimpleNamespace
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import Langevin, LennardJones, Q, Simulation, System, VelocityVerlet, k_B  # noqa: E402
-from accusim.analysis import msd, rdf  # noqa: E402
+from accusim import Langevin, LennardJones, Q, Simulation, System, VelocityVerlet, k_B
+from accusim.analysis import msd, rdf
 
 t0 = time.perf_counter()
 m = Q(39.948, "u").value

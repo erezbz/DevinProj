@@ -8,7 +8,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import G, Gravity, Q, Simulation, System, Yoshida4  # noqa: E402
+from accusim import G, Gravity, Q, Simulation, System, Yoshida4
 
 
 def plummer(n=400, a=Q(1, "pc").value, m=Q(1, "Msun").value, seed=0):

@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import numpy as np
 
-from .units import G as G_CONST, k_e as KE_CONST, si
+from .units import G as G_CONST
+from .units import k_e as KE_CONST
+from .units import si
 
 
 class Force:

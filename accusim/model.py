@@ -48,7 +48,7 @@ def _energy(x):
     return q
 
 
-from .tree import BarnesHut  # noqa: E402
+from .tree import BarnesHut
 
 FORCE_TYPES = {"BarnesHut": BarnesHut, "Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "LennardJones": F.LennardJones,
                "HarmonicBond": F.HarmonicBond, "HarmonicAngle": F.HarmonicAngle, "UniformField": F.UniformField, "Drag": F.Drag}
@@ -86,8 +86,8 @@ def _molecules(s, specs, rng):
             ids = [int(s.add(sp, [c + R @ r])[0]) for sp, r in zip(species, rel)]
             for i, j, k, r0 in m.get("bonds", []):
                 bond_groups.setdefault((float(_si(qty(k))), float(_si(qty(r0)))), []).append((ids[i], ids[j]))
-            for i, j, l, k, th in m.get("angles", []):
-                angle_groups.setdefault((float(_si(_energy(k))), float(np.deg2rad(th))), []).append((ids[i], ids[j], ids[l]))
+            for i, j, k3, k, th in m.get("angles", []):
+                angle_groups.setdefault((float(_si(_energy(k))), float(np.deg2rad(th))), []).append((ids[i], ids[j], ids[k3]))
             exclude += [(ids[a], ids[b]) for a in range(len(ids)) for b in range(a + 1, len(ids))]
         forces += [F.HarmonicBond(b, k=k, r0=r0) for (k, r0), b in bond_groups.items()]
         forces += [F.HarmonicAngle(a, k=k, theta0=th) for (k, th), a in angle_groups.items()]

@@ -134,7 +134,7 @@ class System:
             self.pos = np.where(high, 2 * self.box - self.pos, self.pos)
             self.vel = np.where(low | high, -self.vel, self.vel)
 
-    def copy(self) -> "System":
+    def copy(self) -> System:
         other = System.__new__(System)
         other.__dict__.update(self.__dict__)
         for k in ("pos", "vel", "sp", "ids", "eint"):

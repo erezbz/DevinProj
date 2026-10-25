@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import Q, Reaction, Simulation, System  # noqa: E402
+from accusim import Q, Reaction, Simulation, System
 
 s = System(3)
 s.add_species("D", Q(2.01410177812, "u"), charge=Q(1, "e"))

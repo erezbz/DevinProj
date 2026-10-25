@@ -7,7 +7,8 @@ import numpy as np
 
 from .integrators import VelocityVerlet
 from .reactions import ReactionEngine
-from .units import c as C_LIGHT, si
+from .units import c as C_LIGHT
+from .units import si
 
 
 @dataclass

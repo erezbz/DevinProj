@@ -9,7 +9,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import Brownian, Q, Reaction, Simulation, System, gillespie  # noqa: E402
+from accusim import Brownian, Q, Reaction, Simulation, System, gillespie
 
 L = 1e-6
 NE, NS = 50, 500

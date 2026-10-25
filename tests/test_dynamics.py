@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
 
-from accusim import (G, Gravity, HarmonicBond, Q, Simulation, System, VelocityVerlet, Yoshida4,
-                     suggest_dt)
+from accusim import G, Gravity, HarmonicBond, Q, Simulation, System, VelocityVerlet, Yoshida4, suggest_dt
 
 
 def kepler(integrator, steps_per_orbit=200, e=0.0):

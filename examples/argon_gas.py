@@ -8,7 +8,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import LennardJones, N_A, Q, Simulation, System, VelocityVerlet, suggest_dt  # noqa: E402
+from accusim import N_A, LennardJones, Q, Simulation, System, VelocityVerlet, suggest_dt
 
 EPS = Q(0.996, "kJ/mol") / N_A   # Rahman 1964: eps/k_B = 120 K
 SIGMA = Q(3.405, "A")

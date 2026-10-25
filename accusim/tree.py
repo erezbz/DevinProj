@@ -8,11 +8,12 @@ from __future__ import annotations
 import numpy as np
 
 from .forces import Force
-from .units import G as G_CONST, si
+from .units import G as G_CONST
+from .units import si
 
 
 class _Node:
-    __slots__ = ("idx", "center", "half", "mass", "com", "children")
+    __slots__ = ("center", "children", "com", "half", "idx", "mass")
 
 
 class BarnesHut(Force):

@@ -9,7 +9,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import Coulomb, HarmonicAngle, HarmonicBond, LennardJones, Q, Simulation, System, VelocityVerlet  # noqa: E402
+from accusim import Coulomb, HarmonicAngle, HarmonicBond, LennardJones, Q, Simulation, System, VelocityVerlet
 
 KCAL = 4184 / 6.02214076e23  # J per kcal/mol
 s = System(3)

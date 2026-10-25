@@ -7,7 +7,7 @@ import pytest
 from accusim import BarnesHut, Gravity
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "examples"))
-from star_cluster import plummer  # noqa: E402
+from star_cluster import plummer
 
 
 def _err(theta, n=1500):

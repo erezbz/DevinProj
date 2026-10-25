@@ -8,7 +8,7 @@ import sys
 import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from accusim import G, Gravity, Q, Simulation, System, Yoshida4, suggest_dt  # noqa: E402
+from accusim import G, Gravity, Q, Simulation, System, Yoshida4, suggest_dt
 
 # name, mass, semi-major axis (au), eccentricity  (approximate J2000 elements)
 BODIES = [

@@ -160,3 +160,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   **energy-error sparkline** (relative error over the whole run, with a cursor at the current frame and the max value). The CLI passes `sim`.
   Headless-Chrome screenshot of the 27-water model: molecules drawn with O–H bonds, energy panel reads "max 3.66e-4". Test parses the
   embedded JSON (54 bonds, 21 energy samples). **75/75 tests pass.**
+- **06:03**: Quality pass. Checked packaging: `pip install` into a clean venv works and `python -m accusim.validate` passes from the installed copy.
+  Ran ruff: no pyflakes errors (no unused names or undefined variables). Applied the safe auto-fixes (import order, stale noqa, sorted `__all__`) and renamed an
+  ambiguous variable. The remaining style notes are one-line semicolons in the matplotlib helpers, left alone. Examples re-run OK. Full suite: **75 passed in 22.80s**.
