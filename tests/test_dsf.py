@@ -50,3 +50,12 @@ def test_dsf_vs_ewald_on_disordered_melt():
     _, ue = Ewald(k=1.0).compute(s)
     _, ud = DampedShiftedCoulomb(rcut=1.99, alpha=0.9, k=1.0).compute(s)
     assert abs(ud / ue - 1) < 3e-2
+
+
+def test_dsf_cell_list_path_matches_dense():
+    s = rocksalt(10)
+    rng = np.random.default_rng(3)
+    s.pos = (s.pos + rng.normal(0, 0.2, s.pos.shape)) % s.box
+    fd, ud = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=10 ** 9).compute(s)
+    fc, uc = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=1).compute(s)
+    assert abs(uc / ud - 1) < 1e-12 and np.allclose(fc, fd, rtol=1e-9, atol=1e-12)

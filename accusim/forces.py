@@ -360,14 +360,15 @@ class Ewald(Force):
 
 
 class DampedShiftedCoulomb(Force):
-    """O(N)-style cutoff electrostatics (damped shifted force, Fennell & Gezelter 2006).
+    """Cutoff electrostatics (damped shifted force, Fennell & Gezelter 2006); O(N) via cell lists for large N.
 
     Pair potential erfc(a r)/r shifted so both energy and force vanish at rcut, plus the
     matching self term. Approximates Ewald for neutral condensed systems at a fraction of the
     cost; compare against Ewald on a snapshot to quantify the error for your system.
     """
 
-    def __init__(self, rcut, alpha=None, k=KE_CONST):
+    def __init__(self, rcut, alpha=None, k=KE_CONST, pairlist_threshold=400):
+        self.pairlist_threshold = pairlist_threshold
         self.k = si(k, "J*m/C^2")
         self.rcut = si(rcut, "m")
         self.alpha = 2.0 / self.rcut if alpha is None else si(alpha, "1/m")
@@ -381,6 +382,20 @@ class DampedShiftedCoulomb(Force):
         c = 2 * a / np.sqrt(np.pi)
         erc = float(_erfc(np.array(a * rc)))
         fshift = erc / rc ** 2 + c * np.exp(-(a * rc) ** 2) / rc
+        if s.n >= self.pairlist_threshold:
+            i, j = cell_list_pairs(s, rc)
+            d = s.pos[j] - s.pos[i]
+            if s.periodic:
+                d -= s.box * np.round(d / s.box)
+            r = np.sqrt(np.einsum("ij,ij->i", d, d))
+            er = _erfc(a * r)
+            qq = q[i] * q[j]
+            U = float(np.sum(qq * (er / r - erc / rc + fshift * (r - rc))))
+            U -= float(np.sum(q ** 2)) * (erc / (2 * rc) + a / np.sqrt(np.pi))
+            fv = (qq * ((er / r ** 2 + c * np.exp(-(a * r) ** 2) / r) - fshift) / r)[:, None] * d
+            np.add.at(f, i, -fv)
+            np.add.at(f, j, fv)
+            return self.k * f, self.k * U
         d, r2 = _pairs(s)
         r = np.sqrt(r2)
         inside = r < rc
