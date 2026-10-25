@@ -230,3 +230,7 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Test: 500 atoms, compared every 20 steps against a skin = 0 force. Forces and energy agree to ≤ 1e-12 relative.
   - Benchmark: 864 atoms, 300 steps, **4.84 s → 1.72 s (2.8x)**, with list rebuilds 302 → 24.
   - Full suite: **87 passed in 47.32s**.
+- **06:32**: Re-ran `examples/rahman_argon.py` with the Verlet skin: wall time **95 s → 33 s**.
+  - Results: D = (2.47 ± 0.10)e-5 (MSD) and 2.44e-5 (Green–Kubo); peak 3.75 Å; energy drift 4.0e-5 (WARN, as before).
+  - The numbers shift a little because a different pair order changes the round-off, and the dynamics is chaotic. Both runs agree with each other and with Rahman's 2.43e-5 within the error bars.
+  - Updated README and EXAMPLES.md. This also fixes a README inaccuracy: it said "laptop-class CPU", but these runs are on a 2-vCPU cloud VM.

@@ -1,6 +1,6 @@
 # Example gallery: what every example's accuracy report says
 
-All examples were run on 2026-10-25 on a 2-vCPU cloud VM (CPU only) from commit `f7a957f`. Each one ends with
+All examples were run on 2026-10-25 on a 2-vCPU cloud VM (CPU only) from commit `f7a957f`; the Rahman row was re-run at `9e255af`. Each one ends with
 `sim.accuracy_report()`. The warnings and failures are left in on purpose: the report is supposed to say when a result shouldn't be trusted.
 
 | Example | Accuracy report | Wall time |
@@ -12,7 +12,7 @@ All examples were run on 2026-10-25 on a 2-vCPU cloud VM (CPU only) from commit 
 | `chemistry.py` | all applicable checks passed | 135.11 s |
 | `enzyme.py` | no failures, 1 warning | 3.94 s |
 | `fusion.py` | PROBLEMS FOUND: 1 failed, 1 warnings | 0.08 s |
-| `rahman_argon.py` | no failures, 1 warning (energy 4.6e-5) | 95 s |
+| `rahman_argon.py` | no failures, 1 warning (energy 4.0e-5) | 33 s (95 s before the Verlet skin) |
 | `molten_salt.py` | 1 warning (DSF vs Ewald 0.12–0.14) | 69 s (216 ions), 254 s (512 ions) |
 
 The gradings are only meaningful in context:
@@ -29,7 +29,7 @@ Physical results checked against the literature (from the examples' own output):
 
 | Example | Quantity | accusim | Reference |
 |---|---|---|---|
-| `rahman_argon.py` | self-diffusion, MSD blocks | (2.54 ± 0.13)e-5 cm²/s | Rahman 1964 / experiment: 2.43e-5 |
+| `rahman_argon.py` | self-diffusion, MSD blocks | (2.47 ± 0.10)e-5 cm²/s | Rahman 1964 / experiment: 2.43e-5 |
 | `rahman_argon.py` | self-diffusion, Green–Kubo | 2.44e-5 cm²/s | 2.43e-5 |
 | `rahman_argon.py` | g(r) first peak | 3.75 Å | ~3.7 Å |
 | `molten_salt.py` | Na–Cl g(r) first peak | 2.59 Å | 2.6–2.8 Å |
