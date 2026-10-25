@@ -201,3 +201,7 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:19**: Trajectories now record **velocities** alongside positions, and they survive `io.save`/`io.load` (round trip checked). New `analysis.vacf` and
   `analysis.green_kubo_diffusion` give a second, independent route to D (the integral of the velocity autocorrelation, next to the MSD slope). Test: free Langevin particles
   (γ = 1e12 /s, 300 K) give C(0) = 3kT/m within 5% and the Green–Kubo D = kT/(mγ) within 6%. Full suite: **84 passed in 26.77s**.
+- **06:19–06:23**: The Rahman example now prints a **Green–Kubo cross-check**.
+  - First run printed "0.00e-5". That was my unit slip (×1e4 instead of ×1e9 for "e-5 cm²/s"), so I fixed it and re-ran the full 95 s example.
+  - Result: VACF-integral D = **2.44e-5 cm²/s**, against the MSD block estimate (2.54 ± 0.13)e-5 and Rahman/experiment 2.43e-5.
+  - Two independent estimators now agree within the error bar.

@@ -13,7 +13,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from accusim import Langevin, LennardJones, Q, Simulation, System, VelocityVerlet, k_B
-from accusim.analysis import msd, rdf
+from accusim.analysis import green_kubo_diffusion, msd, rdf
 
 t0 = time.perf_counter()
 m = Q(39.948, "u").value
@@ -48,6 +48,8 @@ D, dD = np.mean(Ds), (np.std(Ds, ddof=1) / np.sqrt(len(Ds)) if len(Ds) > 1 else 
 r, g = rdf(s, 0.49 * L, bins=120)
 print(f"NVE production {prod_ps:g} ps: mean T = {np.mean(2 * np.array(tr.kinetic) / (3 * (s.n - 1) * k_B.value)):.1f} K")
 print(f"diffusion D = ({D * 1e9:.2f} +/- {dD * 1e9:.2f})e-5 cm^2/s from {len(Ds)} blocks   (Rahman 1964: 2.43e-5, experiment: 2.43e-5)")
+D_gk = green_kubo_diffusion(tr, max_lag=int(round(Q(2, "ps").value / (5 * sim.dt))))
+print(f"Green-Kubo cross-check (VACF integral to 2 ps): D = {D_gk * 1e9:.2f}e-5 cm^2/s")
 print(f"g(r) first peak at {r[np.argmax(g)] * 1e10:.2f} A, height {g.max():.2f}   (Rahman: ~3.7 A)")
 print(sim.accuracy_report())
 print(f"wall time {time.perf_counter() - t0:.0f} s")
