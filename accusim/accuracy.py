@@ -128,8 +128,14 @@ class AccuracyReport:
             bi = [r for r in sim.reactions.reactions if len(r.reactants) == 2]
             if bi:
                 ldt = max(r.rate for r in bi) * sim.dt
-                checks.append(Check("reaction timestep", _grade(ldt, 0.01, 0.1), ldt,
-                                    f"max rate*dt of contact reactions: rates biased low by ~{min(ldt / 2, 1):.0%}"))
+                if ldt > 20:
+                    checks.append(Check("reaction timestep", WARN, ldt,
+                                        "rate*dt >> 1: reactions fire on first contact (diffusion/contact-limited); "
+                                        "the rate constant itself is not resolved"))
+                else:
+                    checks.append(Check("reaction timestep", _grade(ldt, 0.01, 0.1), ldt,
+                                        f"max rate*dt of contact reactions: rates biased low by "
+                                        f"~{1 - (1 - np.exp(-ldt)) / ldt:.0%}"))
 
         from .units import c as C_LIGHT
         beta2 = float(np.max(np.sum(s.vel ** 2, axis=1)) / C_LIGHT.value ** 2) if s.n else 0.0

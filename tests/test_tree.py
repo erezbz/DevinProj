@@ -37,3 +37,11 @@ def test_report_measures_tree_force_error():
     chk = sim.accuracy_report()["force approximation"]
     ferr, _ = _err(0.7, n=600)
     assert chk.status in ("PASS", "WARN") and 0 < chk.value < 2e-2
+
+
+def test_advisor_scales_to_large_tree_runs():
+    from accusim import Simulation
+    from accusim.advisor import timescales
+    s, a, M = plummer(n=10000, seed=3)
+    ts = timescales(Simulation(s, [BarnesHut(softening=0.01 * a)], dt=1e10))
+    assert "gravity (orbital)" in ts and ts["closest approach / speed"] > 0

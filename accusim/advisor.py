@@ -6,23 +6,30 @@ import numpy as np
 from .forces import Coulomb, Gravity, HarmonicBond, LennardJones
 
 
-def timescales(sim) -> dict:
+def timescales(sim, max_rows: int = 1500) -> dict:
     """Shortest characteristic times (s) for each kind of physics present."""
     s = sim.system
     out = {}
     if s.n >= 2:
-        d = s.displacements()
+        from .tree import BarnesHut
+        # rows: all particles for small systems, a random sample for large ones (keeps memory O(N))
+        sub = np.arange(s.n) if s.n <= max_rows else np.random.default_rng(0).choice(s.n, max_rows, replace=False)
+        d = s.pos[None, :, :] - s.pos[sub][:, None, :]
+        if s.periodic:
+            d -= s.box * np.round(d / s.box)
         r = np.sqrt(np.einsum("ijk,ijk->ij", d, d))
-        np.fill_diagonal(r, np.inf)
-        m = s.masses
+        r[np.arange(len(sub)), sub] = np.inf
+        m_all = s.masses
+        m = m_all[sub][:, None] * np.ones((1, s.n))
+        m_col = np.ones((len(sub), 1)) * m_all[None, :]
         for f in sim.forces:
-            if isinstance(f, Gravity):
-                M = m[:, None] + m[None, :]
+            if isinstance(f, (Gravity, BarnesHut)):
+                M = m + m_col
                 out["gravity (orbital)"] = float(np.min(np.sqrt((r ** 2 + f.eps2) ** 1.5 / (f.G * M))))
             elif isinstance(f, Coulomb) and np.any(s.charges):
                 q = s.charges
-                k = np.abs(f.k * q[:, None] * q[None, :])
-                mu = m[:, None] * m[None, :] / (m[:, None] + m[None, :])
+                k = np.abs(f.k * q[sub][:, None] * q[None, :])
+                mu = m * m_col / (m + m_col)
                 with np.errstate(divide="ignore"):
                     t = np.sqrt(mu * (r ** 2 + f.eps2) ** 1.5 / np.where(k > 0, k, np.nan))
                 out["electrostatic"] = float(np.nanmin(t))
@@ -33,10 +40,11 @@ def timescales(sim) -> dict:
                         t = sig_t[i, i] * np.sqrt(sp.mass / eps_t[i, i])
                         out["Lennard-Jones"] = min(out.get("Lennard-Jones", np.inf), float(t))
             elif isinstance(f, HarmonicBond) and f.bonds:
-                out["bond vibration"] = float(2 * np.pi * np.sqrt(np.min(m) / 2 / f.k))
+                out["bond vibration"] = float(2 * np.pi * np.sqrt(np.min(m_all) / 2 / f.k))
         speed = np.max(np.linalg.norm(s.vel, axis=1))
         if speed > 0 and any(not f.external for f in sim.forces):
-            out["closest approach / speed"] = float(np.min(r) / speed)
+            eps2 = max([getattr(f, "eps2", 0.0) for f in sim.forces] or [0.0])
+            out["closest approach / speed"] = float(np.sqrt(np.min(r) ** 2 + eps2) / speed)
     return out
 
 

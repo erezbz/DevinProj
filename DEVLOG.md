@@ -119,3 +119,10 @@ No contact with humans and no money spent. I can make my own decisions about the
   Grades: PASS < 0.02, WARN < 0.1, FAIL above. It is skipped for Brownian dynamics. The first run wrongly FAILed force-free gases,
   because the "closest approach / speed" timescale was being counted when nothing interacts; it now only counts when interaction forces exist.
   Test added. **58/58 tests pass.**
+- **05:51**: Re-ran the examples to see what the new check reports. Two problems:
+  (1) Fusion showed `reaction timestep` FAIL "biased ~100%". Its contact reaction is deliberately instantaneous (rate·dt = 1e6),
+  so it now reports WARN "fires on first contact; rate constant not resolved", and the bias estimate uses the exact 1 − (1 − e^(−x))/x.
+  (2) The advisor built a full N×N distance matrix, so a 10k-star Barnes-Hut run would run out of memory, and it ignored Barnes-Hut and softening.
+  It now samples ≤1500 rows (O(N) memory), treats Barnes-Hut as gravity, and includes softening in closest approach. Test added for 10k stars.
+- **05:52**: 59/59 tests pass. The star cluster still reports `timestep vs physics` WARN (0.062). I kept it: the closest-approach/speed estimate is
+  deliberately conservative, and the energy check (9.6e-8) shows the actual run is fine. Both numbers are shown to the user.
