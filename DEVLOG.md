@@ -253,3 +253,10 @@ No contact with humans and no money spent. I can make my own decisions about the
     - So the constraint forces do no work, and what's left is ordinary integration error. The collision is stiff: the A–A pair sits at r = σ, where the constraint carries the LJ force.
     - The test now asserts < 1e-4 plus a ratio > 3 per halving.
   - Full suite: **90 passed in 42.61s**.
+- **06:37–06:38**: New example `examples/rigid_water.py`: rigid SPC water (3 `Rattle` constraints per molecule), 8 molecules, 2 ps NVE at three timesteps.
+  - Expectation: about 10x larger dt than flexible water. **Not borne out.**
+    - Energy drift: 2.87e-4 at 0.5 fs (WARN), 1.15e-3 at 1 fs (FAIL), 4.83e-3 at 2 fs (FAIL). That's 4.0x and 4.2x per doubling, so clean 2nd order.
+    - Constraint violation: 5e-13 throughout.
+    - Flexible SPC/Fw had 4.1e-4 at 0.2 fs, so rigidity buys ~2.5x. The report's own "timestep vs physics" row (0.44 at 2 fs) points to close O···H electrostatic encounters (4.5 fs) as the new limit.
+  - Wrote that into the example docstring and EXAMPLES.md instead of the "10x" claim in my first draft.
+  - Cost: the pure-Python Gauss–Seidel loop is slow (55 s for 4000 steps), so vectorising it is the obvious next step.

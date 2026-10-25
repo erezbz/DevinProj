@@ -12,6 +12,7 @@ All examples were run on 2026-10-25 on a 2-vCPU cloud VM (CPU only) from commit 
 | `chemistry.py` | all applicable checks passed | 135.11 s |
 | `enzyme.py` | no failures, 1 warning | 3.94 s |
 | `fusion.py` | PROBLEMS FOUND: 1 failed, 1 warnings | 0.08 s |
+| `rigid_water.py` | dt = 2 fs: 2 failed (energy 4.8e-3, timestep); dt = 0.5 fs: energy 2.9e-4 WARN; constraints 5e-13 PASS | 101 s (3 runs) |
 | `rahman_argon.py` | no failures, 1 warning (energy 4.0e-5) | 33 s (95 s before the Verlet skin) |
 | `molten_salt.py` | 1 warning (DSF vs Ewald 0.12–0.14) | 69 s (216 ions), 254 s (512 ions) |
 
@@ -20,6 +21,7 @@ The gradings are only meaningful in context:
 - **fusion: relativity FAIL** is real. D–T fusion makes 14.1 MeV neutrons moving at 0.17 c, and the integrator is Newtonian, so their kinetic energy is about 3% off.
   The reaction energy ledger itself is exact (Q-value benchmark 1.8e-7), but the trajectories of the products aren't.
 - **fusion / enzyme: reaction timestep.** The fusion contact rate is set to "react on contact" on purpose. In the enzyme model rate*dt = 0.1 means the rates come out about 5% low; halve dt for quantitative kinetics.
+- **rigid_water: energy FAIL at 1–2 fs** is real. Making the water rigid only buys ~2.5x in dt here: close O···H Coulomb encounters (~4.5 fs) become the limit, which the timestep row flags.
 - **water_cluster: energy 4e-4 + timestep WARN.** The flexible SPC/Fw O–H stretch is fast compared with dt = 0.2 fs. Halving dt to 0.1 fs (checked) cuts the drift 4.1× to 9.9e-5, as expected for a second-order integrator. That is still a WARN; use a smaller dt or more steps for production energies.
 - **argon_gas: timestep error WARN.** The observed order is 1.6 instead of 2 (dt comes from `suggest_dt`, capped at 5 fs). My hypothesis, not tested: the steep LJ wall means this dt is still outside the asymptotic regime. The absolute error is 1e-6.
 - **molten_salt: DSF vs Ewald WARN.** Cutoff electrostatics with the published settings has about 10% RMS force error (force R² ≈ 0.99). Structure is right
