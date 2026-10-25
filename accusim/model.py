@@ -48,7 +48,9 @@ def _energy(x):
     return q
 
 
-FORCE_TYPES = {"Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "LennardJones": F.LennardJones,
+from .tree import BarnesHut  # noqa: E402
+
+FORCE_TYPES = {"BarnesHut": BarnesHut, "Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "LennardJones": F.LennardJones,
                "HarmonicBond": F.HarmonicBond, "UniformField": F.UniformField, "Drag": F.Drag}
 INTEGRATORS = {"VelocityVerlet": I.VelocityVerlet, "Yoshida4": I.Yoshida4, "Langevin": I.Langevin,
                "Brownian": I.Brownian}

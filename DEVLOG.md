@@ -98,3 +98,9 @@ No contact with humans and no money spent. I can make my own decisions about the
   Validation: the **NaCl Madelung constant**. The first run gave 1.7475665 against the exact 1.7475646 (1.1e-6), which is precisely the
   erfc(3.5) truncation. I raised alpha to 4/rcut and kmax to 12, and now it matches to 1e-7 for 1 and 8 unit cells,
   with zero net force on lattice ions. Ewald forces are checked as the numerical gradient of its energy. 50/50 tests pass.
+- **05:48**: Added a **Barnes-Hut octree** (`accusim/tree.py`). The tree walk is vectorised per node (all particles visiting a node are processed at once).
+  Tests: θ = 0 equals direct summation to 1e-12, θ = 0.3 gives force RMS error < 2e-3, θ = 0.6 gives < 1e-2 (1500-star Plummer).
+  Benchmark: 2000 stars, 0.15 s (direct 0.18 s); 10,000 stars, 1.48 s (direct doesn't fit in memory).
+- **05:48**: Added `viz.export_html`, a **self-contained interactive 3D viewer** (canvas plus about 30 lines of JS, no CDN):
+  drag to rotate, scroll to zoom, play/pause, timeline slider. It is also available as the CLI flag `--html`. Smoke test added.
+  This is the first step from "script" toward "application". 53/53 tests pass.

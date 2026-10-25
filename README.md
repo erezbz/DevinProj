@@ -62,7 +62,15 @@ Accuracy report (all applicable checks passed)
   [PASS] energy                   2.93e-15  ...
 ```
 
+## Interactive 3D viewer
+
+Add `--html out.html` to the CLI, or call `accusim.viz.export_html(trajectory, system, path)`.
+It writes one self-contained HTML file with no internet needed: drag to rotate, scroll to zoom, and a timeline slider.
+
 ## Performance
+
+`BarnesHut(theta=0.5)` gives O(N log N) gravity, with measured force errors under 1% (θ = 0.6) and under 0.2% (θ = 0.3), and θ = 0 exact.
+One force evaluation for 10,000 stars takes 1.5 s; all-pairs gravity doesn't fit in memory at that size.
 
 Lennard-Jones automatically switches to an O(N) cell list once there are 400 or more particles.
 One force evaluation takes 0.044 s for 2,000 atoms (0.36 s with all pairs) and 0.17 s for 8,000 atoms.
@@ -82,7 +90,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 50 tests cover:
+`python -m pytest`. The 53 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.
@@ -91,6 +99,6 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Limits (honest)
 
-- Gravity and Coulomb are still O(N²), so they are practical up to a few thousand bodies. A Barnes-Hut tree is the next step. Lennard-Jones is O(N).
+- Direct Gravity, Coulomb and Ewald are O(N²) in memory. Use `BarnesHut` for large gravitating systems. Ewald is meant for a few thousand ions; PME would be the next step.
 - Kinematics are Newtonian. The relativity check tells you when that stops being valid.
 - Reactions use the Doi contact model; diffusion-limited regimes need a small dt relative to the time particles take to cross the reaction radius.
