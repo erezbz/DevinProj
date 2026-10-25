@@ -4,7 +4,7 @@ distances are held fixed (3 constraints per molecule), which removes the fast O-
 Measured (2 ps NVE): energy drift 2.9e-4 at dt = 0.5 fs, 1.2e-3 at 1 fs and 4.8e-3 at 2 fs (clean 2nd order).
 Bonds hold to 5e-13. So rigidity buys ~2.5x in dt here, not the textbook 10x. The report's
 "timestep vs physics" row says why: close O...H electrostatic encounters (~4.5 fs) now limit dt, and
-8 molecules in vacuum have a small energy scale. Constraints are solved in pure Python, so this is slow.
+8 molecules in vacuum have a small energy scale. Constraints use vectorised M-SHAKE (all 3 runs: ~4 s).
 
 SPC: Berendsen, Postma, van Gunsteren & Hermans, in Intermolecular Forces (1981): r_OH = 1 A, H-O-H = 109.47 deg.
 """

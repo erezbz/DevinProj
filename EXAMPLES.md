@@ -12,7 +12,7 @@ All examples were run on 2026-10-25 on a 2-vCPU cloud VM (CPU only) from commit 
 | `chemistry.py` | all applicable checks passed | 135.11 s |
 | `enzyme.py` | no failures, 1 warning | 3.94 s |
 | `fusion.py` | PROBLEMS FOUND: 1 failed, 1 warnings | 0.08 s |
-| `rigid_water.py` | dt = 2 fs: 2 failed (energy 4.8e-3, timestep); dt = 0.5 fs: energy 2.9e-4 WARN; constraints 5e-13 PASS | 101 s (3 runs) |
+| `rigid_water.py` | dt = 2 fs: 2 failed (energy 4.8e-3, timestep); dt = 0.5 fs: energy 2.9e-4 WARN; constraints ≤ 5e-13 PASS | 4.4 s for 3 runs (101 s with Gauss–Seidel SHAKE) |
 | `rahman_argon.py` | no failures, 1 warning (energy 4.0e-5) | 33 s (95 s before the Verlet skin) |
 | `molten_salt.py` | 1 warning (DSF vs Ewald 0.12–0.14) | 69 s (216 ions), 254 s (512 ions) |
 

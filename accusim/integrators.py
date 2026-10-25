@@ -121,14 +121,16 @@ class Rattle(Integrator):
 
     constraints: [(id_a, id_b, length)] using stable particle IDs. Constraint forces do no work, so energy stays
     conserved; the accuracy report checks the worst relative bond-length violation of the run (`max_violation`).
-    Constraints are solved one at a time (Gauss-Seidel), which also converges for coupled ones (e.g. rigid water).
+    "matrix" solves all constraints together by Newton iteration (M-SHAKE; dense K x K, used for K <= 1500 by
+    default); "gauss-seidel" solves them one at a time (classic SHAKE, no memory cost, slow in Python).
     """
 
     order = 2
     symplectic = True
 
-    def __init__(self, constraints, tol=1e-12, max_iter=1000):
+    def __init__(self, constraints, tol=1e-12, max_iter=1000, method="auto"):
         self.constraints = [(int(a), int(b), si(d, "m")) for a, b, d in constraints]
+        self.method = method  # "matrix" (Newton on all constraints at once, vectorised), "gauss-seidel" or "auto"
         self.tol = tol
         self.max_iter = max_iter
         self.max_violation = 0.0
@@ -142,6 +144,17 @@ class Rattle(Integrator):
         where = {pid: n for n, pid in enumerate(s.ids)}
         cons = [(where[a], where[b], d) for a, b, d in self.constraints if a in where and b in where]
         inv = 1.0 / s.masses
+        use_matrix = self.method == "matrix" or (self.method == "auto" and len(cons) <= 1500)
+        if use_matrix and cons:
+            self._step_matrix(sim, dt, cons, inv)
+        else:
+            self._step_gs(sim, dt, cons, inv)
+        for a, b, d in cons:
+            r = self._mi(s, s.pos[a] - s.pos[b])
+            self.max_violation = max(self.max_violation, abs(np.sqrt(r @ r) - d) / d)
+
+    def _step_gs(self, sim, dt, cons, inv):
+        s = sim.system
         old = [self._mi(s, s.pos[a] - s.pos[b]) for a, b, _ in cons]
         s.vel += 0.5 * dt * sim.acc
         new = s.pos + dt * s.vel
@@ -179,9 +192,39 @@ class Rattle(Integrator):
                 break
         else:
             raise RuntimeError("RATTLE did not converge: reduce dt")
-        for a, b, d in cons:
-            r = self._mi(s, s.pos[a] - s.pos[b])
-            self.max_violation = max(self.max_violation, abs(np.sqrt(r @ r) - d) / d)
+
+    def _step_matrix(self, sim, dt, cons, inv):
+        s = sim.system
+        ia = np.array([c[0] for c in cons])
+        ib = np.array([c[1] for c in cons])
+        d2 = np.array([c[2] for c in cons]) ** 2
+        # C[k, l]: how a unit multiplier on constraint l moves the bond vector of constraint k (per unit vector)
+        C = (inv[ia][:, None] * ((ia[:, None] == ia[None, :]).astype(float) - (ia[:, None] == ib[None, :]))
+             - inv[ib][:, None] * ((ib[:, None] == ia[None, :]).astype(float) - (ib[:, None] == ib[None, :])))
+        ro = self._mi(s, s.pos[ia] - s.pos[ib])
+        s.vel += 0.5 * dt * sim.acc
+        new = s.pos + dt * s.vel
+        for _ in range(self.max_iter):
+            r = self._mi(s, new[ia] - new[ib])
+            diff = d2 - np.einsum("ij,ij->i", r, r)
+            if np.max(np.abs(diff) / d2) <= self.tol:
+                break
+            g = np.linalg.solve(2 * C * (r @ ro.T), diff)
+            for idx, sign in ((ia, 1.0), (ib, -1.0)):
+                dx = sign * (g * inv[idx])[:, None] * ro
+                np.add.at(new, idx, dx)
+                np.add.at(s.vel, idx, dx / dt)
+        else:
+            raise RuntimeError("SHAKE did not converge: reduce dt")
+        s.pos = new
+        s.apply_boundaries()
+        sim.update_forces()
+        s.vel += 0.5 * dt * sim.acc
+        r = self._mi(s, s.pos[ia] - s.pos[ib])
+        rv = np.einsum("ij,ij->i", r, s.vel[ia] - s.vel[ib])
+        mu = np.linalg.solve(C * (r @ r.T), rv)
+        for idx, sign in ((ia, -1.0), (ib, 1.0)):
+            np.add.at(s.vel, idx, sign * (mu * inv[idx])[:, None] * r)
 
 
 class Brownian(Integrator):

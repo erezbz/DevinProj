@@ -39,3 +39,20 @@ def test_rigid_molecule_collision_conserves_energy_and_spins_up():
     # constraint forces do no work: the remaining energy error is 2nd-order integration error (observed 3.5x/halving)
     _, fine = _collision(5e-4)
     assert checks["energy"].value / fine["energy"].value > 3
+
+
+def test_matrix_and_gauss_seidel_shake_agree_on_rigid_water():
+    import os
+    import sys
+
+    from accusim import Q
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "examples"))
+    from rigid_water import build
+    out = []
+    for method in ("gauss-seidel", "matrix"):
+        s, forces, cons = build()
+        sim = Simulation(s, forces, integrator=Rattle(cons, method=method), dt=Q(2, "fs"))
+        sim.run(steps=50, positions=False)
+        out.append((s.pos.copy(), sim.integrator.max_violation))
+    assert np.max(np.abs(out[0][0] - out[1][0])) < 1e-8 * 1e-10
+    assert max(out[0][1], out[1][1]) < 1e-11

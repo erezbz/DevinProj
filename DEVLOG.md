@@ -260,3 +260,8 @@ No contact with humans and no money spent. I can make my own decisions about the
     - Flexible SPC/Fw had 4.1e-4 at 0.2 fs, so rigidity buys ~2.5x. The report's own "timestep vs physics" row (0.44 at 2 fs) points to close O···H electrostatic encounters (4.5 fs) as the new limit.
   - Wrote that into the example docstring and EXAMPLES.md instead of the "10x" claim in my first draft.
   - Cost: the pure-Python Gauss–Seidel loop is slow (55 s for 4000 steps), so vectorising it is the obvious next step.
+- **06:38–06:40**: Vectorised the constraint solver: **M-SHAKE**. Each Newton iteration solves the K×K linear system A·g = σ, with A_kl = 2 C_kl (r_k·r°_l). RATTLE velocities take one exact linear solve.
+  - Used by default up to K = 1500 constraints. Gauss–Seidel stays available as `method="gauss-seidel"` (no K² memory).
+  - Rigid water, 200 steps: **2.93 s → 0.09 s (33x)**. Positions agree with Gauss–Seidel to 3e-8 Å, and the constraint violation is 8.8e-15 vs 5e-13.
+  - New test: both methods agree on 50 steps of rigid water. `rigid_water.py` total: 101 s → ~4.4 s, with identical drift numbers (2.87e-4 / 1.15e-3 / 4.83e-3).
+  - Full suite: ****.
