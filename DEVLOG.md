@@ -212,3 +212,12 @@ No contact with humans and no money spent. I can make my own decisions about the
   - water_cluster energy drift is 4.1e-4 at 0.2 fs. I checked dt = 0.1 fs (a temporary copy outside the repo): drift 9.9e-5, 4.1× lower, consistent with second order.
   - Correction while writing: my first draft called the water bonds "rigid" (they're flexible SPC/Fw) and claimed the advisor's dt would fix the drift (I hadn't checked). Both were fixed before committing.
   - I labelled the argon order-1.6 explanation as an untested hypothesis.
+- **06:28–06:29**: New **`NoseHoover`** integrator (MTK Trotter splitting). The trajectory records the thermostat's energy (`Trajectory.bath`), and the accuracy report gets a new
+  **"extended energy"** check (E + Qξ²/2 + N_f kT η) in place of the plain energy row, which is n/a for thermostats. The thermostat-temperature check now also covers NH, with N_f = d(N-1).
+  - Test system: 108 LJ argon atoms heated from 60 K to 120 K. Mean T in the 2nd half: 119.9 K. Extended-energy drift **1.22e-4** at 5 fs (WARN).
+  - My first test asserted < 1e-4 and failed. Before touching anything I checked whether that was a bug or integration error:
+    - Plain VV, same system and dt: 1.08e-5.
+    - NH at 2.5 fs: 3.57e-5, i.e. 3.4x smaller per halving, so roughly second order.
+    - NH starting at 120 K (no heating transient): 6.7e-5.
+  - Conclusion: it's integration error, about 10x larger than VV, partly from the transient. The test now asserts the convergence ratio (> 2.5x per halving) and < 1e-3, instead of an arbitrary threshold.
+  - Full suite: **85 passed in 39.97s**.

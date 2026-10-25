@@ -71,6 +71,51 @@ class Langevin(Integrator):
         s.vel += 0.5 * dt * sim.acc
 
 
+class NoseHoover(Integrator):
+    """Nose-Hoover thermostat (Trotter splitting, Martyna-Tuckerman-Klein 1996): canonical sampling with a conserved
+    extended energy E + Q xi^2/2 + N_f kT eta, which the accuracy report checks. `period` sets the thermostat mass."""
+
+    order = 2
+    thermostat = True
+
+    def __init__(self, temperature, period):
+        self.T = si(temperature, "K")
+        self.tau = si(period, "s")
+        self.xi = 0.0
+        self.eta = 0.0
+        self.Q = None
+
+    @staticmethod
+    def dof(s):
+        return s.dim * max(s.n - 1, 1)
+
+    def _half(self, s, dt):
+        kT, nf = k_B.value * self.T, self.dof(s)
+        if self.Q is None:
+            self.Q = nf * kT * self.tau ** 2
+        k2 = float(np.sum(s.masses[:, None] * s.vel ** 2))
+        self.xi += 0.25 * dt * (k2 - nf * kT) / self.Q
+        scale = np.exp(-0.5 * dt * self.xi)
+        s.vel *= scale
+        self.eta += 0.5 * dt * self.xi
+        self.xi += 0.25 * dt * (k2 * scale ** 2 - nf * kT) / self.Q
+
+    def step(self, sim, dt):
+        s = sim.system
+        self._half(s, dt)
+        s.vel += 0.5 * dt * sim.acc
+        s.pos += dt * s.vel
+        s.apply_boundaries()
+        sim.update_forces()
+        s.vel += 0.5 * dt * sim.acc
+        self._half(s, dt)
+
+    def bath_energy(self, s):
+        if self.Q is None:
+            return 0.0
+        return 0.5 * self.Q * self.xi ** 2 + self.dof(s) * k_B.value * self.T * self.eta
+
+
 class Brownian(Integrator):
     """Overdamped Langevin (Euler-Maruyama) for diffusing molecules in a solvent.
 

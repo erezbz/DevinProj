@@ -9,7 +9,7 @@ from .accuracy import AccuracyReport
 from .advisor import calibrate_dt, suggest_dt, timescales
 from .analysis import msd, pressure, rdf
 from .forces import Coulomb, Drag, Ewald, DampedShiftedCoulomb, Gravity, HarmonicAngle, HarmonicBond, LennardJones, UniformField
-from .integrators import Brownian, Langevin, VelocityVerlet, Yoshida4
+from .integrators import Brownian, Langevin, NoseHoover, VelocityVerlet, Yoshida4
 from .minimize import minimize
 from .reactions import Reaction, gillespie
 from .simulation import Simulation, Trajectory
@@ -23,8 +23,8 @@ __all__ = [
     "BarnesHut",
     "Brownian",
     "Coulomb",
-    "Drag",
     "DampedShiftedCoulomb",
+    "Drag",
     "Ewald",
     "G",
     "Gravity",
@@ -32,6 +32,7 @@ __all__ = [
     "HarmonicBond",
     "Langevin",
     "LennardJones",
+    "NoseHoover",
     "Q",
     "Quantity",
     "Reaction",

@@ -25,6 +25,7 @@ class Trajectory:
     counts: list = field(default_factory=list)
     positions: list = field(default_factory=list)
     velocities: list = field(default_factory=list)
+    bath: list = field(default_factory=list)
     species: list = field(default_factory=list)
 
     @property
@@ -84,6 +85,8 @@ class Simulation:
         tr.mass.append(self._mass_energy())
         tr.charge.append(float(np.sum(s.charges)))
         tr.counts.append(s.counts())
+        bath = getattr(self.integrator, "bath_energy", None)
+        tr.bath.append(bath(s) if bath else 0.0)
         if positions:
             tr.positions.append(s.pos.copy())
             tr.velocities.append(s.vel.copy())

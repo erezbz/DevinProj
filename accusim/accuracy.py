@@ -78,6 +78,12 @@ class AccuracyReport:
             why = "thermostat" if integ.thermostat else "dissipative force"
             checks.append(Check("energy", NA, None, f"not conserved by design ({why})"))
 
+        if hasattr(integ, "bath_energy") and all(f.conservative for f in sim.forces) and len(tr.bath) == len(tr.t):
+            Ex = E + np.array(tr.bath)
+            dx = float(np.max(np.abs(Ex - Ex[0])) / scale)
+            checks.append(Check("extended energy", _grade(dx, 1e-5, 1e-3), dx,
+                                "Nose-Hoover conserved quantity: E + thermostat energy"))
+
         P = np.array(tr.momentum)
         pscale = max(float(np.sum(s.masses[:, None] * np.abs(s.vel))), 1e-300)
         if not external and not walls and not integ.thermostat:
@@ -103,13 +109,14 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
-        from .integrators import Langevin
-        if isinstance(integ, Langevin) and len(tr.t) >= 4:
+        from .integrators import Langevin, NoseHoover
+        if isinstance(integ, (Langevin, NoseHoover)) and len(tr.t) >= 4:
             from .units import k_B as KB
             half = len(tr.t) // 2
             kin = np.asarray(tr.kinetic[half:])
             n = np.array([sum(c.values()) for c in tr.counts[half:]], dtype=float)
-            T_meas = float(np.mean(2 * kin / (s.dim * np.maximum(n, 1) * KB.value)))
+            dof = s.dim * np.maximum(n - 1, 1) if isinstance(integ, NoseHoover) else s.dim * np.maximum(n, 1)
+            T_meas = float(np.mean(2 * kin / (dof * KB.value)))
             dev = abs(T_meas - integ.T) / integ.T
             tol = max(0.02, 3 * np.sqrt(2 / (s.dim * max(s.n, 1))))
             checks.append(Check("thermostat", PASS if dev <= tol else (WARN if dev <= 0.1 else FAIL), dev,
