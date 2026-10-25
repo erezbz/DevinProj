@@ -189,3 +189,12 @@ No contact with humans and no money spent. I can make my own decisions about the
   First test **failed honestly**: on a barely-perturbed crystal (σ = 0.15 r0) even good DSF settings scored 11–19%. A parameter scan showed why: in a near-perfect
   lattice the Ewald forces nearly cancel, so the *relative* error is inflated. On a disordered melt (σ = 0.4 r0, 512 ions) the error is 0.3–0.6% for
   rc = 2.9–3.9 r0, and 5% for rc = 1.9 r0. The test now uses the melt and checks the PASS/scaling. The caveat is in the check's own detail text. Full suite: **83 passed in 25.50s**.
+- **06:11–06:18**: New example `examples/molten_salt.py`: molten NaCl (Joung–Cheatham LJ + DSF) at the experimental density.
+  - First run: the Na–Cl peak came out at "5.81 Å". That was my bug: I took the argmax of raw pair counts, which grow as r². After dividing by the shell volume, the peak is at **2.59 Å**
+    (experiment 2.6–2.8 Å).
+  - Second issue: a perfect crystal superheats, so a 1100 K Langevin run never melted it. The example now melts at 3000 K, cools to 1100 K, and prints the rms displacement from the
+    lattice as proof (4.8 Å for 216 ions, 5.6 Å for 512).
+  - The "DSF vs Ewald" row then FAILED at ~12–14% even in the real melt, and also with 512 ions at the published rcut = 12 Å (254 s run). An alpha scan (0.1–0.3 /Å)
+    never got below 9%, and the error relative to the *total* force (incl. LJ) was the same. So DSF isn't buggy (the Madelung energy and gradient tests pass). The literature's DSF force correlation
+    R² ≈ 0.99 corresponds to exactly this ~10% RMS force error. Re-graded the check to PASS < 5%, WARN < 20% (with the reason in a code comment), so published settings
+    show as **WARN, not PASS**. The report now says plainly that the cutoff forces are approximate. Full suite: **83 passed in 25.35s**.

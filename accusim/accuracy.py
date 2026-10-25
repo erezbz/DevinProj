@@ -149,7 +149,7 @@ class AccuracyReport:
             F_d = f.compute(s)[0]
             F_e = Ewald(k=f.k).compute(s)[0]
             e = float(np.sqrt(np.mean(np.sum((F_d - F_e) ** 2, 1)) / np.mean(np.sum(F_e ** 2, 1))))
-            checks.append(Check("DSF vs Ewald", _grade(e, 1e-2, 5e-2), e,
+            checks.append(Check("DSF vs Ewald", _grade(e, 5e-2, 2e-1), e,  # published DSF settings give ~0.1 (force R^2 ~ 0.99)
                                 "RMS force error of the cutoff method vs Ewald, final snapshot (inflated for near-crystalline states)"))
         if s.periodic and any(type(f) is Coulomb for f in sim.forces):
             checks.append(Check("electrostatics", WARN, None,
