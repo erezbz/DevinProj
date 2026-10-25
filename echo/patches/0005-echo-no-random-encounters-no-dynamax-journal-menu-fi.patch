@@ -1,0 +1,84 @@
+From 4d3747c4a96b464ead156fae7e914e619f7f81db Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:33:15 +0000
+Subject: [PATCH 5/5] echo: no random encounters, no dynamax, journal menu fix
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ include/config/echo.h | 4 +++-
+ src/battle_dynamax.c  | 3 +++
+ src/echo_loop.c       | 2 +-
+ src/start_menu.c      | 1 +
+ src/wild_encounter.c  | 2 +-
+ 5 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/include/config/echo.h b/include/config/echo.h
+index 1040deee..f39f666e 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -8,7 +8,9 @@
+ #define ECHO_SMART_WILD       TRUE  // Wild Pokémon use the battle AI (needed for intents).
+ 
+ #define ECHO_ALWAYS_OBEY      TRUE  // Fixed story levels: party Pokémon never disobey.
+-#define ECHO_STEPS_PER_PHASE  100   // Steps between bell tolls (12 phases per loop).
++#define ECHO_NO_RANDOM_WILD   TRUE  // No random grass/water/cave encounters; battles are visible and authored.
++#define ECHO_NO_DYNAMAX       TRUE  // Smart wild AI would otherwise Dynamax; Echo has no Dynamax.
++#define ECHO_STEPS_PER_PHASE  5   // Steps between bell tolls (12 phases per loop).
+ #define ECHO_JOURNAL_COUNT    16
+ #define ECHO_LOOP_START_MONEY 500
+ #define ECHO_LOOP_START_MAP   MAP_ROUTE102  // TODO: Verran start map.
+diff --git a/src/battle_dynamax.c b/src/battle_dynamax.c
+index bf99cb0e..0008a4a7 100644
+--- a/src/battle_dynamax.c
++++ b/src/battle_dynamax.c
+@@ -75,6 +75,9 @@ bool32 CanDynamax(enum BattlerId battler)
+     enum Species species = GetBattlerVisualSpecies(battler);
+     enum HoldEffect holdEffect = GetBattlerHoldEffectIgnoreNegation(battler);
+ 
++    if (ECHO_NO_DYNAMAX && !TESTING)
++        return FALSE;
++
+     // Prevents Zigzagoon from dynamaxing in vanilla.
+     if (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE && !IsOnPlayerSide(battler))
+         return FALSE;
+diff --git a/src/echo_loop.c b/src/echo_loop.c
+index 87a04f6e..6af56526 100644
+--- a/src/echo_loop.c
++++ b/src/echo_loop.c
+@@ -27,7 +27,7 @@ static const u8 *const sPhaseNames[ECHO_PHASES_PER_DAY] =
+     COMPOUND_STRING("Night"),
+ };
+ 
+-static const u8 sPhaseHours[ECHO_PHASES_PER_DAY] = {6, 12, 18, 22};
++static const u8 sPhaseHours[ECHO_PHASES_PER_DAY] = {8, 13, 19, 23};
+ 
+ static const u8 *const sJournalEntries[ECHO_JOURNAL_COUNT] =
+ {
+diff --git a/src/start_menu.c b/src/start_menu.c
+index 36f05e1f..1af809dd 100644
+--- a/src/start_menu.c
++++ b/src/start_menu.c
+@@ -663,6 +663,7 @@ static bool8 HandleStartMenuInput(void)
+             && gMenuCallback != StartMenuExitCallback
+             && gMenuCallback != StartMenuDebugCallback
+             && gMenuCallback != StartMenuSafariZoneRetireCallback
++            && gMenuCallback != StartMenuJournalCallback
+             && gMenuCallback != StartMenuBattlePyramidRetireCallback)
+         {
+            FadeScreen(FADE_TO_BLACK, 0);
+diff --git a/src/wild_encounter.c b/src/wild_encounter.c
+index dd6a0c88..fa9fccea 100644
+--- a/src/wild_encounter.c
++++ b/src/wild_encounter.c
+@@ -668,7 +668,7 @@ bool8 StandardWildEncounter(u16 curMetatileBehavior, u16 prevMetatileBehavior)
+     enum TimeOfDay timeOfDay;
+     struct Roamer *roamer;
+ 
+-    if (sWildEncountersDisabled == TRUE)
++    if (sWildEncountersDisabled == TRUE || ECHO_NO_RANDOM_WILD)
+         return FALSE;
+ 
+     headerId = GetCurrentMapWildMonHeaderId();
+-- 
+2.34.1
+

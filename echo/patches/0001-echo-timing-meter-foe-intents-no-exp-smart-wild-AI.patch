@@ -1,0 +1,638 @@
+From ca683b64e545cbf878cabf775eb39c02c0469ba5 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:16:44 +0000
+Subject: [PATCH 1/5] echo: timing meter, foe intents, no exp, smart wild AI
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ data/battle_scripts_1.s                    |   4 +
+ include/battle_scripts.h                   |   1 +
+ include/config/echo.h                      |  10 +
+ include/config/general.h                   |   1 +
+ include/constants/battle_move_resolution.h |   1 +
+ include/echo_timing.h                      |  28 ++
+ src/battle_controller_player.c             |   5 +
+ src/battle_main.c                          |   3 +
+ src/battle_move_resolution.c               |  15 +-
+ src/battle_script_commands.c               |   3 +
+ src/echo_timing.c                          | 410 +++++++++++++++++++++
+ 11 files changed, 480 insertions(+), 1 deletion(-)
+ create mode 100644 include/config/echo.h
+ create mode 100644 include/echo_timing.h
+ create mode 100644 src/echo_timing.c
+
+diff --git a/data/battle_scripts_1.s b/data/battle_scripts_1.s
+index 4745ed0f..610c35da 100644
+--- a/data/battle_scripts_1.s
++++ b/data/battle_scripts_1.s
+@@ -6454,3 +6454,7 @@ BattleScript_BelchFails::
+ 	printstring STRINGID_BELCHCANTSELECT
+ 	waitmessage B_WAIT_TIME_LONG
+ 	goto BattleScript_MoveEnd
++
++BattleScript_EchoTiming::
++	callnative BS_EchoTiming
++	return
+diff --git a/include/battle_scripts.h b/include/battle_scripts.h
+index f52800db..da5c9cac 100644
+--- a/include/battle_scripts.h
++++ b/include/battle_scripts.h
+@@ -322,6 +322,7 @@ extern const u8 BattleScript_MoveUsedIsThroatChopPrevented[];
+ extern const u8 BattleScript_SelectingNotAllowedMoveThroatChopInPalace[];
+ extern const u8 BattleScript_ThroatChopEndTurn[];
+ extern const u8 BattleScript_GemActivates[];
++extern const u8 BattleScript_EchoTiming[];
+ extern const u8 BattleScript_BerryReduceAnimation[];
+ extern const u8 BattleScript_BerryReduceDmg[];
+ extern const u8 BattleScript_ItemStatChange[];
+diff --git a/include/config/echo.h b/include/config/echo.h
+new file mode 100644
+index 00000000..151bab08
+--- /dev/null
++++ b/include/config/echo.h
+@@ -0,0 +1,10 @@
++#ifndef GUARD_CONFIG_ECHO_H
++#define GUARD_CONFIG_ECHO_H
++
++// Pokémon Echo: skill-based battle and progression settings.
++#define ECHO_TIMING_ENABLED   TRUE  // Timing meter on every damaging move (attack bonus / guard).
++#define ECHO_SHOW_INTENT      TRUE  // Action prompt shows what the foe plans to do this turn.
++#define ECHO_NO_EXP           TRUE  // No experience from battles; levels come from story progress.
++#define ECHO_SMART_WILD       TRUE  // Wild Pokémon use the battle AI (needed for intents).
++
++#endif // GUARD_CONFIG_ECHO_H
+diff --git a/include/config/general.h b/include/config/general.h
+index ad075fbd..ba2425c2 100644
+--- a/include/config/general.h
++++ b/include/config/general.h
+@@ -88,3 +88,4 @@
+ #define AUTO_LOWERCASE_KEYBOARD      GEN_LATEST  // Starting in GEN_6, after entering the first uppercase character, the keyboard switches to lowercase letters.
+ 
+ #endif // GUARD_CONFIG_GENERAL_H
++#include "config/echo.h"
+diff --git a/include/constants/battle_move_resolution.h b/include/constants/battle_move_resolution.h
+index b86d3dc1..82c770c9 100644
+--- a/include/constants/battle_move_resolution.h
++++ b/include/constants/battle_move_resolution.h
+@@ -89,6 +89,7 @@ enum CancelerState
+     CANCELER_SUBSTITUTE,
+     CANCELER_ACCURACY_CHECK,
+     CANCELER_PRE_ATTACK_MOVE_EFFECT,
++    CANCELER_ECHO_TIMING,
+     CANCELER_DAMAGE_CALC,
+     CANCELER_PRE_ANIM_ACTIVATIONS,
+     CANCELER_MOVE_ANIMATION,
+diff --git a/include/echo_timing.h b/include/echo_timing.h
+new file mode 100644
+index 00000000..f278cb35
+--- /dev/null
++++ b/include/echo_timing.h
+@@ -0,0 +1,28 @@
++#ifndef GUARD_ECHO_TIMING_H
++#define GUARD_ECHO_TIMING_H
++
++enum EchoTimingKind
++{
++    ECHO_TIMING_NONE,
++    ECHO_TIMING_ATTACK,
++    ECHO_TIMING_DEFEND,
++};
++
++enum EchoTimingResult
++{
++    ECHO_RESULT_NONE,
++    ECHO_RESULT_MISS,
++    ECHO_RESULT_GOOD,
++    ECHO_RESULT_PERFECT,
++};
++
++void EchoTiming_Reset(void);
++bool32 EchoTiming_ShouldRun(u32 battlerAtk, u32 battlerDef, u32 move);
++s32 EchoTiming_ModifyDamage(u32 battlerAtk, u32 battlerDef, s32 dmg);
++u32 EchoTiming_DamagePercent(enum EchoTimingKind kind, enum EchoTimingResult result);
++enum EchoTimingResult EchoTiming_Grade(s32 cursorX);
++void EchoTiming_SetResult(enum EchoTimingKind kind, enum EchoTimingResult result);
++bool32 EchoTiming_BuildIntentString(u8 *dst);
++void BS_EchoTiming(void);
++
++#endif // GUARD_ECHO_TIMING_H
+diff --git a/src/battle_controller_player.c b/src/battle_controller_player.c
+index 7553ca61..a1b623c9 100644
+--- a/src/battle_controller_player.c
++++ b/src/battle_controller_player.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "echo_timing.h"
+ #include "battle.h"
+ #include "battle_anim.h"
+ #include "battle_arena.h"
+@@ -2053,6 +2054,10 @@ static void PlayerHandleChooseAction(enum BattlerId battler)
+         }
+         BattlePutTextOnWindow(gStringVar1, B_WIN_ACTION_PROMPT);
+     }
++    else if (EchoTiming_BuildIntentString(gStringVar1))
++    {
++        BattlePutTextOnWindow(gStringVar1, B_WIN_ACTION_PROMPT);
++    }
+     else
+     {
+         BattlePutTextOnWindow(gDisplayedStringBattle, B_WIN_ACTION_PROMPT);
+diff --git a/src/battle_main.c b/src/battle_main.c
+index a8da2e1c..9b75fd17 100644
+--- a/src/battle_main.c
++++ b/src/battle_main.c
+@@ -5813,6 +5813,9 @@ void ScriptSetTotemBoost(struct ScriptContext *ctx)
+ 
+ bool32 IsWildMonSmart(void)
+ {
++#if ECHO_SMART_WILD && !TESTING
++    return TRUE;
++#endif
+ #if WE_SMART_WILD_AI_FLAG != 0
+     return (FlagGet(WE_SMART_WILD_AI_FLAG));
+ #else
+diff --git a/src/battle_move_resolution.c b/src/battle_move_resolution.c
+index bbf444af..3ba7dd76 100644
+--- a/src/battle_move_resolution.c
++++ b/src/battle_move_resolution.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "echo_timing.h"
+ #include "battle.h"
+ #include "battle_arena.h"
+ #include "battle_environment.h"
+@@ -51,6 +52,7 @@ static bool32 CutThirdOfHp(enum BattlerId battler);
+ 
+ static enum CancelerResult CancelerClearFlags(struct BattleCalcValues *cv)
+ {
++    EchoTiming_Reset();
+     gBattleMons[cv->battlerAtk].volatiles.grudge = FALSE;
+     gBattleMons[cv->battlerAtk].volatiles.glaiveRush = FALSE;
+     gBattleStruct->eventState.atkCancelerBattler = 0;
+@@ -2668,7 +2670,7 @@ static enum CancelerResult CancelerDamageCalc(struct BattleCalcValues *cv)
+             continue;
+ 
+         ctx.battlerDef = battlerDef;
+-        gBattleStruct->moveDamage[battlerDef] = CalculateMoveDamage(&ctx);
++        gBattleStruct->moveDamage[battlerDef] = EchoTiming_ModifyDamage(cv->battlerAtk, battlerDef, CalculateMoveDamage(&ctx));
+     }
+ 
+     if (gSpecialStatuses[cv->battlerAtk].gemBoost
+@@ -3085,6 +3087,16 @@ static enum CancelerResult CancelerMoveDamageUpdate(struct BattleCalcValues *cv)
+     return CANCELER_RESULT_RUN_SCRIPT_AND_INCREMENT; // Update hp
+ }
+ 
++static enum CancelerResult CancelerEchoTiming(struct BattleCalcValues *cv)
++{
++    if (EchoTiming_ShouldRun(cv->battlerAtk, gBattlerTarget, cv->move))
++    {
++        BattleScriptCall(BattleScript_EchoTiming);
++        return CANCELER_RESULT_RUN_SCRIPT_AND_INCREMENT;
++    }
++    return CANCELER_RESULT_SUCCESS;
++}
++
+ static enum CancelerResult (*const sMoveSuccessOrderCancelers[])(struct BattleCalcValues *cv) =
+ {
+     [CANCELER_CLEAR_FLAGS] = CancelerClearFlags,
+@@ -3137,6 +3149,7 @@ static enum CancelerResult (*const sMoveSuccessOrderCancelers[])(struct BattleCa
+     [CANCELER_SUBSTITUTE] = CancelerSubstitute,
+     [CANCELER_ACCURACY_CHECK] = CancelerAccuracyCheck,
+     [CANCELER_PRE_ATTACK_MOVE_EFFECT] = CancelerPreAttackMoveEffect,
++    [CANCELER_ECHO_TIMING] = CancelerEchoTiming,
+     [CANCELER_DAMAGE_CALC] = CancelerDamageCalc,
+     [CANCELER_PRE_ANIM_ACTIVATIONS] = CancelerPreAnimActivations,
+     [CANCELER_MOVE_ANIMATION] = CancelerMoveAnimation,
+diff --git a/src/battle_script_commands.c b/src/battle_script_commands.c
+index 98877b90..0bcbded2 100644
+--- a/src/battle_script_commands.c
++++ b/src/battle_script_commands.c
+@@ -2098,6 +2098,9 @@ FEATURE_FLAG_ASSERT(I_EXP_SHARE_FLAG, YouNeedToSetTheExpShareFlagToAnUnusedFlag)
+ 
+ static bool32 BattleTypeAllowsExp(void)
+ {
++#if ECHO_NO_EXP && !TESTING
++    return FALSE;
++#endif
+     if (RECORDED_WILD_BATTLE)
+         return TRUE;
+     else if (gBattleTypeFlags &
+diff --git a/src/echo_timing.c b/src/echo_timing.c
+new file mode 100644
+index 00000000..3e8e9b51
+--- /dev/null
++++ b/src/echo_timing.c
+@@ -0,0 +1,410 @@
++#include "global.h"
++#include "battle.h"
++#include "battle_ai_main.h"
++#include "battle_controllers.h"
++#include "battle_util.h"
++#include "echo_timing.h"
++#include "main.h"
++#include "palette.h"
++#include "sound.h"
++#include "sprite.h"
++#include "string_util.h"
++#include "test_runner.h"
++#include "constants/rgb.h"
++#include "constants/songs.h"
++
++// Pokémon Echo timing meter: a cursor sweeps across a bar; pressing A near the
++// centre powers up the player's attack, or guards against the foe's attack.
++
++#define BAR_WIDTH       96
++#define BAR_CENTER      (BAR_WIDTH / 2)
++#define PERFECT_RANGE   3
++#define GOOD_RANGE      12
++#define METER_X         (DISPLAY_WIDTH / 2)
++#define METER_Y         100
++#define ATTACK_BOUNCES  4
++#define RESULT_FRAMES   36
++
++#define TAG_ECHO_BAR    0x7E40
++#define TAG_ECHO_CURSOR 0x7E41
++#define TAG_ECHO_PAL    0x7E40
++
++enum
++{
++    COL_CLEAR,
++    COL_OUTLINE,
++    COL_MISS,
++    COL_GOOD,
++    COL_PERFECT,
++    COL_WHITE,
++    COL_ATTACK,
++    COL_DEFEND,
++};
++
++enum
++{
++    STATE_INIT,
++    STATE_SWEEP,
++    STATE_SHOW_RESULT,
++    STATE_FINISH,
++};
++
++struct EchoTimingState
++{
++    u8 kind;
++    u8 result;
++    u8 done;
++    u8 state;
++    s16 x;
++    s8 dir;
++    u8 speed;
++    u8 bounces;
++    u8 timer;
++    u8 spriteIds[4];
++};
++
++static EWRAM_DATA struct EchoTimingState sEcho = {0};
++static EWRAM_DATA u8 sBarTiles[(BAR_WIDTH / 8) * TILE_SIZE_4BPP] = {0};
++static EWRAM_DATA u8 sCursorTiles[2 * TILE_SIZE_4BPP] = {0};
++
++static const u16 sEchoPalette[16] =
++{
++    RGB(0, 0, 0), RGB(3, 3, 6), RGB(24, 6, 4), RGB(30, 24, 4),
++    RGB(6, 28, 8), RGB(31, 31, 31), RGB(31, 16, 2), RGB(6, 16, 31),
++};
++
++static const struct OamData sOamBar =
++{
++    .shape = SPRITE_SHAPE(32x8),
++    .size = SPRITE_SIZE(32x8),
++    .priority = 0,
++};
++
++static const struct OamData sOamCursor =
++{
++    .shape = SPRITE_SHAPE(8x16),
++    .size = SPRITE_SIZE(8x16),
++    .priority = 0,
++};
++
++static const struct SpriteTemplate sBarTemplate =
++{
++    .tileTag = TAG_ECHO_BAR,
++    .paletteTag = TAG_ECHO_PAL,
++    .oam = &sOamBar,
++    .anims = gDummySpriteAnimTable,
++    .images = NULL,
++    .affineAnims = gDummySpriteAffineAnimTable,
++    .callback = SpriteCallbackDummy,
++};
++
++static const struct SpriteTemplate sCursorTemplate =
++{
++    .tileTag = TAG_ECHO_CURSOR,
++    .paletteTag = TAG_ECHO_PAL,
++    .oam = &sOamCursor,
++    .anims = gDummySpriteAnimTable,
++    .images = NULL,
++    .affineAnims = gDummySpriteAffineAnimTable,
++    .callback = SpriteCallbackDummy,
++};
++
++static void SetPixel(u8 *tiles, u32 widthTiles, u32 x, u32 y, u32 color)
++{
++    u32 tile = (y / 8) * widthTiles + (x / 8);
++    u32 offset = tile * TILE_SIZE_4BPP + ((y % 8) * 8 + (x % 8)) / 2;
++    if (x & 1)
++        tiles[offset] = (tiles[offset] & 0x0F) | (color << 4);
++    else
++        tiles[offset] = (tiles[offset] & 0xF0) | color;
++}
++
++static u32 ZoneColor(s32 x)
++{
++    switch (EchoTiming_Grade(x))
++    {
++    case ECHO_RESULT_PERFECT:
++        return COL_PERFECT;
++    case ECHO_RESULT_GOOD:
++        return COL_GOOD;
++    default:
++        return COL_MISS;
++    }
++}
++
++static void DrawMeterTiles(u32 kind)
++{
++    u32 x, y;
++    u32 cursorColor = (kind == ECHO_TIMING_ATTACK) ? COL_ATTACK : COL_DEFEND;
++
++    for (y = 0; y < 8; y++)
++    {
++        for (x = 0; x < BAR_WIDTH; x++)
++        {
++            u32 color = (y == 0 || y == 7 || x == 0 || x == BAR_WIDTH - 1) ? COL_OUTLINE : ZoneColor(x);
++            SetPixel(sBarTiles, BAR_WIDTH / 8, x, y, color);
++        }
++    }
++    // Cursor tiles are stacked vertically in 1D mapping: treat as 1 tile wide.
++    for (y = 0; y < 16; y++)
++    {
++        for (x = 0; x < 8; x++)
++        {
++            u32 color = COL_CLEAR;
++            if (x == 2 || x == 5 || y == 0 || y == 15)
++                color = (x >= 2 && x <= 5) ? COL_OUTLINE : COL_CLEAR;
++            if (x >= 3 && x <= 4 && y >= 1 && y <= 14)
++                color = (y >= 6 && y <= 9) ? COL_WHITE : cursorColor;
++            SetPixel(sCursorTiles, 1, x, y, color);
++        }
++    }
++}
++
++static void CreateMeter(void)
++{
++    u32 i;
++    struct SpriteSheet barSheet = {sBarTiles, sizeof(sBarTiles), TAG_ECHO_BAR};
++    struct SpriteSheet cursorSheet = {sCursorTiles, sizeof(sCursorTiles), TAG_ECHO_CURSOR};
++    struct SpritePalette pal = {sEchoPalette, TAG_ECHO_PAL};
++
++    DrawMeterTiles(sEcho.kind);
++    LoadSpriteSheet(&barSheet);
++    LoadSpriteSheet(&cursorSheet);
++    LoadSpritePalette(&pal);
++
++    for (i = 0; i < 3; i++)
++    {
++        u8 id = CreateSprite(&sBarTemplate, METER_X - BAR_CENTER + 16 + 32 * i, METER_Y, 1);
++        gSprites[id].oam.tileNum += 4 * i;
++        sEcho.spriteIds[i] = id;
++    }
++    sEcho.spriteIds[3] = CreateSprite(&sCursorTemplate, METER_X - BAR_CENTER, METER_Y, 0);
++}
++
++static void DestroyMeter(void)
++{
++    u32 i;
++    for (i = 0; i < ARRAY_COUNT(sEcho.spriteIds); i++)
++        DestroySprite(&gSprites[sEcho.spriteIds[i]]);
++    FreeSpriteTilesByTag(TAG_ECHO_BAR);
++    FreeSpriteTilesByTag(TAG_ECHO_CURSOR);
++    FreeSpritePaletteByTag(TAG_ECHO_PAL);
++}
++
++static bool32 IsHumanBattler(u32 battler)
++{
++    u32 position = GetBattlerPosition(battler);
++    if (position == B_POSITION_PLAYER_LEFT)
++        return TRUE;
++    if (position == B_POSITION_PLAYER_RIGHT)
++        return !(gBattleTypeFlags & (BATTLE_TYPE_INGAME_PARTNER | BATTLE_TYPE_MULTI));
++    return FALSE;
++}
++
++void EchoTiming_Reset(void)
++{
++    sEcho.kind = ECHO_TIMING_NONE;
++    sEcho.result = ECHO_RESULT_NONE;
++    sEcho.done = FALSE;
++}
++
++void EchoTiming_SetResult(enum EchoTimingKind kind, enum EchoTimingResult result)
++{
++    sEcho.kind = kind;
++    sEcho.result = result;
++    sEcho.done = TRUE;
++}
++
++enum EchoTimingResult EchoTiming_Grade(s32 cursorX)
++{
++    s32 d = cursorX - BAR_CENTER;
++    if (d < 0)
++        d = -d;
++    if (d <= PERFECT_RANGE)
++        return ECHO_RESULT_PERFECT;
++    if (d <= GOOD_RANGE)
++        return ECHO_RESULT_GOOD;
++    return ECHO_RESULT_MISS;
++}
++
++u32 EchoTiming_DamagePercent(enum EchoTimingKind kind, enum EchoTimingResult result)
++{
++    if (kind == ECHO_TIMING_ATTACK)
++    {
++        switch (result)
++        {
++        case ECHO_RESULT_PERFECT: return 150;
++        case ECHO_RESULT_GOOD:    return 120;
++        case ECHO_RESULT_MISS:    return 80;
++        default:                  return 100;
++        }
++    }
++    if (kind == ECHO_TIMING_DEFEND)
++    {
++        switch (result)
++        {
++        case ECHO_RESULT_PERFECT: return 50;
++        case ECHO_RESULT_GOOD:    return 75;
++        default:                  return 100;
++        }
++    }
++    return 100;
++}
++
++bool32 EchoTiming_ShouldRun(u32 battlerAtk, u32 battlerDef, u32 move)
++{
++    if (!ECHO_TIMING_ENABLED || gTestRunnerEnabled || sEcho.done)
++        return FALSE;
++    if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED | BATTLE_TYPE_SAFARI) || IsAiVsAiBattle())
++        return FALSE;
++    if (IsBattleMoveStatus(move) || battlerDef >= gBattlersCount)
++        return FALSE;
++    if (gBattleStruct->moveResultFlags[battlerDef] & MOVE_RESULT_NO_EFFECT)
++        return FALSE;
++
++    if (IsHumanBattler(battlerAtk) && !IsOnPlayerSide(battlerDef))
++        sEcho.kind = ECHO_TIMING_ATTACK;
++    else if (!IsOnPlayerSide(battlerAtk) && IsHumanBattler(battlerDef))
++        sEcho.kind = ECHO_TIMING_DEFEND;
++    else
++        return FALSE;
++
++    sEcho.done = TRUE;
++    sEcho.result = ECHO_RESULT_NONE;
++    sEcho.state = STATE_INIT;
++    if (sEcho.kind == ECHO_TIMING_ATTACK)
++    {
++        u32 power = GetMovePower(move);
++        sEcho.speed = (power >= 100) ? 4 : (power >= 70) ? 3 : 2;
++    }
++    else
++    {
++        sEcho.speed = 3;
++    }
++    return TRUE;
++}
++
++s32 EchoTiming_ModifyDamage(u32 battlerAtk, u32 battlerDef, s32 dmg)
++{
++    s32 modified;
++
++    if (dmg <= 0 || sEcho.result == ECHO_RESULT_NONE)
++        return dmg;
++    if (sEcho.kind == ECHO_TIMING_ATTACK && !(IsHumanBattler(battlerAtk) && !IsOnPlayerSide(battlerDef)))
++        return dmg;
++    if (sEcho.kind == ECHO_TIMING_DEFEND && !IsHumanBattler(battlerDef))
++        return dmg;
++
++    modified = dmg * (s32)EchoTiming_DamagePercent(sEcho.kind, sEcho.result) / 100;
++    return modified > 0 ? modified : 1;
++}
++
++bool32 EchoTiming_BuildIntentString(u8 *dst)
++{
++    u32 foe = GetBattlerAtPosition(B_POSITION_OPPONENT_LEFT);
++
++    if (!ECHO_SHOW_INTENT || gTestRunnerEnabled)
++        return FALSE;
++    if (foe >= gBattlersCount || !IsBattlerAlive(foe))
++        return FALSE;
++    if (!(gAiLogicData->battlerMovesScored & (1u << foe)))
++        return FALSE;
++
++    if (gAiLogicData->shouldSwitch & (1u << foe))
++    {
++        StringCopy(dst, COMPOUND_STRING("Foe is about\nto switch out!"));
++    }
++    else
++    {
++        u32 move = gBattleMons[foe].moves[gAiBattleData->chosenMoveIndex[foe]];
++        if (move == MOVE_NONE)
++            return FALSE;
++        StringCopy(dst, COMPOUND_STRING("Foe plans:\n"));
++        StringAppend(dst, GetMoveName(move));
++    }
++    return TRUE;
++}
++
++static void PlayResultSound(u32 result)
++{
++    switch (result)
++    {
++    case ECHO_RESULT_PERFECT:
++        PlaySE(SE_SUCCESS);
++        break;
++    case ECHO_RESULT_GOOD:
++        PlaySE(SE_PIN);
++        break;
++    default:
++        PlaySE(SE_FAILURE);
++        break;
++    }
++}
++
++static void FinishSweep(u32 result)
++{
++    sEcho.result = result;
++    sEcho.timer = 0;
++    sEcho.state = STATE_SHOW_RESULT;
++    PlayResultSound(result);
++}
++
++// callnative: re-entered every frame until it advances the script.
++void BS_EchoTiming(void)
++{
++    struct Sprite *cursor;
++
++    switch (sEcho.state)
++    {
++    case STATE_INIT:
++        CreateMeter();
++        sEcho.x = 0;
++        sEcho.dir = 1;
++        sEcho.bounces = 0;
++        sEcho.timer = 0;
++        sEcho.state = STATE_SWEEP;
++        PlaySE(sEcho.kind == ECHO_TIMING_DEFEND ? SE_M_DETECT : SE_SELECT);
++        break;
++    case STATE_SWEEP:
++        cursor = &gSprites[sEcho.spriteIds[3]];
++        if (JOY_NEW(A_BUTTON))
++        {
++            FinishSweep(EchoTiming_Grade(sEcho.x));
++            break;
++        }
++        sEcho.x += sEcho.dir * sEcho.speed;
++        if (sEcho.x >= BAR_WIDTH - 1)
++        {
++            if (sEcho.kind == ECHO_TIMING_DEFEND)
++            {
++                FinishSweep(ECHO_RESULT_MISS);
++                break;
++            }
++            sEcho.x = BAR_WIDTH - 1;
++            sEcho.dir = -1;
++            sEcho.bounces++;
++        }
++        else if (sEcho.x <= 0)
++        {
++            sEcho.x = 0;
++            sEcho.dir = 1;
++            sEcho.bounces++;
++        }
++        if (sEcho.bounces >= ATTACK_BOUNCES)
++            FinishSweep(ECHO_RESULT_MISS);
++        cursor->x = METER_X - BAR_CENTER + sEcho.x;
++        break;
++    case STATE_SHOW_RESULT:
++        cursor = &gSprites[sEcho.spriteIds[3]];
++        if (sEcho.result == ECHO_RESULT_PERFECT)
++            cursor->invisible = (sEcho.timer / 4) & 1;
++        if (++sEcho.timer >= RESULT_FRAMES)
++            sEcho.state = STATE_FINISH;
++        break;
++    case STATE_FINISH:
++    default:
++        DestroyMeter();
++        gBattlescriptCurrInstr += 5; // callnative opcode + function pointer
++        break;
++    }
++}
+-- 
+2.34.1
+

@@ -1,0 +1,560 @@
+From 15ad8cfd6fd0de48eb5416f7a814f08c09a065c6 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:30:12 +0000
+Subject: [PATCH 4/5] echo: 3-day loop engine (step clock, phase tint, reset on
+ loop end/blackout, journal menu)
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ data/event_scripts.s       |   1 +
+ data/scripts/echo.inc      |  40 ++++++++
+ data/specials.inc          |   4 +
+ include/config/echo.h      |   6 ++
+ include/constants/flags.h  |  35 +++----
+ include/constants/vars.h   |   8 +-
+ include/echo_loop.h        |  19 ++++
+ include/event_scripts.h    |   4 +
+ src/echo_loop.c            | 191 +++++++++++++++++++++++++++++++++++++
+ src/field_control_avatar.c |   3 +
+ src/new_game.c             |   4 +-
+ src/overworld.c            |  13 +++
+ src/start_menu.c           |  15 +++
+ 13 files changed, 321 insertions(+), 22 deletions(-)
+ create mode 100644 data/scripts/echo.inc
+ create mode 100644 include/echo_loop.h
+ create mode 100644 src/echo_loop.c
+
+diff --git a/data/event_scripts.s b/data/event_scripts.s
+index bc9688b6..41658d9d 100644
+--- a/data/event_scripts.s
++++ b/data/event_scripts.s
+@@ -1738,3 +1738,4 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
+ 	.include "data/scripts/battle_frontier.inc"
+ 	.include "data/scripts/apricorn_tree.inc"
+ 	.include "data/scripts/wild_encounter.inc"
++	.include "data/scripts/echo.inc"
+diff --git a/data/scripts/echo.inc b/data/scripts/echo.inc
+new file mode 100644
+index 00000000..974fd3ef
+--- /dev/null
++++ b/data/scripts/echo.inc
+@@ -0,0 +1,40 @@
++EventScript_EchoPhaseChange::
++	lockall
++	special EchoLoop_BufferPhase
++	playse SE_DING_DONG
++	msgbox EchoText_PhaseChange, MSGBOX_DEFAULT
++	releaseall
++	end
++
++EventScript_EchoLoopEnd::
++	lockall
++	playse SE_ORB
++	msgbox EchoText_LoopEnd, MSGBOX_DEFAULT
++	fadescreen FADE_TO_WHITE
++	special EchoLoop_EndLoop
++	waitstate
++	end
++
++EventScript_EchoWake::
++	lockall
++	delay 30
++	special EchoLoop_BufferPhase
++	msgbox EchoText_Wake, MSGBOX_DEFAULT
++	releaseall
++	end
++
++EventScript_EchoJournal::
++	lockall
++	special EchoJournal_Buffer
++	msgbox gStringVar4, MSGBOX_DEFAULT
++	releaseall
++	end
++
++EchoText_PhaseChange:
++	.string "A distant bell tolls.\n{STR_VAR_1}, {STR_VAR_2}.$"
++
++EchoText_LoopEnd:
++	.string "The bell tolls a final time…\pThe sky tears open into white light.$"
++
++EchoText_Wake:
++	.string "…You wake with a start.\n{STR_VAR_1}, {STR_VAR_2}. Again.\pLoop {STR_VAR_3}.\nYou remember everything.$"
+diff --git a/data/specials.inc b/data/specials.inc
+index 3492bf3b..47625c83 100644
+--- a/data/specials.inc
++++ b/data/specials.inc
+@@ -638,3 +638,7 @@ gSpecials::
+ 	def_special UpdateTrainerCardPhotoIcons
+ 	def_special StickerManGetBragFlags
+ 	def_special CheckAddCoins
++	def_special EchoLoop_BufferPhase
++	def_special EchoLoop_EndLoop
++	def_special EchoJournal_Buffer
++	def_special EchoJournal_Unlock
+diff --git a/include/config/echo.h b/include/config/echo.h
+index 7f46a984..1040deee 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -8,6 +8,12 @@
+ #define ECHO_SMART_WILD       TRUE  // Wild Pokémon use the battle AI (needed for intents).
+ 
+ #define ECHO_ALWAYS_OBEY      TRUE  // Fixed story levels: party Pokémon never disobey.
++#define ECHO_STEPS_PER_PHASE  100   // Steps between bell tolls (12 phases per loop).
++#define ECHO_JOURNAL_COUNT    16
++#define ECHO_LOOP_START_MONEY 500
++#define ECHO_LOOP_START_MAP   MAP_ROUTE102  // TODO: Verran start map.
++#define ECHO_LOOP_START_X     40
++#define ECHO_LOOP_START_Y     6
+ #define ECHO_DEV_QUICKSTART   TRUE  // DEV ONLY: New Game skips the intro and drops you on Route 102 next to a trainer with a test party.
+ 
+ #endif // GUARD_CONFIG_ECHO_H
+diff --git a/include/constants/flags.h b/include/constants/flags.h
+index d7a02311..44bbb581 100644
+--- a/include/constants/flags.h
++++ b/include/constants/flags.h
+@@ -51,23 +51,24 @@
+ 
+ #else
+ 
+-#define FLAG_UNUSED_0x020    0x20 // Unused Flag
+-#define FLAG_UNUSED_0x021    0x21 // Unused Flag
+-#define FLAG_UNUSED_0x022    0x22 // Unused Flag
+-#define FLAG_UNUSED_0x023    0x23 // Unused Flag
+-#define FLAG_UNUSED_0x024    0x24 // Unused Flag
+-#define FLAG_UNUSED_0x025    0x25 // Unused Flag
+-#define FLAG_UNUSED_0x026    0x26 // Unused Flag
+-#define FLAG_UNUSED_0x027    0x27 // Unused Flag
+-#define FLAG_UNUSED_0x028    0x28 // Unused Flag
+-#define FLAG_UNUSED_0x029    0x29 // Unused Flag
+-#define FLAG_UNUSED_0x02A    0x2A // Unused Flag
+-#define FLAG_UNUSED_0x02B    0x2B // Unused Flag
+-#define FLAG_UNUSED_0x02C    0x2C // Unused Flag
+-#define FLAG_UNUSED_0x02D    0x2D // Unused Flag
+-#define FLAG_UNUSED_0x02E    0x2E // Unused Flag
+-#define FLAG_UNUSED_0x02F    0x2F // Unused Flag
+-#define FLAG_UNUSED_0x030    0x30 // Unused Flag
++#define FLAG_ECHO_JOURNAL_00    0x20 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_01    0x21 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_02    0x22 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_03    0x23 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_04    0x24 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_05    0x25 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_06    0x26 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_07    0x27 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_08    0x28 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_09    0x29 // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_10    0x2A // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_11    0x2B // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_12    0x2C // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_13    0x2D // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_14    0x2E // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_JOURNAL_15    0x2F // Echo: journal entry (kept across loops)
++#define FLAG_ECHO_LOOP_ACTIVE    0x30 // Echo: time loop running
++#define FLAG_ECHO_JOURNAL_START FLAG_ECHO_JOURNAL_00
+ #define FLAG_UNUSED_0x031    0x31 // Unused Flag
+ #define FLAG_UNUSED_0x032    0x32 // Unused Flag
+ #define FLAG_UNUSED_0x033    0x33 // Unused Flag
+diff --git a/include/constants/vars.h b/include/constants/vars.h
+index 7992ae09..0deae179 100644
+--- a/include/constants/vars.h
++++ b/include/constants/vars.h
+@@ -266,10 +266,10 @@
+ #define VAR_ROXANNE_CALL_STEP_COUNTER                    0x40F4
+ #define VAR_SCOTT_BF_CALL_STEP_COUNTER                   0x40F5
+ #define VAR_RIVAL_RAYQUAZA_CALL_STEP_COUNTER             0x40F6
+-#define VAR_UNUSED_0x40F7                                0x40F7 // Unused Var
+-#define VAR_UNUSED_0x40F8                                0x40F8 // Unused Var
+-#define VAR_UNUSED_0x40F9                                0x40F9 // Unused Var
+-#define VAR_UNUSED_0x40FA                                0x40FA // Unused Var
++#define VAR_ECHO_LOOP                                    0x40F7 // Unused Var
++#define VAR_ECHO_SHARDS                                  0x40F8 // Unused Var
++#define VAR_ECHO_PHASE                                   0x40F9 // Unused Var
++#define VAR_ECHO_STEPS                                   0x40FA // Unused Var
+ #define VAR_UNUSED_0x40FB                                0x40FB // Unused Var
+ #define VAR_UNUSED_0x40FC                                0x40FC // Unused Var
+ #define VAR_UNUSED_0x40FD                                0x40FD // Unused Var
+diff --git a/include/echo_loop.h b/include/echo_loop.h
+new file mode 100644
+index 00000000..41fafa03
+--- /dev/null
++++ b/include/echo_loop.h
+@@ -0,0 +1,19 @@
++#ifndef GUARD_ECHO_LOOP_H
++#define GUARD_ECHO_LOOP_H
++
++#define ECHO_PHASES_PER_DAY 4
++#define ECHO_DAYS_PER_LOOP  3
++#define ECHO_TOTAL_PHASES   (ECHO_PHASES_PER_DAY * ECHO_DAYS_PER_LOOP)
++
++bool32 EchoLoop_IsActive(void);
++u32 EchoLoop_GetHours(void);
++bool32 EchoLoop_OnStep(void);
++bool32 EchoLoop_OnWhiteOut(void);
++void EchoLoop_OverrideWhiteOutFieldCallback(void);
++void EchoLoop_Begin(void);
++void EchoLoop_BufferPhase(void);
++void EchoLoop_EndLoop(void);
++void EchoJournal_Buffer(void);
++void EchoJournal_Unlock(void);
++
++#endif // GUARD_ECHO_LOOP_H
+diff --git a/include/event_scripts.h b/include/event_scripts.h
+index 235bea5c..a31b4414 100644
+--- a/include/event_scripts.h
++++ b/include/event_scripts.h
+@@ -647,6 +647,10 @@ extern const u8 EventScript_SelectWithoutRegisteredItem[];
+ 
+ // overworld
+ extern const u8 EventScript_WhiteOut[];
++extern const u8 EventScript_EchoPhaseChange[];
++extern const u8 EventScript_EchoLoopEnd[];
++extern const u8 EventScript_EchoWake[];
++extern const u8 EventScript_EchoJournal[];
+ extern const u8 EventScript_AfterWhiteOutMomHeal[];
+ extern const u8 EventScript_AfterWhiteOutHeal[];
+ extern const u8 EventScript_AfterWhiteOutHeal_Frlg[];
+diff --git a/src/echo_loop.c b/src/echo_loop.c
+new file mode 100644
+index 00000000..87a04f6e
+--- /dev/null
++++ b/src/echo_loop.c
+@@ -0,0 +1,191 @@
++#include "global.h"
++#include "echo_loop.h"
++#include "event_data.h"
++#include "event_scripts.h"
++#include "field_screen_effect.h"
++#include "item.h"
++#include "money.h"
++#include "overworld.h"
++#include "pokemon.h"
++#include "script.h"
++#include "script_pokemon_util.h"
++#include "string_util.h"
++#include "constants/flags.h"
++#include "constants/vars.h"
++
++// Pokémon Echo: the island relives the same three days. Phases advance with steps
++// (not the real-time clock); at the end of day 3 or on a blackout the world resets.
++// Kept across loops: party slot 1 (your bonded partner), journal flags, Echo Shards.
++
++static EWRAM_DATA bool8 sWakePending = FALSE;
++
++static const u8 *const sPhaseNames[ECHO_PHASES_PER_DAY] =
++{
++    COMPOUND_STRING("Dawn"),
++    COMPOUND_STRING("Day"),
++    COMPOUND_STRING("Dusk"),
++    COMPOUND_STRING("Night"),
++};
++
++static const u8 sPhaseHours[ECHO_PHASES_PER_DAY] = {6, 12, 18, 22};
++
++static const u8 *const sJournalEntries[ECHO_JOURNAL_COUNT] =
++{
++    COMPOUND_STRING("The bell tolls at every change of\nlight. After three days, it breaks."),
++    COMPOUND_STRING("Wake. Remember. Change something.\nThe island forgets. I don't."),
++};
++
++bool32 EchoLoop_IsActive(void)
++{
++    return FlagGet(FLAG_ECHO_LOOP_ACTIVE);
++}
++
++u32 EchoLoop_GetHours(void)
++{
++    return sPhaseHours[VarGet(VAR_ECHO_PHASE) % ECHO_PHASES_PER_DAY];
++}
++
++bool32 EchoLoop_OnStep(void)
++{
++    u32 steps, phase;
++
++    if (!EchoLoop_IsActive())
++        return FALSE;
++    steps = VarGet(VAR_ECHO_STEPS) + 1;
++    if (steps < ECHO_STEPS_PER_PHASE)
++    {
++        VarSet(VAR_ECHO_STEPS, steps);
++        return FALSE;
++    }
++    VarSet(VAR_ECHO_STEPS, 0);
++    phase = VarGet(VAR_ECHO_PHASE) + 1;
++    if (phase >= ECHO_TOTAL_PHASES)
++    {
++        ScriptContext_SetupScript(EventScript_EchoLoopEnd);
++        return TRUE;
++    }
++    VarSet(VAR_ECHO_PHASE, phase);
++    SetTimeOfDay(EchoLoop_GetHours());
++    ScriptContext_SetupScript(EventScript_EchoPhaseChange);
++    return TRUE;
++}
++
++void EchoLoop_Begin(void)
++{
++    FlagSet(FLAG_ECHO_LOOP_ACTIVE);
++    VarSet(VAR_ECHO_LOOP, 1);
++    VarSet(VAR_ECHO_PHASE, 0);
++    VarSet(VAR_ECHO_STEPS, 0);
++    FlagSet(FLAG_ECHO_JOURNAL_START);
++}
++
++void EchoLoop_BufferPhase(void)
++{
++    u32 phase = VarGet(VAR_ECHO_PHASE);
++    u8 *end = StringCopy(gStringVar1, COMPOUND_STRING("Day "));
++    ConvertIntToDecimalStringN(end, phase / ECHO_PHASES_PER_DAY + 1, STR_CONV_MODE_LEFT_ALIGN, 1);
++    StringCopy(gStringVar2, sPhaseNames[phase % ECHO_PHASES_PER_DAY]);
++    ConvertIntToDecimalStringN(gStringVar3, VarGet(VAR_ECHO_LOOP), STR_CONV_MODE_LEFT_ALIGN, 4);
++}
++
++static void ResetWorld(void)
++{
++    u16 loop = VarGet(VAR_ECHO_LOOP);
++    u16 shards = VarGet(VAR_ECHO_SHARDS);
++    bool8 journal[ECHO_JOURNAL_COUNT];
++    struct Pokemon partner = gPlayerParty[0];
++    u32 i;
++
++    for (i = 0; i < ECHO_JOURNAL_COUNT; i++)
++        journal[i] = FlagGet(FLAG_ECHO_JOURNAL_START + i);
++
++    // Story and trainer flags reset; system flags (badges, menus) survive.
++    memset(gSaveBlock1Ptr->flags, 0, SYSTEM_FLAGS / 8);
++    memset(gSaveBlock1Ptr->vars, 0, sizeof(gSaveBlock1Ptr->vars));
++
++    for (i = 0; i < ECHO_JOURNAL_COUNT; i++)
++    {
++        if (journal[i])
++            FlagSet(FLAG_ECHO_JOURNAL_START + i);
++    }
++    FlagSet(FLAG_ECHO_LOOP_ACTIVE);
++    VarSet(VAR_ECHO_LOOP, loop + 1);
++    VarSet(VAR_ECHO_SHARDS, shards);
++
++    ZeroPlayerPartyMons();
++    gPlayerParty[0] = partner;
++    CalculatePlayerPartyCount();
++    HealPlayerParty();
++    ClearBag();
++    SetMoney(&gSaveBlock1Ptr->money, ECHO_LOOP_START_MONEY);
++}
++
++static void SetLoopStartWarp(void)
++{
++    SetWarpDestination(MAP_GROUP(ECHO_LOOP_START_MAP), MAP_NUM(ECHO_LOOP_START_MAP), WARP_ID_NONE, ECHO_LOOP_START_X, ECHO_LOOP_START_Y);
++}
++
++static void FieldCB_EchoWake(void)
++{
++    LockPlayerFieldControls();
++    FadeInFromBlack();
++    ScriptContext_SetupScript(EventScript_EchoWake);
++}
++
++void EchoLoop_EndLoop(void)
++{
++    ResetWorld();
++    SetLoopStartWarp();
++    DoWarp();
++    ResetInitialPlayerAvatarState();
++    gFieldCallback = FieldCB_EchoWake;
++}
++
++bool32 EchoLoop_OnWhiteOut(void)
++{
++    if (!EchoLoop_IsActive())
++        return FALSE;
++    ResetWorld();
++    SetLoopStartWarp();
++    sWakePending = TRUE;
++    return TRUE;
++}
++
++void EchoLoop_OverrideWhiteOutFieldCallback(void)
++{
++    if (sWakePending)
++    {
++        sWakePending = FALSE;
++        gFieldCallback = FieldCB_EchoWake;
++    }
++}
++
++// special: gSpecialVar_0x8004 = journal entry index
++void EchoJournal_Unlock(void)
++{
++    if (gSpecialVar_0x8004 < ECHO_JOURNAL_COUNT)
++        FlagSet(FLAG_ECHO_JOURNAL_START + gSpecialVar_0x8004);
++}
++
++void EchoJournal_Buffer(void)
++{
++    u32 i;
++    u8 *s = gStringVar4;
++
++    EchoLoop_BufferPhase();
++    s = StringCopy(s, COMPOUND_STRING("ECHO JOURNAL - Loop "));
++    s = StringCopy(s, gStringVar3);
++    s = StringCopy(s, COMPOUND_STRING("\n"));
++    s = StringCopy(s, gStringVar1);
++    s = StringCopy(s, COMPOUND_STRING(", "));
++    s = StringCopy(s, gStringVar2);
++    s = StringCopy(s, COMPOUND_STRING(" - Shards: "));
++    s = ConvertIntToDecimalStringN(s, VarGet(VAR_ECHO_SHARDS), STR_CONV_MODE_LEFT_ALIGN, 3);
++    for (i = 0; i < ECHO_JOURNAL_COUNT; i++)
++    {
++        if (!FlagGet(FLAG_ECHO_JOURNAL_START + i) || sJournalEntries[i] == NULL)
++            continue;
++        s = StringCopy(s, COMPOUND_STRING("\p"));
++        s = StringCopy(s, sJournalEntries[i]);
++    }
++}
+diff --git a/src/field_control_avatar.c b/src/field_control_avatar.c
+index 0ca29931..6e7396c2 100644
+--- a/src/field_control_avatar.c
++++ b/src/field_control_avatar.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "echo_loop.h"
+ #include "battle_setup.h"
+ #include "bike.h"
+ #include "coord_event_weather.h"
+@@ -758,6 +759,8 @@ static bool8 TryStartStepCountScript(u16 metatileBehavior)
+ 
+     if (!(gPlayerAvatar.flags & PLAYER_AVATAR_FLAG_FORCED_MOVE) && !MetatileBehavior_IsForcedMovementTile(metatileBehavior))
+     {
++        if (EchoLoop_OnStep())
++            return TRUE;
+     #if OW_POISON_DAMAGE < GEN_5
+         if (UpdatePoisonStepCounter() == TRUE)
+         {
+diff --git a/src/new_game.c b/src/new_game.c
+index c62be70d..7fa83a07 100644
+--- a/src/new_game.c
++++ b/src/new_game.c
+@@ -53,6 +53,7 @@
+ #include "difficulty.h"
+ #include "follower_npc.h"
+ #include "script_pokemon_util.h"
++#include "echo_loop.h"
+ 
+ extern const u8 EventScript_ResetAllMapFlags[];
+ extern const u8 EventScript_ResetAllMapFlagsFrlg[];
+@@ -214,9 +215,10 @@ void NewGameInitData(void)
+     UpdateDailySeed();
+ #if ECHO_DEV_QUICKSTART
+     FlagSet(FLAG_SYS_POKEMON_GET);
++    EchoLoop_Begin();
+     ScriptGiveMon(SPECIES_TREECKO, 15, ITEM_NONE);
+     ScriptGiveMon(SPECIES_ZIGZAGOON, 15, ITEM_NONE);
+-    SetWarpDestination(MAP_GROUP(MAP_ROUTE102), MAP_NUM(MAP_ROUTE102), WARP_ID_NONE, 33, 16);
++    SetWarpDestination(MAP_GROUP(ECHO_LOOP_START_MAP), MAP_NUM(ECHO_LOOP_START_MAP), WARP_ID_NONE, ECHO_LOOP_START_X, ECHO_LOOP_START_Y);
+     WarpIntoMap();
+ #else
+     WarpToTruck();
+diff --git a/src/overworld.c b/src/overworld.c
+index 4d01b45e..091e5811 100644
+--- a/src/overworld.c
++++ b/src/overworld.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "echo_loop.h"
+ #include "overworld.h"
+ #include "battle_pyramid.h"
+ #include "battle_setup.h"
+@@ -392,6 +393,12 @@ static void (*const sMovementStatusHandler[])(struct LinkPlayerObjectEvent *, st
+ // code
+ void DoWhiteOut(void)
+ {
++    if (EchoLoop_OnWhiteOut())
++    {
++        Overworld_ResetStateAfterWhiteOut();
++        WarpIntoMap();
++        return;
++    }
+     RunScriptImmediately(EventScript_WhiteOut);
+     HealPlayerParty();
+     Overworld_ResetStateAfterWhiteOut();
+@@ -1704,6 +1711,11 @@ void UpdateTimeOfDay(bool32 updateBlend)
+     RtcCalcLocalTime();
+     hours = sHoursOverride ? sHoursOverride : gLocalTime.hours;
+     minutes = sHoursOverride ? 0 : gLocalTime.minutes;
++    if (EchoLoop_IsActive())
++    {
++        hours = EchoLoop_GetHours();
++        minutes = 0;
++    }
+ 
+     if (IsBetweenHours(hours, MORNING_HOUR_BEGIN, MORNING_HOUR_MIDDLE)) // night->morning
+     {
+@@ -1970,6 +1982,7 @@ void CB2_WhiteOut(void)
+             gFieldCallback = FieldCB_RushInjuredPokemonToCenter;
+         else
+             gFieldCallback = FieldCB_WarpExitFadeFromBlack;
++        EchoLoop_OverrideWhiteOutFieldCallback();
+         state = 0;
+         SetFollowerNPCData(FNPC_DATA_SURF_BLOB, FNPC_SURF_BLOB_NONE);
+         DoMapLoadLoop(&state);
+diff --git a/src/start_menu.c b/src/start_menu.c
+index 648fa837..36f05e1f 100644
+--- a/src/start_menu.c
++++ b/src/start_menu.c
+@@ -1,4 +1,5 @@
+ #include "global.h"
++#include "echo_loop.h"
+ #include "config/save.h"
+ #include "battle_pike.h"
+ #include "battle_pyramid.h"
+@@ -69,6 +70,7 @@ enum
+     MENU_ACTION_PYRAMID_BAG,
+     MENU_ACTION_DEBUG,
+     MENU_ACTION_DEXNAV,
++    MENU_ACTION_JOURNAL,
+ };
+ 
+ // Save status
+@@ -111,6 +113,7 @@ static bool8 StartMenuBattlePyramidRetireCallback(void);
+ static bool8 StartMenuBattlePyramidBagCallback(void);
+ static bool8 StartMenuDebugCallback(void);
+ static bool8 StartMenuDexNavCallback(void);
++static bool8 StartMenuJournalCallback(void);
+ 
+ // Menu callbacks
+ static bool8 SaveStartCallback(void);
+@@ -206,6 +209,7 @@ static const struct MenuAction sStartMenuItems[] =
+     [MENU_ACTION_PYRAMID_BAG]     = {gText_MenuBag,     {.u8_void = StartMenuBattlePyramidBagCallback}},
+     [MENU_ACTION_DEBUG]           = {sText_MenuDebug,   {.u8_void = StartMenuDebugCallback}},
+     [MENU_ACTION_DEXNAV]          = {gText_MenuDexNav,  {.u8_void = StartMenuDexNavCallback}},
++    [MENU_ACTION_JOURNAL]         = {COMPOUND_STRING("JOURNAL"), {.u8_void = StartMenuJournalCallback}},
+ };
+ 
+ static const struct BgTemplate sBgTemplates_LinkBattleSave[] =
+@@ -333,6 +337,9 @@ static void BuildNormalStartMenu(void)
+     if (FlagGet(FLAG_SYS_POKEMON_GET) == TRUE)
+         AddStartMenuAction(MENU_ACTION_POKEMON);
+ 
++    if (EchoLoop_IsActive())
++        AddStartMenuAction(MENU_ACTION_JOURNAL);
++
+     AddStartMenuAction(MENU_ACTION_BAG);
+ 
+     if (FlagGet(FLAG_SYS_POKENAV_GET) == TRUE)
+@@ -804,6 +811,14 @@ static bool8 StartMenuDebugCallback(void)
+ return TRUE;
+ }
+ 
++static bool8 StartMenuJournalCallback(void)
++{
++    RemoveExtraStartMenuWindows();
++    HideStartMenu();
++    ScriptContext_SetupScript(EventScript_EchoJournal);
++    return TRUE;
++}
++
+ static bool8 StartMenuSafariZoneRetireCallback(void)
+ {
+     RemoveExtraStartMenuWindows();
+-- 
+2.34.1
+

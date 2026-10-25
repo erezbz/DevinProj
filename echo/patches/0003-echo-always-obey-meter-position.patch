@@ -1,0 +1,63 @@
+From 4c7a3dcf7e3f275226b0a22149da4a53abeca060 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:27:13 +0000
+Subject: [PATCH 3/5] echo: always obey, meter position
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ include/config/echo.h | 1 +
+ src/battle_util.c     | 3 +++
+ src/echo_timing.c     | 4 ++--
+ 3 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/config/echo.h b/include/config/echo.h
+index de04f67c..7f46a984 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -7,6 +7,7 @@
+ #define ECHO_NO_EXP           TRUE  // No experience from battles; levels come from story progress.
+ #define ECHO_SMART_WILD       TRUE  // Wild Pokémon use the battle AI (needed for intents).
+ 
++#define ECHO_ALWAYS_OBEY      TRUE  // Fixed story levels: party Pokémon never disobey.
+ #define ECHO_DEV_QUICKSTART   TRUE  // DEV ONLY: New Game skips the intro and drops you on Route 102 next to a trainer with a test party.
+ 
+ #endif // GUARD_CONFIG_ECHO_H
+diff --git a/src/battle_util.c b/src/battle_util.c
+index 9dc74cc5..2b0c9bf4 100644
+--- a/src/battle_util.c
++++ b/src/battle_util.c
+@@ -5629,6 +5629,9 @@ enum Obedience GetAttackerObedienceForAction(void)
+     u8 obedienceLevel = 0;
+     u8 levelReferenced;
+ 
++#if ECHO_ALWAYS_OBEY && !TESTING
++    return OBEYS;
++#endif
+     if (gBattleTypeFlags & (BATTLE_TYPE_LINK | BATTLE_TYPE_RECORDED_LINK))
+         return OBEYS;
+     if (BattlerHasAi(gBattlerAttacker))
+diff --git a/src/echo_timing.c b/src/echo_timing.c
+index 3e8e9b51..3bbb1bcc 100644
+--- a/src/echo_timing.c
++++ b/src/echo_timing.c
+@@ -21,7 +21,7 @@
+ #define PERFECT_RANGE   3
+ #define GOOD_RANGE      12
+ #define METER_X         (DISPLAY_WIDTH / 2)
+-#define METER_Y         100
++#define METER_Y         60
+ #define ATTACK_BOUNCES  4
+ #define RESULT_FRAMES   36
+ 
+@@ -404,7 +404,7 @@ void BS_EchoTiming(void)
+     case STATE_FINISH:
+     default:
+         DestroyMeter();
+-        gBattlescriptCurrInstr += 5; // callnative opcode + function pointer
++        gBattlescriptCurrInstr += 5; // callnative: 1-byte opcode + 4-byte function pointer
+         break;
+     }
+ }
+-- 
+2.34.1
+

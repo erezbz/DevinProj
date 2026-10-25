@@ -1,0 +1,74 @@
+From 3a001c4b0fe3f182fb9e152c5d80ae8340100841 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:24:51 +0000
+Subject: [PATCH 2/5] echo: dev quickstart
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ include/config/echo.h | 2 ++
+ src/main_menu.c       | 9 +++++++++
+ src/new_game.c        | 9 +++++++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/include/config/echo.h b/include/config/echo.h
+index 151bab08..de04f67c 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -7,4 +7,6 @@
+ #define ECHO_NO_EXP           TRUE  // No experience from battles; levels come from story progress.
+ #define ECHO_SMART_WILD       TRUE  // Wild Pokémon use the battle AI (needed for intents).
+ 
++#define ECHO_DEV_QUICKSTART   TRUE  // DEV ONLY: New Game skips the intro and drops you on Route 102 next to a trainer with a test party.
++
+ #endif // GUARD_CONFIG_ECHO_H
+diff --git a/src/main_menu.c b/src/main_menu.c
+index 7fc7e417..96dc4c60 100644
+--- a/src/main_menu.c
++++ b/src/main_menu.c
+@@ -1091,6 +1091,15 @@ static void Task_HandleMainMenuAPressed(u8 taskId)
+ 
+             gPlttBufferUnfaded[0] = RGB_BLACK;
+             gPlttBufferFaded[0] = RGB_BLACK;
++#if ECHO_DEV_QUICKSTART
++            StringCopy(gSaveBlock2Ptr->playerName, COMPOUND_STRING("ECHO"));
++            gSaveBlock2Ptr->playerGender = MALE;
++            gSaveBlock2Ptr->optionsTextSpeed = OPTIONS_TEXT_SPEED_FAST;
++            FreeAllWindowBuffers();
++            DestroyTask(taskId);
++            SetMainCallback2(CB2_NewGame);
++            return;
++#endif
+             gTasks[taskId].func = Task_NewGameBirchSpeech_Init;
+             break;
+         case ACTION_CONTINUE:
+diff --git a/src/new_game.c b/src/new_game.c
+index 89a2bf4c..c62be70d 100644
+--- a/src/new_game.c
++++ b/src/new_game.c
+@@ -52,6 +52,7 @@
+ #include "constants/items.h"
+ #include "difficulty.h"
+ #include "follower_npc.h"
++#include "script_pokemon_util.h"
+ 
+ extern const u8 EventScript_ResetAllMapFlags[];
+ extern const u8 EventScript_ResetAllMapFlagsFrlg[];
+@@ -211,7 +212,15 @@ void NewGameInitData(void)
+     ResetFanClub();
+     ResetLotteryCorner();
+     UpdateDailySeed();
++#if ECHO_DEV_QUICKSTART
++    FlagSet(FLAG_SYS_POKEMON_GET);
++    ScriptGiveMon(SPECIES_TREECKO, 15, ITEM_NONE);
++    ScriptGiveMon(SPECIES_ZIGZAGOON, 15, ITEM_NONE);
++    SetWarpDestination(MAP_GROUP(MAP_ROUTE102), MAP_NUM(MAP_ROUTE102), WARP_ID_NONE, 33, 16);
++    WarpIntoMap();
++#else
+     WarpToTruck();
++#endif
+     if (IS_FRLG)
+         RunScriptImmediately(EventScript_ResetAllMapFlagsFrlg);
+     else
+-- 
+2.34.1
+
