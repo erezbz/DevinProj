@@ -126,3 +126,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   It now samples ≤1500 rows (O(N) memory), treats Barnes-Hut as gravity, and includes softening in closest approach. Test added for 10k stars.
 - **05:52**: 59/59 tests pass. The star cluster still reports `timestep vs physics` WARN (0.062). I kept it: the closest-approach/speed estimate is
   deliberately conservative, and the energy check (9.6e-8) shows the actual run is fine. Both numbers are shown to the user.
+- **05:54**: Added **`HarmonicAngle`** (three-body bond-angle springs, analytic gradient; it conserves angular momentum because it is rotationally invariant)
+  and **Coulomb `exclude=`** (id pairs with no interaction, so atoms in the same molecule don't attract each other). Both pass the numerical
+  F = −∇U checks, periodic and open. The exclusion test checks that exactly that one pair's energy is removed. 61 → 63 tests, all pass.

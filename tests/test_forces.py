@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from accusim import Coulomb, Gravity, HarmonicBond, LennardJones, Q, System, UniformField
+from accusim import Coulomb, Gravity, HarmonicAngle, HarmonicBond, LennardJones, Q, System, UniformField
 
 
 def _system(periodic=False):
@@ -19,9 +19,11 @@ def _system(periodic=False):
 FORCES = [
     lambda s: Gravity(),
     lambda s: Coulomb(),
+    lambda s: Coulomb(exclude=[(0, 3), (1, 4)]),
     lambda s: LennardJones({"A": (Q(1.0, "kJ") / 6.022e23, Q(3.4, "A")), "B": (Q(0.5, "kJ") / 6.022e23, Q(2.8, "A"))}, cutoff=5),
     lambda s: HarmonicBond([(0, 3), (1, 4)], k=Q(300, "N/m"), r0=Q(1, "A")),
     lambda s: UniformField(g=[0, 0, -9.8], E=[1e5, 0, 0]),
+    lambda s: HarmonicAngle([(0, 3, 1), (2, 4, 5), (3, 1, 4)], k=Q(400, "kJ") / 6.022e23, theta0=1.91),
 ]
 
 
@@ -109,3 +111,15 @@ def test_ewald_force_is_negative_gradient():
             down = f.compute(s)[1]
             s.pos[i, k] += h
             assert -(up - down) / (2 * h) == pytest.approx(F[i, k], rel=1e-4, abs=1e-6 * np.max(np.abs(F)))
+
+
+def test_coulomb_exclusion_removes_exactly_that_pair():
+    s = _system()
+    full = Coulomb().compute(s)[1]
+    s2 = System(3)
+    s2.add_species("A", Q(40, "u"), charge=Q(1, "e"))
+    s2.add_species("B", Q(20, "u"), charge=Q(-1, "e"))
+    s2.add("A", [s.pos[0]])
+    s2.add("B", [s.pos[3]])
+    pair = Coulomb().compute(s2)[1]
+    assert Coulomb(exclude=[(3, 0)]).compute(s)[1] == pytest.approx(full - pair, rel=1e-12)

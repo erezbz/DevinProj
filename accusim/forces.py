@@ -49,9 +49,10 @@ class Gravity(Force):
 class Coulomb(Force):
     """Electrostatics between charged particles (k = 1/4 pi eps0 by default)."""
 
-    def __init__(self, k=KE_CONST, softening=0.0):
+    def __init__(self, k=KE_CONST, softening=0.0, exclude=()):
         self.k = si(k, "J*m/C^2")
         self.eps2 = si(softening, "m") ** 2
+        self.exclude = [tuple(p) for p in exclude]  # id pairs with no interaction (same-molecule atoms)
 
     def compute(self, s):
         q = s.charges
@@ -61,6 +62,12 @@ class Coulomb(Force):
         r2 = r2 + self.eps2
         inv_r = 1 / np.sqrt(r2)
         qq = self.k * q[:, None] * q[None, :]
+        if self.exclude:
+            where = {pid: n for n, pid in enumerate(s.ids)}
+            ex = np.array([(where[a], where[b]) for a, b in self.exclude if a in where and b in where], dtype=int)
+            if len(ex):
+                qq[ex[:, 0], ex[:, 1]] = 0.0
+                qq[ex[:, 1], ex[:, 0]] = 0.0
         f = -np.einsum("ij,ijk->ik", qq * inv_r ** 3, d)
         U = 0.5 * float(np.sum(qq * inv_r))
         return f, U
@@ -164,6 +171,40 @@ class HarmonicBond(Force):
         np.add.at(f, i, fij)
         np.add.at(f, j, -fij)
         return f, 0.5 * self.k * float(np.sum(stretch ** 2))
+
+
+class HarmonicAngle(Force):
+    """Bond-angle springs on id triplets (i, j, k), vertex j: U = k/2 (theta - theta0)^2."""
+
+    def __init__(self, angles, k, theta0):
+        self.angles = [tuple(a) for a in angles]
+        self.k = si(k, "J")
+        self.theta0 = float(theta0)
+
+    def compute(self, s):
+        f = np.zeros_like(s.pos)
+        where = {pid: n for n, pid in enumerate(s.ids)}
+        trip = [(where[a], where[b], where[c]) for a, b, c in self.angles if a in where and b in where and c in where]
+        if not trip:
+            return f, 0.0
+        i, j, k = np.array(trip).T
+        u = s.pos[i] - s.pos[j]
+        v = s.pos[k] - s.pos[j]
+        if s.periodic:
+            u -= s.box * np.round(u / s.box)
+            v -= s.box * np.round(v / s.box)
+        lu = np.linalg.norm(u, axis=1)
+        lv = np.linalg.norm(v, axis=1)
+        cos = np.clip(np.einsum("ij,ij->i", u, v) / (lu * lv), -1.0, 1.0)
+        theta = np.arccos(cos)
+        sin = np.maximum(np.sqrt(1 - cos ** 2), 1e-12)
+        pref = (self.k * (theta - self.theta0) / sin)[:, None]
+        fi = pref * (v / (lu * lv)[:, None] - cos[:, None] * u / (lu ** 2)[:, None])
+        fk = pref * (u / (lu * lv)[:, None] - cos[:, None] * v / (lv ** 2)[:, None])
+        np.add.at(f, i, fi)
+        np.add.at(f, k, fk)
+        np.add.at(f, j, -(fi + fk))
+        return f, 0.5 * self.k * float(np.sum((theta - self.theta0) ** 2))
 
 
 class UniformField(Force):
