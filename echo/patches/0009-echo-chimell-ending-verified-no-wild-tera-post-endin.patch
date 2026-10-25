@@ -1,0 +1,213 @@
+From 7d4d0949b20312d0cd8d5dbc3f41bd606b4bd25f Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:55:24 +0000
+Subject: [PATCH 9/9] echo: chimell ending verified, no wild tera, post-ending
+ Odette, 100 steps/phase, map/phase fixes
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ data/layouts/VerranBellmoor/map.bin           | Bin 960 -> 960 bytes
+ data/layouts/VerranGloamWood/map.bin          | Bin 1440 -> 1440 bytes
+ data/layouts/VerranTideway/map.bin            | Bin 1152 -> 1152 bytes
+ data/maps/VerranBellmoor_BellHall/scripts.inc |   5 ++++
+ data/maps/VerranGloamWood/scripts.inc         |  28 ++++++++++++++++--
+ include/config/echo.h                         |   2 +-
+ src/battle_terastal.c                         |   3 ++
+ src/echo_loop.c                               |   2 +-
+ tools/echo/gen_maps.py                        |   6 ++--
+ 9 files changed, 39 insertions(+), 7 deletions(-)
+
+diff --git a/data/layouts/VerranBellmoor/map.bin b/data/layouts/VerranBellmoor/map.bin
+index 1c5bac27e32a0c8e7d08849cb0846628f14218b8..2e79e2e8f949186d20f4e87e3a3739a75b87fcbf 100644
+GIT binary patch
+delta 82
+zcmX@Wet=!(3hPx?RLp2_!|;|Nqrp|y2_h2>gg9XQjb0keTrdtua`FUbAx@aU-O2sT
+Fq5!i&8;1Y@
+
+delta 91
+zcmX@Wet=!-3hPx?bbQ0`mf;oFiBcLIPgz0iC#)O2G?+QAf;m@MCs#3R$lV2V?y%lv
+G#fAa53ni)m
+
+diff --git a/data/layouts/VerranGloamWood/map.bin b/data/layouts/VerranGloamWood/map.bin
+index 29884eab8e2c2bdb0fdfbba06b7afdc5fff2bda6..f33528fec416384978f28bfc46d66e56f7f9981a 100644
+GIT binary patch
+delta 59
+scmZ3$y?}c|04vWGRz`yxhPMnE4X(0I5Sd)SDxh!&E_9dm4l5=G09_{)bpQYW
+
+delta 42
+kcmZ3$y?}c|0PExlEIboLCKs>@Og_NEBXWoJE-N|)06lRJkpKVy
+
+diff --git a/data/layouts/VerranTideway/map.bin b/data/layouts/VerranTideway/map.bin
+index 0bf269ae4f4e2bc5ed67acee7f13fb02df53e2bc..84ebf15936404cd1b3ea6bc0784f20f9bced03a7 100644
+GIT binary patch
+delta 131
+zcmZqRY~Yl>!g`ez6*C&#FuY~RXmEA1Jd5b$02U!mn8@A9{w$&s69l-gu)>6hS2Xd1
+Q0M8S+zNf64c^FHW0Y9@UoB#j-
+
+delta 138
+zcmZqRY~Yl+!g`ez88aF%8r(3vWeB1tE3k-6G!WoH5eoo{C7_9sqV5B#-pxFWCCmU^
+Cg(M09
+
+diff --git a/data/maps/VerranBellmoor_BellHall/scripts.inc b/data/maps/VerranBellmoor_BellHall/scripts.inc
+index f0f20e41..66c88165 100644
+--- a/data/maps/VerranBellmoor_BellHall/scripts.inc
++++ b/data/maps/VerranBellmoor_BellHall/scripts.inc
+@@ -6,8 +6,13 @@ VerranBellmoor_BellHall_OnTransition:
+ 	special EchoLoop_BufferDayTime
+ 	setflag FLAG_ECHO_HIDE_ODETTE_HALL
+ 	call_if_eq VAR_0x8001, 2, VerranBellmoor_BellHall_EventScript_Show
++	call_if_eq VAR_ECHO_PHASE, 10, VerranBellmoor_BellHall_EventScript_Hide
+ 	end
+ 
++VerranBellmoor_BellHall_EventScript_Hide::
++	setflag FLAG_ECHO_HIDE_ODETTE_HALL
++	return
++
+ VerranBellmoor_BellHall_EventScript_Show::
+ 	clearflag FLAG_ECHO_HIDE_ODETTE_HALL
+ 	return
+diff --git a/data/maps/VerranGloamWood/scripts.inc b/data/maps/VerranGloamWood/scripts.inc
+index 9dda0ca9..06e425ae 100644
+--- a/data/maps/VerranGloamWood/scripts.inc
++++ b/data/maps/VerranGloamWood/scripts.inc
+@@ -7,7 +7,7 @@ VerranGloamWood_OnTransition:
+ 	setflag FLAG_ECHO_HIDE_SOLUNE
+ 	setflag FLAG_ECHO_HIDE_GLOAMOTH
+ 	setflag FLAG_ECHO_HIDE_ODETTE_SHRINE
+-	call_if_eq VAR_ECHO_PHASE, 11, VerranGloamWood_EventScript_ShowOdette
++	call_if_ge VAR_ECHO_PHASE, 10, VerranGloamWood_EventScript_ShowOdette
+ 	call_if_unset FLAG_ECHO_SOLUNE_DONE, VerranGloamWood_EventScript_TrySolune
+ 	call_if_unset FLAG_ECHO_GLOAMOTH_DONE, VerranGloamWood_EventScript_TryGloamoth
+ 	end
+@@ -98,13 +98,27 @@ VerranGloamWood_EventScript_Bell::
+ VerranGloamWood_EventScript_Odette::
+ 	lock
+ 	faceplayer
++	goto_if_unset FLAG_ECHO_LOOP_ACTIVE, VerranGloamWood_EventScript_Ending
+ 	goto_if_set FLAG_ECHO_GAVE_COMPASS, VerranGloamWood_EventScript_Farewell
++	goto_if_lt VAR_ECHO_PHASE, 11, VerranGloamWood_EventScript_OdetteWaits
+ 	msgbox VerranGloamWood_Text_OdetteRing, MSGBOX_DEFAULT
+ 	setvar VAR_0x8004, 2
+ 	call EventScript_EchoNote
+ 	closemessage
+ 	goto EventScript_EchoLoopEnd
+ 
++VerranGloamWood_EventScript_OdetteWaits::
++	msgbox VerranGloamWood_Text_OdetteWaits, MSGBOX_DEFAULT
++	setvar VAR_0x8004, 2
++	call EventScript_EchoNote
++	release
++	end
++
++VerranGloamWood_EventScript_Ending::
++	msgbox VerranGloamWood_Text_Ending, MSGBOX_DEFAULT
++	release
++	end
++
+ VerranGloamWood_EventScript_Farewell::
+ 	msgbox VerranGloamWood_Text_Farewell, MSGBOX_DEFAULT
+ 	playse SE_ORB
+@@ -112,7 +126,7 @@ VerranGloamWood_EventScript_Farewell::
+ 	playmoncry SPECIES_CHIMELL, CRY_MODE_ENCOUNTER
+ 	msgbox VerranGloamWood_Text_TollWakes, MSGBOX_DEFAULT
+ 	waitmoncry
+-	setwildbattle SPECIES_CHIMELL, 22
++	setwildbattle SPECIES_CHIMELL, 19
+ 	dowildbattle
+ 	specialvar VAR_RESULT, GetBattleOutcome
+ 	goto_if_eq VAR_RESULT, B_OUTCOME_WON, VerranGloamWood_EventScript_Freed
+@@ -144,6 +158,11 @@ VerranGloamWood_Text_Bell:
+ 	.string "THE GREAT BELL OF VERRAN\n"
+ 	.string "Cast to call lost ships home.$"
+ 
++VerranGloamWood_Text_OdetteWaits:
++	.string "ODETTE: When night falls, I ring it.\n"
++	.string "Harder than ever before.\p"
++	.string "If only I knew he could hear…$"
++
+ VerranGloamWood_Text_OdetteRing:
+ 	.string "ODETTE: Ring, bell… Bring him home!\n"
+ 	.string "CORIN, can you hear me?$"
+@@ -171,3 +190,8 @@ VerranGloamWood_Text_Freed:
+ 	.string "a fourth morning dawns on Verran.\p"
+ 	.string "THE LOOP IS BROKEN.\n"
+ 	.string "Thanks for playing this slice!$"
++
++VerranGloamWood_Text_Ending:
++	.string "ODETTE: Listen… no bell. Just the sea.\p"
++	.string "Tomorrow will be a new day. A real one.\n"
++	.string "Thank you, child.$"
+diff --git a/include/config/echo.h b/include/config/echo.h
+index 1e006a2f..4d97e0d9 100644
+--- a/include/config/echo.h
++++ b/include/config/echo.h
+@@ -10,7 +10,7 @@
+ #define ECHO_ALWAYS_OBEY      TRUE  // Fixed story levels: party Pokémon never disobey.
+ #define ECHO_NO_RANDOM_WILD   TRUE  // No random grass/water/cave encounters; battles are visible and authored.
+ #define ECHO_NO_DYNAMAX       TRUE  // Smart wild AI would otherwise Dynamax; Echo has no Dynamax.
+-#define ECHO_STEPS_PER_PHASE  100   // Steps between bell tolls (12 phases per loop).
++#define ECHO_STEPS_PER_PHASE  100  // Steps between bell tolls (12 phases per loop).
+ #define ECHO_JOURNAL_FREED    15
+ #define ECHO_MAX_SHARD_BONUS  4
+ #define ECHO_JOURNAL_COUNT    16
+diff --git a/src/battle_terastal.c b/src/battle_terastal.c
+index ea018e50..63c32e64 100644
+--- a/src/battle_terastal.c
++++ b/src/battle_terastal.c
+@@ -73,6 +73,9 @@ bool32 CanTerastallize(enum BattlerId battler)
+     if (gBattleMons[battler].volatiles.transformed && GET_BASE_SPECIES_ID(gBattleMons[battler].species) == SPECIES_TERAPAGOS)
+         return FALSE;
+ 
++    if (!(gBattleTypeFlags & BATTLE_TYPE_TRAINER) && !IsOnPlayerSide(battler))
++        return FALSE;
++
+     // Prevents Zigzagoon from terastalizing in vanilla.
+     if (gBattleTypeFlags & BATTLE_TYPE_FIRST_BATTLE && !IsOnPlayerSide(battler))
+         return FALSE;
+diff --git a/src/echo_loop.c b/src/echo_loop.c
+index 9ce3a6f4..8bc6fc93 100644
+--- a/src/echo_loop.c
++++ b/src/echo_loop.c
+@@ -29,7 +29,7 @@ static const u8 *const sPhaseNames[ECHO_PHASES_PER_DAY] =
+     COMPOUND_STRING("Night"),
+ };
+ 
+-static const u8 sPhaseHours[ECHO_PHASES_PER_DAY] = {8, 13, 19, 23};
++static const u8 sPhaseHours[ECHO_PHASES_PER_DAY] = {8, 13, 20, 23}; // 20 = full evening tint
+ 
+ static const u8 *const sJournalEntries[ECHO_JOURNAL_COUNT] =
+ {
+diff --git a/tools/echo/gen_maps.py b/tools/echo/gen_maps.py
+index ad8705a4..d5d71187 100644
+--- a/tools/echo/gen_maps.py
++++ b/tools/echo/gen_maps.py
+@@ -91,7 +91,7 @@ class Map:
+ 
+ def bellmoor():
+     m = Map('VerranBellmoor', 24, 20)
+-    m.rect(2, 2, 21, 17, '.').rect(10, 0, 11, 19, 'p').rect(6, 8, 17, 9, 'p').rect(12, 16, 19, 17, 'p')
++    m.rect(2, 2, 21, 17, '.').rect(9, 0, 12, 19, '.').rect(10, 0, 11, 19, 'p').rect(6, 8, 17, 9, 'p').rect(12, 16, 19, 17, 'p')
+     m.put([(3, 9), (20, 9), (4, 11), (5, 11), (18, 11), (19, 11), (3, 17), (4, 17), (20, 3)], 'f')
+     m.doors = {'odette': m.stamp('houseA', 3, 3), 'tobin': m.stamp('houseB', 15, 3), 'hall': m.stamp('hall', 13, 11)}
+     m.raw[(8, 15)] = SIGN
+@@ -100,7 +100,7 @@ def bellmoor():
+ 
+ def gloamwood():
+     m = Map('VerranGloamWood', 24, 30)
+-    for r in [(6, 2, 17, 7), (14, 8, 19, 15), (2, 10, 19, 15), (2, 14, 13, 23), (8, 18, 13, 29), (12, 22, 19, 27)]:
++    for r in [(6, 2, 17, 7), (14, 8, 19, 15), (2, 10, 19, 15), (2, 14, 13, 23), (8, 18, 13, 27), (9, 28, 12, 29), (12, 22, 19, 27)]:
+         m.rect(*r, '.')
+     m.rect(6, 14, 9, 17, ',').rect(14, 22, 19, 25, ',').rect(18, 10, 19, 11, ',')
+     for r in [(16, 8, 17, 11), (4, 12, 17, 13), (4, 14, 5, 19), (4, 20, 11, 21), (10, 22, 11, 29)]:
+@@ -112,7 +112,7 @@ def gloamwood():
+ 
+ def tideway():
+     m = Map('VerranTideway', 24, 24)
+-    m.rect(8, 0, 13, 5, '.').rect(2, 6, 21, 21, '.').rect(2, 16, 13, 21, 'w')
++    m.rect(9, 0, 12, 5, '.').rect(2, 6, 21, 21, '.').rect(2, 16, 13, 21, 'w')
+     m.rect(10, 0, 11, 15, 'p').rect(12, 12, 19, 13, 'p').rect(14, 6, 19, 9, ',')
+     m.put([(3, 7), (4, 7), (20, 15), (19, 19), (20, 19), (16, 17)], 'f')
+     return m
+-- 
+2.34.1
+

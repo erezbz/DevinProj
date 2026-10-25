@@ -1,7 +1,7 @@
 From 15ad8cfd6fd0de48eb5416f7a814f08c09a065c6 Mon Sep 17 00:00:00 2001
 From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
 Date: Sun, 25 Oct 2026 16:30:12 +0000
-Subject: [PATCH 4/8] echo: 3-day loop engine (step clock, phase tint, reset on
+Subject: [PATCH 4/9] echo: 3-day loop engine (step clock, phase tint, reset on
  loop end/blackout, journal menu)
 
 Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
