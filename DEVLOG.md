@@ -225,3 +225,8 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:30**: Checked that `NoseHoover` samples the *canonical* ensemble, not just the right mean T: 108 LJ argon atoms, 120 ps at 120 K, kinetic-energy variance in 6 blocks.
   - Result: Var(K) / ((N_f/2)(kT)²) = **1.080 ± 0.060**, which is consistent with the exact 1 (1.3σ). Mean T = 119.96 K.
   - Not added as a unit test: getting the error bar down would take a run that's too long for the suite.
+- **06:31–06:32**: Profiling 864-atom LJ showed **56% of the time in `cell_list_pairs`** (a Python loop over cells, ~11 ms per step). Added a **Verlet-list skin** to `LennardJones`
+  (default 0.3σ). The list is reused until some particle has moved more than skin/2, and rebuilt whenever the particle IDs, the box or the cutoff change (so reactions are safe). The result is exact, not approximate.
+  - Test: 500 atoms, compared every 20 steps against a skin = 0 force. Forces and energy agree to ≤ 1e-12 relative.
+  - Benchmark: 864 atoms, 300 steps, **4.84 s → 1.72 s (2.8x)**, with list rebuilds 302 → 24.
+  - Full suite: **87 passed in 47.32s**.

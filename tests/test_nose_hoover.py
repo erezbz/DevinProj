@@ -32,3 +32,17 @@ def test_nose_hoover_reaches_target_and_conserves_extended_energy():
     # the extended-energy error is integration error: it shrinks ~dt^2 (observed 3.4x per halving)
     _, fine = _run(2.5, 8000)
     assert checks["extended energy"].value / fine["extended energy"].value > 2.5
+
+
+def test_lj_verlet_skin_is_exact_and_saves_rebuilds():
+    from accusim import VelocityVerlet
+    s, lj = _argon(n_cells=5, T0=300)  # 500 atoms: cell-list path
+    fresh = LennardJones({"Ar": (120 * k_B.value, 3.4e-10)}, cutoff=2.5, skin=0.0)
+    sim = Simulation(s, [lj], integrator=VelocityVerlet(), dt=Q(5, "fs"))
+    for _ in range(10):
+        sim.run(steps=20, positions=False)
+        f1, u1 = lj.compute(s)
+        f0, u0 = fresh.compute(s)
+        assert np.max(np.abs(f1 - f0)) <= 1e-12 * np.max(np.abs(f0))
+        assert abs(u1 - u0) <= 1e-12 * abs(u0)
+    assert lj.rebuilds < 0.5 * 210

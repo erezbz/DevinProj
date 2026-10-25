@@ -82,16 +82,33 @@ class LennardJones(Force):
     The potential is truncated at cutoff*sigma_ij and shifted to zero there.
     """
 
-    def __init__(self, params: dict, cutoff: float = 2.5, pairlist_threshold: int = 400):
+    def __init__(self, params: dict, cutoff: float = 2.5, pairlist_threshold: int = 400, skin: float = 0.3):
         self.params = {k: (si(e, "J"), si(sg, "m")) for k, (e, sg) in params.items()}
         self.cutoff = cutoff
         self.pairlist_threshold = pairlist_threshold
+        self.skin = skin  # Verlet-list skin (units of sigma): exact, the list is rebuilt before any pair can be missed
+        self._nl = None
+        self.rebuilds = 0
+
+    def _neighbours(self, s, rc, skin):
+        nl = self._nl
+        if nl is not None and nl[3].shape == s.ids.shape and np.array_equal(nl[3], s.ids) \
+                and np.array_equal(nl[4], s.box) and nl[5] == rc:
+            disp = s.pos - nl[2]
+            if s.periodic:
+                disp -= s.box * np.round(disp / s.box)
+            if skin > 0 and float(np.max(np.einsum("ij,ij->i", disp, disp))) < (0.5 * skin) ** 2:
+                return nl[0], nl[1]
+        i, j = cell_list_pairs(s, rc + skin)
+        self._nl = (i, j, s.pos.copy(), s.ids.copy(), None if s.box is None else s.box.copy(), rc)
+        self.rebuilds += 1
+        return i, j
 
     def _compute_pairlist(self, s):
         """O(N) neighbour search with a cell list: only pairs within the cutoff are visited."""
         eps_t, sig_t = self._tables(s)
-        rc = self.cutoff * float(np.max(np.where(eps_t > 0, sig_t, 0)))
-        i, j = cell_list_pairs(s, rc)
+        smax = float(np.max(np.where(eps_t > 0, sig_t, 0)))
+        i, j = self._neighbours(s, self.cutoff * smax, self.skin * smax)
         f = np.zeros_like(s.pos)
         if not len(i):
             return f, 0.0
