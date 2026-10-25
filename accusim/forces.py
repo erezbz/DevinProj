@@ -367,8 +367,9 @@ class DampedShiftedCoulomb(Force):
     cost; compare against Ewald on a snapshot to quantify the error for your system.
     """
 
-    def __init__(self, rcut, alpha=None, k=KE_CONST, pairlist_threshold=400):
+    def __init__(self, rcut, alpha=None, k=KE_CONST, pairlist_threshold=400, exclude=()):
         self.pairlist_threshold = pairlist_threshold
+        self.exclude = [tuple(p) for p in exclude]  # id pairs with no interaction (same-molecule atoms)
         self.k = si(k, "J*m/C^2")
         self.rcut = si(rcut, "m")
         self.alpha = 2.0 / self.rcut if alpha is None else si(alpha, "1/m")
@@ -382,8 +383,14 @@ class DampedShiftedCoulomb(Force):
         c = 2 * a / np.sqrt(np.pi)
         erc = float(_erfc(np.array(a * rc)))
         fshift = erc / rc ** 2 + c * np.exp(-(a * rc) ** 2) / rc
+        where = {pid: n for n, pid in enumerate(s.ids)} if self.exclude else {}
+        ex = np.array([(where[a], where[b]) for a, b in self.exclude if a in where and b in where], dtype=int).reshape(-1, 2)
         if s.n >= self.pairlist_threshold:
             i, j = cell_list_pairs(s, rc)
+            if len(ex):
+                lo, hi = np.minimum(ex[:, 0], ex[:, 1]), np.maximum(ex[:, 0], ex[:, 1])
+                keep = ~np.isin(i * s.n + j, lo * s.n + hi)
+                i, j = i[keep], j[keep]
             d = s.pos[j] - s.pos[i]
             if s.periodic:
                 d -= s.box * np.round(d / s.box)
@@ -402,6 +409,9 @@ class DampedShiftedCoulomb(Force):
         rr = np.where(inside, r, 1.0)
         er = _erfc(a * rr)
         qq = np.where(inside, q[:, None] * q[None, :], 0.0)
+        if len(ex):
+            qq[ex[:, 0], ex[:, 1]] = 0.0
+            qq[ex[:, 1], ex[:, 0]] = 0.0
         U = 0.5 * float(np.sum(qq * (er / rr - erc / rc + fshift * (rr - rc))))
         U -= float(np.sum(q ** 2)) * (erc / (2 * rc) + a / np.sqrt(np.pi))
         fmag = qq * ((er / rr ** 2 + c * np.exp(-(a * rr) ** 2) / rr) - fshift) / rr

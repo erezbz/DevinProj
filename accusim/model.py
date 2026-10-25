@@ -124,9 +124,7 @@ def build(model: dict) -> tuple[Simulation, dict]:
             f["params"] = {k: (_energy(e), qty(sg)) for k, (e, sg) in f["params"].items()}
         else:
             f = {k: qty(v) for k, v in f.items()}
-        if kind is F.DampedShiftedCoulomb and exclude:
-            raise ValueError("DampedShiftedCoulomb has no intramolecular exclusions yet; use Coulomb with molecules")
-        if kind is F.Coulomb and exclude:
+        if kind in (F.Coulomb, F.DampedShiftedCoulomb) and exclude:
             f["exclude"] = list(f.get("exclude", [])) + exclude
         forces.append(kind(**f))
     forces += mol_forces

@@ -64,8 +64,6 @@ def test_dsf_cell_list_path_matches_dense():
 def test_dsf_from_json_model(tmp_path):
     import json
 
-    import pytest
-
     from accusim.model import load
     n = np.stack(np.meshgrid(*[np.arange(4)] * 3, indexing="ij"), -1).reshape(-1, 3)
     odd = n.sum(1) % 2 == 1
@@ -88,5 +86,17 @@ def test_dsf_from_json_model(tmp_path):
     model["molecules"] = [{"atoms": [["Na", [0, 0, 0]], ["Cl", [2.8e-10, 0, 0]]], "bonds": [[0, 1, "100 N/m", "2.8 A"]],
                            "at": [[5e-10, 5e-10, 5e-10]]}]
     path.write_text(json.dumps(model))
-    with pytest.raises(ValueError, match="exclusions"):
-        load(str(path))
+    sim, _ = load(str(path))
+    dsf = [f for f in sim.forces if isinstance(f, DampedShiftedCoulomb)][0]
+    assert len(dsf.exclude) == 1
+
+
+def test_dsf_exclusions_same_in_dense_and_cell_paths():
+    s = rocksalt(8)
+    rng = np.random.default_rng(5)
+    s.pos = (s.pos + rng.normal(0, 0.2, s.pos.shape)) % s.box
+    ex = [(int(s.ids[2 * m]), int(s.ids[2 * m + 1])) for m in range(50)]
+    fd, ud = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=10 ** 9, exclude=ex).compute(s)
+    fc, uc = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=1, exclude=ex).compute(s)
+    _, u0 = DampedShiftedCoulomb(rcut=2.5, k=1.0).compute(s)
+    assert abs(uc / ud - 1) < 1e-12 and np.allclose(fc, fd, rtol=1e-9, atol=1e-12) and abs(u0 - ud) > 1e-6

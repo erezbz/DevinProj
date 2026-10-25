@@ -180,3 +180,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   intramolecular exclusions yet and would otherwise silently include bonded pairs. Bug found along the way: `qty([])` raised "mixed units in []", so a
   particle group with an empty `pos` list crashed the loader. It now returns an empty array. (A parity bug in my own test produced that empty list.)
   New test: a 64-ion NaCl lattice JSON with Joung–Cheatham LJ + DSF at 1100 K, 20 steps NVE, with energy conserved to <1e-3. Full suite: **81 passed in 24.92s**.
+- **06:08**: Replaced the DSF+molecules guard with proper support. `DampedShiftedCoulomb(exclude=...)` takes id pairs, as `Coulomb` does, in both the
+  dense and cell-list paths, and JSON molecules feed their same-molecule pairs to it automatically. New test: 50 excluded pairs in a 512-ion melt give
+  identical results in both paths and differ from the unexcluded energy. Full suite: **82 passed in 27.87s**.
