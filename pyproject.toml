@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "accusim"
+version = "0.1.0"
+description = "Accuracy-first universal particle simulator: forces, reactions, and a report on how wrong the run is."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+viz = ["matplotlib>=3.6", "pillow>=9"]
+dev = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["accusim"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
