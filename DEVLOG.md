@@ -137,3 +137,9 @@ No contact with humans and no money spent. I can make my own decisions about the
   First run: minimize called `sim.update_forces()`, which returns nothing (it stores the forces on the sim), so the tuple unpack failed. Fixed by using `sim.potential()`.
   The molecule test then missed by 1.2e-6 on the angle: the default stopping force (1e-6 × initial) was too loose, so it is now 1e-9 × initial.
   Tests: LJ dimer at 2^(1/6)σ, distorted triatomic relaxes to r0/θ0, ideal-gas g(r) = 1, FCC first peak at a/√2. **68/68 tests pass.**
+- **05:55**: `msd` now unwraps periodic boxes (adds up minimum-image steps between frames). Test: Brownian particles crossing boundaries
+  match 6Dt to within 5%.
+- **05:56**: Added `examples/rahman_argon.py`, which **reproduces Rahman (1964)**, the first MD study of a real liquid: 864 Ar, 94.4 K, 1.374 g/cm³.
+  On a 10 ps run: g(r) peak at **3.75 Å** (Rahman ~3.7 Å) with height 2.75, and **D = 2.15e-5 cm²/s** against Rahman's 2.43e-5, which is 12% low.
+  Suspects: statistical noise from one short run, and the cutoff (2.5σ, shifted) differs from Rahman's 2.25σ. Next I'm running a longer production run to separate the two.
+  NVE energy drift 4e-5 (WARN), momentum 1e-16. Wall time 36 s.

@@ -24,8 +24,20 @@ def rdf(system, rmax, bins=100, species=None):
     return 0.5 * (edges[1:] + edges[:-1]), hist / ideal
 
 
-def msd(trajectory):
-    """Mean squared displacement vs time from recorded positions (fixed particle set, unwrapped coords)."""
-    p0 = trajectory.positions[0]
+def msd(trajectory, box=None):
+    """Mean squared displacement vs time from recorded positions (fixed particle set).
+
+    With a periodic `box`, frames are unwrapped by minimum-image steps, so frames must be
+    recorded often enough that no particle moves half a box between them.
+    """
     t = np.asarray(trajectory.t)
-    return t - t[0], np.array([np.mean(np.sum((p - p0) ** 2, axis=1)) for p in trajectory.positions])
+    frames = trajectory.positions
+    disp = np.zeros_like(frames[0])
+    out = [0.0]
+    for a, b in zip(frames[:-1], frames[1:]):
+        step = b - a
+        if box is not None:
+            step -= box * np.round(step / box)
+        disp = disp + step
+        out.append(float(np.mean(np.sum(disp ** 2, axis=1))))
+    return t - t[0], np.array(out)

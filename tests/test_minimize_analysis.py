@@ -50,3 +50,17 @@ def test_rdf_of_fcc_crystal_peaks_at_nearest_neighbour_distance():
     s.add("X", pts)
     r, g = rdf(s, 1.5, bins=150)
     assert r[np.argmax(g)] == pytest.approx(a / np.sqrt(2), abs=0.01)
+
+
+def test_msd_unwraps_periodic_brownian_motion():
+    from accusim import Brownian
+    from accusim.analysis import msd
+    D, L = 1e-9, 2e-7
+    s = System(3, box=L, periodic=True)
+    s.add_species("X", 1e-25, diffusion=D)
+    s.add("X", np.random.default_rng(0).uniform(0, L, (4000, 3)))
+    sim = Simulation(s, integrator=Brownian(300.0), dt=1e-9, seed=2)
+    tr = sim.run(steps=200, record_every=2)
+    t, m = msd(tr, box=L)
+    assert 6 * D * t[-1] > (L / 2) ** 2 / 10  # particles really crossed boundaries
+    assert m[-1] == pytest.approx(6 * D * t[-1], rel=0.05)
