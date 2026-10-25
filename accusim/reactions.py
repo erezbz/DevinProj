@@ -54,7 +54,7 @@ class ReactionEngine:
         self.reactions = list(reactions)
         for r in self.reactions:
             r.validate(system)
-        self.internal = 0.0     # energy stored in products' internal degrees of freedom
+        self.internal = 0.0     # potential-energy jumps absorbed by reaction events
         self.released = 0.0     # rest-mass/chemical energy converted (sum of Q)
         self.released_rest = 0.0  # part of `released` that came from rest mass
         self.events = {r.name: 0 for r in self.reactions}
@@ -95,9 +95,9 @@ class ReactionEngine:
             return False
         _, u_before = sim.potential()
         s.remove(busy)
-        for names, pos, vel in new:
-            for n, x, v in zip(names, pos, vel):
-                s.add(n, x, v)
+        for names, pos, vel, eint in new:
+            for n, x, v, e in zip(names, pos, vel, eint):
+                s.add(n, x, v, e)
         s.apply_boundaries()
         sim.update_forces()
         # Potential energy jumps when particles appear/disappear; the reacting
@@ -114,7 +114,7 @@ class ReactionEngine:
             d = s.displacements([idx[0]], [idx[1]])[0, 0]
             x[1] = x[0] + d
         P = np.sum(m[:, None] * v, axis=0)
-        ke_in = 0.5 * float(np.sum(m[:, None] * v ** 2))
+        ke_in = 0.5 * float(np.sum(m[:, None] * v ** 2)) + float(np.sum(s.eint[idx]))
         x_cm = np.sum(m[:, None] * x, axis=0) / m.sum()
         mp = np.array([s.species[s.species_index(n)].mass for n in r.products])
         V = P / mp.sum()
@@ -123,8 +123,7 @@ class ReactionEngine:
             return False  # below threshold: not enough energy
         k = len(mp)
         if k == 1:
-            pos, vel = x_cm[None, :], V[None, :]
-            self.internal += e_rel
+            pos, vel, eint = x_cm[None, :], V[None, :], [e_rel]
         else:
             w = sim.rng.normal(size=(k, s.dim))
             w -= np.sum(mp[:, None] * w, axis=0) / mp.sum()
@@ -135,10 +134,11 @@ class ReactionEngine:
             off = 0.5 * r._sep * dirs
             off -= np.sum(mp[:, None] * off, axis=0) / mp.sum()
             pos = x_cm + off
+            eint = [0.0] * k
         self.released += r.q_value
         self.released_rest += r.rest_q
         self.events[r.name] += 1
-        new.append((list(r.products), pos, vel))
+        new.append((list(r.products), pos, vel, eint))
         return True
 
 

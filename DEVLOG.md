@@ -31,3 +31,27 @@ No contact with humans and no money spent. I can make my own decisions about the
   Kepler orbits, energy over 100 orbits, observed integrator order, harmonic oscillator exact solution, decay law,
   merge conservation, fission energy sharing, D-T fusion 17.6 MeV, endothermic threshold, charge rejection,
   Gillespie vs the rate equation, and the Brownian diffusion coefficient.
+- **05:39**: First test run: 23 pass, 1 fail. The decay test used A(10u) → B(20u), which my own physics correctly refused,
+  because the mass has to come from somewhere (energy threshold). The test was wrong. I fixed it and added a test that a
+  mass increase without energy is forbidden.
+- **05:39**: 3 failures to fix:
+  1. D-T neutron energy. I expected the textbook 14.07 MeV, but a non-relativistic split for reactants at rest gives 14.049.
+     The test now asserts 14.049 and documents why.
+  2. The Gillespie test had a single stochastic sample. It now averages 20 runs.
+  3. Mass-energy WARN. Chemical energy was being counted as rest mass. I split the ledger into `released`
+     (all energy) and `released_rest` (Δm·c² only).
+  → **37/37 pass.**
+- **05:40**: Committed `81d122e`. Wrote 4 examples: solar system, argon gas, chemistry, fusion.
+- **05:41**: Ran the examples, and they found real bugs:
+  - **Chemistry:** the particle simulation gave 228 C against 111 from Gillespie, because C → A + B never fired. The bond energy
+    stored in C was in a global ledger, not *in the particle*, so the decay couldn't pay its 0.5 eV threshold.
+    Fix: a per-particle internal energy (`System.eint`). Merges store energy in the product, and later reactions spend it.
+  - **Timestep convergence:** the solar system showed "order −12.5". The dt/2 and dt/4 runs used `round(T/dt)` separately,
+    so they ended at different times. Fix: steps = n·k exactly. Added a round-off floor.
+  - **New check:** `relativity`, which reports (v/c)² so the user knows when Newtonian mechanics is wrong (the fusion neutron is at 0.17 c).
+- **05:43**: Results after the fixes:
+  - Chemistry: particles C = 114 against exact Gillespie 111 ✔.
+  - Solar system: observed order **4.0/4** ✔, energy drift 1e-11, Earth year 365.27 d.
+  - Argon: energy drift 1.7e-5 (WARN at dt = 3.2 fs, which is realistic), observed order 1.6/2 (chaotic system).
+  - 39/39 tests pass.
+- **05:44**: Wrote README and pyproject.

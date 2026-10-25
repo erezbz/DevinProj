@@ -117,3 +117,30 @@ def test_brownian_diffusion_coefficient():
     sim.run(steps=100, positions=False)
     msd = np.mean(np.sum(s.pos ** 2, axis=1))
     assert msd == pytest.approx(6 * D * 1e-7, rel=0.05)
+
+
+def test_reversible_reaction_stores_and_returns_internal_energy():
+    s = System(3)
+    s.add_species("A", Q(10, "u"))
+    s.add_species("B", Q(10, "u"))
+    s.add_species("C", Q(20, "u"))
+    s.add("A", [0, 0, 0])
+    s.add("B", [1e-10, 0, 0])
+    rx = [Reaction(["A", "B"], "C", rate=1e30, radius=Q(1, "nm"), energy=Q(1, "eV")),
+          Reaction("C", ["A", "B"], rate=1e30, energy=Q(-1, "eV"))]
+    sim = Simulation(s, reactions=rx, dt=1e-15, seed=0)
+    sim.run(steps=1, positions=False)
+    assert s.counts()["C"] == 1 and s.eint[0] == pytest.approx(Q(1, "eV").value)
+    sim.run(steps=1, positions=False)
+    assert s.counts()["C"] == 0
+    assert s.kinetic_energy() == pytest.approx(0, abs=1e-30)
+    assert sim.accuracy_report()["energy"].status == "PASS"
+
+
+def test_report_warns_about_relativistic_speeds():
+    s = System(3)
+    s.add_species("n", Q(1, "u"))
+    s.add("n", [0, 0, 0], [0.2 * 2.998e8, 0, 0])
+    sim = Simulation(s, dt=1e-20)
+    sim.run(steps=2, positions=False)
+    assert sim.accuracy_report()["relativity"].status == "FAIL"

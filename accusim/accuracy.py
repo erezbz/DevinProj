@@ -96,6 +96,11 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
+        from .units import c as C_LIGHT
+        beta2 = float(np.max(np.sum(s.vel ** 2, axis=1)) / C_LIGHT.value ** 2) if s.n else 0.0
+        checks.append(Check("relativity", _grade(beta2, 1e-4, 1e-2), beta2,
+                            f"(v/c)^2 of fastest particle: Newtonian error ~ this size (v = {np.sqrt(beta2):.3g} c)"))
+
         if convergence_duration is not None:
             checks.append(timestep_convergence(sim, convergence_duration))
         return cls(checks)
@@ -112,17 +117,19 @@ def timestep_convergence(sim, duration, start=None) -> Check:
         return Check("timestep error", NA, None, "stochastic run: compare ensemble statistics instead")
     base = start or sim._initial
     T = si(duration, "s")
+    n = max(int(round(T / sim.dt)), 1)
     finals = []
     for k in (1, 2, 4):
         c = base.clone(dt=sim.dt / k)
-        c.run(steps=int(round(T / c.dt)), record_every=10 ** 9, positions=False)
+        c.run(steps=n * k, record_every=10 ** 9, positions=False)
         finals.append(c.system.pos.copy())
     size = max(float(np.ptp(finals[2])), 1e-300)
+    roundoff = 1e-13 * np.sqrt(n * 4)
     e1 = float(np.sqrt(np.mean((finals[0] - finals[1]) ** 2))) / size
     e2 = float(np.sqrt(np.mean((finals[1] - finals[2]) ** 2))) / size
     expected = sim.integrator.order
-    if e2 == 0 or e1 == 0:
-        return Check("timestep error", PASS, 0.0, "identical results at dt, dt/2, dt/4")
+    if e1 < 10 * roundoff:
+        return Check("timestep error", PASS, e1, "converged to floating-point round-off")
     p = np.log2(e1 / e2)
     est = e1 * 2 ** p / (2 ** p - 1) if p > 0.2 else e1
     if p < 0.5 * expected:

@@ -75,7 +75,7 @@ class Simulation:
         tr.t.append(self.time)
         tr.kinetic.append(s.kinetic_energy())
         tr.potential.append(self.pe)
-        tr.internal.append(self.reactions.internal if self.reactions else 0.0)
+        tr.internal.append((self.reactions.internal if self.reactions else 0.0) + float(np.sum(s.eint)))
         tr.released.append(self.reactions.released if self.reactions else 0.0)
         tr.momentum.append(s.momentum())
         tr.angular_momentum.append(s.angular_momentum() if s.dim in (2, 3) else np.zeros(1))

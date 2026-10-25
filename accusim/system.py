@@ -34,6 +34,7 @@ class System:
         self.vel = np.zeros((0, dim))
         self.sp = np.zeros(0, dtype=int)
         self.ids = np.zeros(0, dtype=int)
+        self.eint = np.zeros(0)  # internal (excitation/heat) energy per particle, J
         self._next_id = 0
 
     def add_species(self, name, mass, charge=0.0, radius=0.0, diffusion=0.0) -> Species:
@@ -52,7 +53,7 @@ class System:
         except KeyError:
             raise KeyError(f"unknown species '{name}'") from None
 
-    def add(self, species: str, pos, vel=None) -> np.ndarray:
+    def add(self, species: str, pos, vel=None, eint=0.0) -> np.ndarray:
         """Add one particle (pos shape (dim,)) or many (shape (n, dim)). Returns ids."""
         p = np.atleast_2d(si(pos, "m")).astype(float)
         v = np.zeros_like(p) if vel is None else np.broadcast_to(np.atleast_2d(si(vel, "m/s")), p.shape).astype(float)
@@ -65,11 +66,13 @@ class System:
         self.vel = np.vstack([self.vel, v])
         self.sp = np.concatenate([self.sp, np.full(n, self.species_index(species))])
         self.ids = np.concatenate([self.ids, new_ids])
+        self.eint = np.concatenate([self.eint, np.broadcast_to(np.asarray(eint, float), (n,))])
         return new_ids
 
     def remove(self, mask: np.ndarray):
         keep = ~mask
         self.pos, self.vel, self.sp, self.ids = self.pos[keep], self.vel[keep], self.sp[keep], self.ids[keep]
+        self.eint = self.eint[keep]
 
     @property
     def n(self) -> int:
@@ -134,7 +137,7 @@ class System:
     def copy(self) -> "System":
         other = System.__new__(System)
         other.__dict__.update(self.__dict__)
-        for k in ("pos", "vel", "sp", "ids"):
+        for k in ("pos", "vel", "sp", "ids", "eint"):
             setattr(other, k, getattr(self, k).copy())
         other.species = list(self.species)
         other._index = dict(self._index)
