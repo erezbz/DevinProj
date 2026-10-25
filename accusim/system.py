@@ -36,6 +36,7 @@ class System:
         self.ids = np.zeros(0, dtype=int)
         self.eint = np.zeros(0)  # internal (excitation/heat) energy per particle, J
         self.wall_impulse = 0.0  # momentum delivered to reflecting walls, kg m/s
+        self.constrained_dof = 0  # degrees of freedom removed by rigid constraints (set by Rattle)
         self._next_id = 0
 
     def add_species(self, name, mass, charge=0.0, radius=0.0, diffusion=0.0) -> Species:
@@ -117,7 +118,7 @@ class System:
 
     def temperature(self) -> float:
         from .units import k_B
-        dof = max(self.dim * self.n - self.dim, 1)
+        dof = max(self.dim * self.n - self.dim - self.constrained_dof, 1)
         return 2 * self.kinetic_energy() / (dof * k_B.value)
 
     def apply_boundaries(self):

@@ -265,3 +265,10 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Rigid water, 200 steps: **2.93 s → 0.09 s (33x)**. Positions agree with Gauss–Seidel to 3e-8 Å, and the constraint violation is 8.8e-15 vs 5e-13.
   - New test: both methods agree on 50 steps of rigid water. `rigid_water.py` total: 101 s → ~4.4 s, with identical drift numbers (2.87e-4 / 1.15e-3 / 4.83e-3).
   - Full suite: ****.
+- **06:40–06:45**: `System.temperature()` now subtracts the degrees of freedom removed by constraints (`constrained_dof`, which `Rattle` sets on its first step).
+  - Without this, rigid molecules read too cold: for dumbbells it counted 6 dof instead of 5, about 250 K for a 300 K gas.
+  - First test attempt: **SHAKE did not converge** after 66 s. Cause: I scattered 1 Å dumbbells over a 1 µm region.
+    - Float64 coordinates near 1e-6 m only resolve a 1e-10 m bond to ~1e-12 relative, which is exactly the solver tolerance. So this was a precision limit, not an algorithm bug.
+    - Fix: a 10 nm region. Note for users: tol must exceed eps × (coordinate size / bond length).
+  - Test: 1500 free dumbbells at a Maxwell–Boltzmann 300 K, then one RATTLE projection. Reads 300 K within 5% (the statistical sigma is ~1.6%).
+  - Full suite: **92 passed in 48.17s**.

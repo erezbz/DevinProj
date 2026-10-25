@@ -56,3 +56,20 @@ def test_matrix_and_gauss_seidel_shake_agree_on_rigid_water():
         out.append((s.pos.copy(), sim.integrator.max_violation))
     assert np.max(np.abs(out[0][0] - out[1][0])) < 1e-8 * 1e-10
     assert max(out[0][1], out[1][1]) < 1e-11
+
+
+def test_temperature_counts_constrained_degrees_of_freedom():
+    rng = np.random.default_rng(3)
+    s = System(3)
+    s.add_species("A", Q_u := 1.66053906660e-27)
+    cons = []
+    for _ in range(1500):
+        c = rng.uniform(0, 1e-8, 3)  # coordinates ~1e-6 m would limit |r| to ~1e-12 relative (float64), below tol
+        u = rng.normal(size=3)
+        a, b = s.add("A", [c, c + 1e-10 * u / np.linalg.norm(u)])
+        cons.append((a, b, 1e-10))
+    s.maxwell_boltzmann(300.0, rng)
+    sim = Simulation(s, [], integrator=Rattle(cons), dt=1e-18)
+    sim.run(steps=1, positions=False)  # RATTLE projects out the bond-stretch velocities
+    assert Q_u > 0
+    assert abs(s.temperature() - 300.0) / 300.0 < 0.05  # 5 dof per dumbbell, not 6 (which would read ~250 K)

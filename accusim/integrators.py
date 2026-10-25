@@ -143,6 +143,7 @@ class Rattle(Integrator):
         s = sim.system
         where = {pid: n for n, pid in enumerate(s.ids)}
         cons = [(where[a], where[b], d) for a, b, d in self.constraints if a in where and b in where]
+        s.constrained_dof = len(cons)
         inv = 1.0 / s.masses
         use_matrix = self.method == "matrix" or (self.method == "auto" and len(cons) <= 1500)
         if use_matrix and cons:
