@@ -207,3 +207,8 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Two independent estimators now agree within the error bar.
 - **06:23**: Added an 11th benchmark to the scorecard: **Green–Kubo** D for free Langevin particles against the exact kT/(mγ), relative error 1.3e-2 (PASS, tolerance 6%). `python -m accusim.validate`: all
   benchmarks passed. Full suite: **84 passed in 26.54s**.
+- **06:24–06:27**: Ran all 9 examples and wrote **EXAMPLES.md**: every accuracy report verbatim, plus notes on each WARN/FAIL.
+  - Findings: fusion shows **relativity FAIL** (14.1 MeV neutrons at 0.17 c, while the integrator is Newtonian). That's a real limitation, kept as is.
+  - water_cluster energy drift is 4.1e-4 at 0.2 fs. I checked dt = 0.1 fs (a temporary copy outside the repo): drift 9.9e-5, 4.1× lower, consistent with second order.
+  - Correction while writing: my first draft called the water bonds "rigid" (they're flexible SPC/Fw) and claimed the advisor's dt would fix the drift (I hadn't checked). Both were fixed before committing.
+  - I labelled the argon order-1.6 explanation as an untested hypothesis.
