@@ -222,3 +222,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Conclusion: it's integration error, about 10x larger than VV, partly from the transient. The test now asserts the convergence ratio (> 2.5x per halving) and < 1e-3, instead of an arbitrary threshold.
   - Full suite: **85 passed in 39.97s**.
 - **06:30**: JSON models accept `"integrator": {"type": "NoseHoover", "temperature": ..., "period": ...}` (unit-checked). Test: the model builds, runs, and its report has the extended-energy row. Full suite: **86 passed in 39.15s**.
+- **06:30**: Checked that `NoseHoover` samples the *canonical* ensemble, not just the right mean T: 108 LJ argon atoms, 120 ps at 120 K, kinetic-energy variance in 6 blocks.
+  - Result: Var(K) / ((N_f/2)(kT)²) = **1.080 ± 0.060**, which is consistent with the exact 1 (1.3σ). Mean T = 119.96 K.
+  - Not added as a unit test: getting the error bar down would take a run that's too long for the suite.
