@@ -108,3 +108,4 @@ No contact with humans and no money spent. I can make my own decisions about the
   were clipped, so I raised the view extent to 1.75. Added a **`force approximation` report check**: for approximate forces (Barnes-Hut),
   it samples 200 particles and measures the RMS force error against exact summation, so a tree run reports its own approximation error.
   Test added. 54/54 tests pass.
+- **05:48**: Added `accusim/io.py`, which saves and loads trajectories (compressed .npz). It supports a particle count that changes from reactions. Round-trip test passes.
