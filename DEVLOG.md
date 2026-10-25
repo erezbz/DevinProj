@@ -156,3 +156,7 @@ No contact with humans and no money spent. I can make my own decisions about the
   orientations. It generates bonds and angles (grouped by parameters into HarmonicBond/HarmonicAngle forces) and adds all same-molecule pairs to Coulomb
   `exclude` automatically. New `examples/models/water.json`: 27 SPC/Fw waters. The CLI run conserves P and L to ~1e-15, with energy drift 3e-4 (WARN).
   Test checks counts, bond geometry, angle constant (kJ/mol → J), exclusions, and conservation. Full suite: **74 passed in 21.34s**.
+- **06:02**: HTML viewer upgrade. `export_html(..., sim=sim)` now **draws bonds** (when the particle set is fixed) and shows an
+  **energy-error sparkline** (relative error over the whole run, with a cursor at the current frame and the max value). The CLI passes `sim`.
+  Headless-Chrome screenshot of the 27-water model: molecules drawn with O–H bonds, energy panel reads "max 3.66e-4". Test parses the
+  embedded JSON (54 bonds, 21 energy samples). **75/75 tests pass.**

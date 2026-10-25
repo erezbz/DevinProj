@@ -24,7 +24,7 @@ def main(argv=None):
         (animate3d if a.three_d else animate)(tr, sim.system, a.gif, title=a.model)
     if a.html:
         from .viz import export_html
-        export_html(tr, sim.system, a.html, title=a.model)
+        export_html(tr, sim.system, a.html, title=a.model, sim=sim)
     return sim
 
 

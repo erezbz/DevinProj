@@ -18,3 +18,17 @@ def test_animations_and_plots_render(tmp_path):
     html = (tmp_path / "v.html").read_text()
     assert "requestAnimationFrame" in html and '"species":["A"]' in html and "%" not in html.split("<script>")[0][-5:]
     assert all((tmp_path / f).stat().st_size > 1000 for f in ("a.gif", "b.gif", "e.png", "v.html"))
+
+
+def test_html_viewer_includes_bonds_and_energy_panel(tmp_path):
+    import json
+    import os
+    import re
+
+    from accusim.model import load
+    sim, _ = load(os.path.join(os.path.dirname(__file__), "..", "examples", "models", "water.json"))
+    tr = sim.run(steps=20)
+    out = tmp_path / "w.html"
+    export_html(tr, sim.system, str(out), sim=sim)
+    data = json.loads(re.search(r"const D=(\{.*?\});const C=", out.read_text()).group(1))
+    assert len(data["bonds"]) == 54 and len(data["energy"]) == 21 and data["emax"] > 0
