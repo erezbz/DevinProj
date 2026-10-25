@@ -85,7 +85,8 @@ Accuracy report (no failures, 1 warning)
 - `minimize(sim)`: FIRE energy minimisation, to relax hand-built structures before dynamics. Tested: it finds the LJ dimer minimum
   at 2^(1/6)σ to 1e-6 and relaxes a distorted triatomic to its rest bond length and angle.
 - `rdf(system, rmax)`: radial distribution function g(r). Tested: ideal gas → 1, and the FCC peak at a/√2.
-- `msd(trajectory)`: mean squared displacement against time.
+- `msd(trajectory, box)`: mean squared displacement against time, unwrapping periodic boundaries.
+- `pressure(sim)`: pressure for *any* force set, from box rescaling (−dU/dV), so no per-force virial code is needed. Tested against NkT/V and an independent pairwise LJ virial (1e-5).
 - `accusim.io.save/load`: compressed .npz trajectories, including runs where the particle count changes.
 
 ## Interactive 3D viewer

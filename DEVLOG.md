@@ -150,3 +150,5 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:00**: Added a **`thermostat` report check** for Langevin runs: mean T over the second half against the target, with tolerance max(2%, 3·√(2/dof)).
   Tests: a gas started at 100 K with a 300 K target PASSes; a 1000 K gas with weak friction and a short run FAILs (not equilibrated).
   Added the FIRE LJ-dimer benchmark to `python -m accusim.validate` (9 rows, all PASS, 2e-11). Full suite: **71 passed in 20.00s**.
+- **06:01**: Added **`pressure(sim)`**: P = 2K/(dV) − dU/dV, with dU/dV from a central difference of uniform box rescaling. It works for every
+  force type, so no per-force virial code is needed. Tests: ideal gas equals NkT/V to 1e-12, and LJ matches an independently computed pairwise virial to 1e-5.

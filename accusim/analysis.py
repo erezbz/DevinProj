@@ -41,3 +41,24 @@ def msd(trajectory, box=None):
         disp = disp + step
         out.append(float(np.mean(np.sum(disp ** 2, axis=1))))
     return t - t[0], np.array(out)
+
+
+def pressure(sim, h=1e-6):
+    """Instantaneous pressure P = 2K/(dV) - dU/dV for any set of forces.
+
+    dU/dV is taken by uniformly rescaling the box and all positions (central
+    difference), so it works for every force type without per-force virials.
+    """
+    s = sim.system
+    if s.box is None:
+        raise ValueError("pressure needs a box")
+    box0, pos0 = np.array(s.box, dtype=float), s.pos.copy()
+    V0 = float(np.prod(np.broadcast_to(box0, (s.dim,))))
+    U = []
+    for sign in (+1, -1):
+        lam = (1 + sign * h) ** (1 / s.dim)
+        s.box, s.pos = box0 * lam, pos0 * lam
+        U.append(sum(f.compute(s)[1] for f in sim.forces if not f.external))
+    s.box, s.pos = (box0 if np.ndim(box0) else float(box0)), pos0
+    dUdV = (U[0] - U[1]) / (2 * h * V0)
+    return 2 * s.kinetic_energy() / (s.dim * V0) - dUdV

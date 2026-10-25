@@ -64,3 +64,37 @@ def test_msd_unwraps_periodic_brownian_motion():
     t, m = msd(tr, box=L)
     assert 6 * D * t[-1] > (L / 2) ** 2 / 10  # particles really crossed boundaries
     assert m[-1] == pytest.approx(6 * D * t[-1], rel=0.05)
+
+
+def test_pressure_of_ideal_gas_is_nkt_over_v():
+    from accusim.analysis import pressure
+    s = System(3, box=Q(10, "nm"), periodic=True)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add("Ar", np.random.default_rng(0).uniform(0, 1e-8, (500, 3)))
+    s.maxwell_boltzmann(300.0, np.random.default_rng(1), zero_momentum=False)
+    sim = Simulation(s, dt=1e-15)
+    assert pressure(sim) == pytest.approx(2 * s.kinetic_energy() / 3 / 1e-24, rel=1e-12)
+
+
+def test_pressure_matches_pairwise_virial_for_lennard_jones():
+    from accusim.analysis import pressure
+    L = 2e-9
+    s = System(3, box=L, periodic=True)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add("Ar", np.random.default_rng(3).uniform(0, L, (60, 3)))
+    sim = Simulation(s, [LennardJones({"Ar": (1.65e-21, 3.4e-10)}, cutoff=2.5)], dt=1e-15)
+    minimize(sim, max_steps=300)
+    s.maxwell_boltzmann(120.0, np.random.default_rng(4))
+    # independent virial: W = sum over pairs r_ij . F_ij from the analytic force on each particle pair
+    lj = sim.forces[0]
+    W = 0.0
+    for i in range(s.n):
+        for j in range(i + 1, s.n):
+            d = s.pos[j] - s.pos[i]
+            d -= L * np.round(d / L)
+            two = System(3)
+            two.add_species("Ar", Q(39.948, "u"))
+            two.add("Ar", [[0, 0, 0], d])
+            W += float(d @ lj.compute(two)[0][1])
+    expected = (2 * s.kinetic_energy() + W) / (3 * L ** 3)
+    assert pressure(sim) == pytest.approx(expected, rel=1e-5)
