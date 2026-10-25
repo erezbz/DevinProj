@@ -112,3 +112,10 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **05:49**: Added **`python -m accusim.validate`**, a scorecard of 8 textbook benchmarks with answers that don't come from accusim:
   Kepler closure (9e-9), oscillator (6e-13), measured Verlet order 2.00008, Madelung (5e-8), D-T Q-value 17.5893 MeV (2e-7),
   decay law (1.1%, 1.2σ stochastic), Gillespie against the rate equation (2e-4), and Einstein diffusion (1.3e-3). All PASS. Wrapped as a test.
+- **05:49**: Added a polymer physics test: Rouse chains (harmonic springs, r0 = 0) under Langevin should have <R²> = (N−1)·3kT/k exactly.
+  The first attempt **blew up (NaN)**. My dt of 20 ps was larger than the bond vibration period of 57 ps, the classic way people break simulations.
+  At dt = 2 ps the test passes within 10%. That suggested a new feature.
+- **05:50**: Added a **`timestep vs physics` report check**: dt divided by the shortest physical timescale from the advisor.
+  Grades: PASS < 0.02, WARN < 0.1, FAIL above. It is skipped for Brownian dynamics. The first run wrongly FAILed force-free gases,
+  because the "closest approach / speed" timescale was being counted when nothing interacts; it now only counts when interaction forces exist.
+  Test added. **58/58 tests pass.**

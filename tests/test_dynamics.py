@@ -97,3 +97,36 @@ def test_langevin_thermostat_reaches_target_temperature():
         temps.append(s.temperature())
     assert np.mean(temps) == pytest.approx(200, rel=0.08)
     assert sim.accuracy_report()["energy"].status == "n/a"
+
+
+def test_gaussian_polymer_end_to_end_distance_matches_theory():
+    """Rouse chain: harmonic springs with r0=0 at temperature T give <R^2> = (N-1) * 3 kT / k exactly."""
+    from accusim import Langevin
+    N, k, T = 16, 1e-3, 300.0
+    s = System(3)
+    s.add_species("bead", Q(100, "u"))
+    rng = np.random.default_rng(0)
+    nchains = 40
+    bonds = []
+    for c in range(nchains):
+        ids = s.add("bead", np.cumsum(rng.normal(scale=2e-9, size=(N, 3)), axis=0) + c * 1e-6)
+        bonds += list(zip(ids[:-1], ids[1:]))
+    s.maxwell_boltzmann(T, rng)
+    sim = Simulation(s, [HarmonicBond(bonds, k=k)], integrator=Langevin(T, Q(1, "1/ns")), dt=Q(2, "ps"), seed=5)
+    sim.run(steps=3000, positions=False)
+    samples = []
+    for _ in range(60):
+        sim.run(steps=100, positions=False)
+        p = s.pos.reshape(nchains, N, 3)
+        samples.append(np.mean(np.sum((p[:, -1] - p[:, 0]) ** 2, axis=1)))
+    kB = 1.380649e-23
+    assert np.mean(samples) == pytest.approx((N - 1) * 3 * kB * T / k, rel=0.1)
+
+
+def test_report_flags_dt_too_large_for_bond_vibration():
+    s = System(3)
+    s.add_species("bead", Q(100, "u"))
+    ids = s.add("bead", [[0, 0, 0], [1e-9, 0, 0]])
+    sim = Simulation(s, [HarmonicBond([tuple(ids)], k=1e-3, r0=Q(1, "nm"))], dt=Q(20, "ps"))
+    sim.run(steps=3, positions=False)
+    assert sim.accuracy_report()["timestep vs physics"].status == "FAIL"

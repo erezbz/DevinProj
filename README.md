@@ -44,7 +44,7 @@ Accuracy report (all applicable checks passed)
 | Integrators | Velocity Verlet (2nd order, symplectic), Yoshida (4th order, symplectic), Langevin BAOAB (thermostat), Brownian/overdamped (diffusing molecules). |
 | Reactions | `A -> B`, `A -> B + C`, `A + B -> C`, `A + B -> C + D`, with rates and reaction radii (Doi model). Exact conservation of momentum and charge. Mass-energy is conserved: Q = Δm·c² + chemical energy is shared in the center-of-mass frame, energy thresholds are respected, and products store internal energy that later reactions can use. |
 | Kinetics | Exact Gillespie SSA for well-mixed systems, to cross-check particle simulations. |
-| Accuracy | Applicability-aware conservation checks, relativistic-speed check, reaction-timestep bias check, `calibrate_dt` (halves dt until energy tolerance met), Richardson timestep-error estimate with observed order, pre-flight `suggest_dt`. |
+| Accuracy | Applicability-aware conservation checks, dt-vs-physical-timescale stability check, Barnes-Hut force-error check, periodic-Coulomb warning, relativistic-speed check, reaction-timestep bias check, `calibrate_dt` (halves dt until energy tolerance met), Richardson timestep-error estimate with observed order, pre-flight `suggest_dt`. |
 | Viz | GIF animations and energy-error plots (matplotlib). |
 
 ## It proves itself: `python -m accusim.validate`
@@ -106,9 +106,9 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 57 tests cover:
+`python -m pytest`. The 58 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
-- **Dynamics against exact answers:** Kepler orbits, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
+- **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.
 - **Engine and models:** the cell list matches the all-pairs results, and JSON models run end to end.
 - **Reactions and kinetics:** exponential decay, conservation during reactions, fission energy sharing, the D-T Q-value, endothermic thresholds, Gillespie against the rate equation, and the Brownian diffusion coefficient.

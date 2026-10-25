@@ -96,6 +96,16 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
+        from .advisor import timescales
+        from .integrators import Brownian
+        if not isinstance(integ, Brownian):
+            ts = timescales(sim)
+            if ts:
+                kind, tmin = min(ts.items(), key=lambda kv: kv[1])
+                ratio = sim.dt / tmin
+                checks.append(Check("timestep vs physics", _grade(ratio, 0.02, 0.1), ratio,
+                                    f"dt / shortest timescale ({kind}, {tmin:.3g} s) at end of run"))
+
         approx = [f for f in sim.forces if not getattr(f, "exact", True)]
         if approx and s.n >= 2:
             from .tree import direct_subset

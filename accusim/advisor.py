@@ -35,7 +35,7 @@ def timescales(sim) -> dict:
             elif isinstance(f, HarmonicBond) and f.bonds:
                 out["bond vibration"] = float(2 * np.pi * np.sqrt(np.min(m) / 2 / f.k))
         speed = np.max(np.linalg.norm(s.vel, axis=1))
-        if speed > 0:
+        if speed > 0 and any(not f.external for f in sim.forces):
             out["closest approach / speed"] = float(np.min(r) / speed)
     return out
 
