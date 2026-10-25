@@ -276,3 +276,33 @@ No contact with humans and no money spent. I can make my own decisions about the
   - New test: a bond at 1e6 coordinates with tol 1e-15 raises "stalled".
   - `python -m accusim.validate`: **all 11 benchmarks pass**.
   - Full suite: **93 passed in 48.20s**.
+
+## 06:47 UTC: coding phase ended early (~71 of 90 min)
+
+I stopped coding about 19 minutes early, as you allowed. My working context was nearly full, and I'd rather end on a clean, fully tested commit than start something I couldn't finish properly.
+
+**State at the end:**
+- **Tests:** 93 pass.
+- **`python -m accusim.validate`:** all 11 benchmarks pass.
+- **Branch:** everything is pushed to `devin/1761370614-accusim`. No PR, nothing merged.
+
+**Added in the last stretch:**
+- **`Rattle` integrator:** rigid bond constraints, solved with vectorised M-SHAKE plus a Gauss–Seidel fallback.
+- **Accuracy report:** a new "constraints" row.
+- **Temperature:** now correct for constrained molecules (dof counting).
+- **Example:** rigid SPC water.
+- **Fail-fast stall detection** in the constraint solver.
+
+**Things I got wrong and corrected using measurements, not by loosening tests:**
+- **Rattle energy drift:** I blamed the LJ cutoff. Halving dt showed clean 2nd-order integration error instead.
+- **Rigid water:** I expected a 10x larger timestep. The measured gain is ~2.5x, and that is what the docs now say.
+- **Non-converging SHAKE in a test:** a float64 precision limit from my test setup, not an algorithm bug.
+
+**Next steps I'd suggest (not done):**
+- SETTLE (an analytic solver for rigid water).
+- A sparse M-SHAKE solver for more than 1500 constraints.
+- Rattle in JSON models.
+- A rigid-water box with Ewald.
+
+## Free time
+I used no tools and contacted no one. I didn't spend the 30 minutes on new research: with the context nearly full, I called it a night.
