@@ -47,6 +47,26 @@ Accuracy report (all applicable checks passed)
 | Accuracy | Applicability-aware conservation checks, relativistic-speed check, Richardson timestep-error estimate with observed order, pre-flight `suggest_dt`. |
 | Viz | GIF animations and energy-error plots (matplotlib). |
 
+## No-code models: JSON + command line
+
+Describe a whole simulation in JSON, with units written as strings, then run it:
+
+```
+python -m accusim examples/models/ozone.json [--convergence] [--gif out.gif]
+```
+
+```
+450 particles, 3 species, dt = 5e-11 s
+final counts: {'O': 112, 'O2': 262, 'O3': 38}
+Accuracy report (all applicable checks passed)
+  [PASS] energy                   2.93e-15  ...
+```
+
+## Performance
+
+Lennard-Jones automatically switches to an O(N) cell list once there are 400 or more particles.
+One force evaluation takes 0.044 s for 2,000 atoms (0.36 s with all pairs) and 0.17 s for 8,000 atoms.
+
 ## Examples (`examples/`)
 
 - `solar_system.py`: Sun, the inner planets and Jupiter for 20 years. Earth's simulated year is 365.27 days, energy drift is 1e-11, and observed order is 4.0 (expected 4).
@@ -58,13 +78,14 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 39 tests cover:
+`python -m pytest`. The 43 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
+- **Engine and models:** the cell list matches the all-pairs results, and JSON models run end to end.
 - **Reactions and kinetics:** exponential decay, conservation during reactions, fission energy sharing, the D-T Q-value, endothermic thresholds, Gillespie against the rate equation, and the Brownian diffusion coefficient.
 
 ## Limits (honest)
 
-- Pairwise forces are O(N²) in NumPy, so this is practical up to a few thousand particles. A cell list or tree code is the next step.
+- Gravity and Coulomb are still O(N²), so they are practical up to a few thousand bodies. A Barnes-Hut tree is the next step. Lennard-Jones is O(N).
 - Kinematics are Newtonian. The relativity check tells you when that stops being valid.
 - Reactions use the Doi contact model; diffusion-limited regimes need a small dt relative to the time particles take to cross the reaction radius.

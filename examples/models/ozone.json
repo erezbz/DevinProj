@@ -1,0 +1,20 @@
+{
+  "_comment": "Toy ozone chemistry: O + O2 -> O3 (releases 1.1 eV), O3 -> O + O2. Masses from real atomic masses.",
+  "dim": 3, "box": "60 nm", "periodic": true, "seed": 7,
+  "species": {
+    "O":  {"mass": "15.999 u", "radius": "0.15 nm"},
+    "O2": {"mass": "31.998 u", "radius": "0.2 nm"},
+    "O3": {"mass": "47.997 u", "radius": "0.25 nm"}
+  },
+  "particles": [
+    {"species": "O", "count": 150, "random": true},
+    {"species": "O2", "count": 300, "random": true}
+  ],
+  "temperature": "300 K",
+  "reactions": [
+    {"reactants": ["O", "O2"], "products": ["O3"], "rate": "5e9 1/s", "radius": "1.5 nm", "energy": "1.1 eV"},
+    {"reactants": ["O3"], "products": ["O", "O2"], "rate": "2e8 1/s", "energy": "-1.1 eV"}
+  ],
+  "integrator": {"type": "VelocityVerlet"},
+  "dt": "50 ps", "duration": "50 ns"
+}

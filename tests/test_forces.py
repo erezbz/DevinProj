@@ -57,3 +57,18 @@ def test_lj_minimum_at_two_to_the_sixth_sigma():
     s.add("Ar", [[0, 0, 0], [2 ** (1 / 6) * sigma, 0, 0]])
     F, _ = LennardJones({"Ar": (1e-21, sigma)}, cutoff=10).compute(s)
     assert np.allclose(F, 0, atol=1e-20)
+
+
+@pytest.mark.parametrize("periodic", [False, True])
+def test_cell_list_matches_all_pairs(periodic):
+    rng = np.random.default_rng(5)
+    s = System(3, box=Q(4, "nm"), periodic=periodic)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add_species("Kr", Q(83.8, "u"))
+    s.add("Ar", rng.uniform(0, 4e-9, (300, 3)))
+    s.add("Kr", rng.uniform(0, 4e-9, (200, 3)))
+    params = {"Ar": (1.65e-21, 3.4e-10), "Kr": (2.3e-21, 3.6e-10)}
+    F1, U1 = LennardJones(params, pairlist_threshold=10 ** 9).compute(s)
+    F2, U2 = LennardJones(params, pairlist_threshold=2).compute(s)
+    assert U2 == pytest.approx(U1, rel=1e-10)
+    assert np.allclose(F2, F1, rtol=1e-8, atol=1e-12 * np.max(np.abs(F1)))

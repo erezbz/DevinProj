@@ -55,3 +55,25 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Argon: energy drift 1.7e-5 (WARN at dt = 3.2 fs, which is realistic), observed order 1.6/2 (chaotic system).
   - 39/39 tests pass.
 - **05:44**: Wrote README and pyproject.
+- **05:44**: Pushed the branch (no PR, as agreed). Remaining plan for the coding window (ends 07:06:54 UTC):
+  1. Verify the GIF animation pipeline.
+  2. A cell list for short-range Lennard-Jones, so large systems scale O(N).
+  3. A declarative JSON model format plus `python -m accusim model.json`, the first step from script toward application.
+  4. More tests, then commit and push.
+- **05:44**: The GIF pipeline works: `examples/out/solar_system.gif` came out at 406 KB (the output folder is gitignored).
+- **05:44**: Added a **cell-list neighbour search** for Lennard-Jones (`forces.cell_list_pairs`), used automatically at 400+ particles.
+  New tests check that it matches the all-pairs results (open and periodic boxes, two species) to 1e-10. They pass.
+  Benchmark for one force evaluation:
+
+  | Atoms | All pairs | Cell list |
+  |---|---|---|
+  | 500 | 0.027 s | 0.013 s |
+  | 2000 | 0.360 s | 0.044 s |
+  | 8000 | skipped (too much memory) | 0.169 s |
+
+  This is linear scaling.
+- **05:44**: Added a **declarative JSON model format** (`accusim/model.py`) and a **CLI** (`python -m accusim model.json`).
+  Energies can be given in kJ/mol and are converted per molecule.
+  - Example model: `examples/models/ozone.json`, toy ozone chemistry with real masses.
+  - Run result: O = 112, O2 = 262, O3 = 38; energy drift 3e-15; every check PASS.
+  - 43/43 tests pass.

@@ -73,9 +73,35 @@ class LennardJones(Force):
     The potential is truncated at cutoff*sigma_ij and shifted to zero there.
     """
 
-    def __init__(self, params: dict, cutoff: float = 2.5):
+    def __init__(self, params: dict, cutoff: float = 2.5, pairlist_threshold: int = 400):
         self.params = {k: (si(e, "J"), si(sg, "m")) for k, (e, sg) in params.items()}
         self.cutoff = cutoff
+        self.pairlist_threshold = pairlist_threshold
+
+    def _compute_pairlist(self, s):
+        """O(N) neighbour search with a cell list: only pairs within the cutoff are visited."""
+        eps_t, sig_t = self._tables(s)
+        rc = self.cutoff * float(np.max(np.where(eps_t > 0, sig_t, 0)))
+        i, j = cell_list_pairs(s, rc)
+        f = np.zeros_like(s.pos)
+        if not len(i):
+            return f, 0.0
+        d = s.pos[j] - s.pos[i]
+        if s.periodic:
+            d -= s.box * np.round(d / s.box)
+        r2 = np.einsum("ij,ij->i", d, d)
+        eps = eps_t[s.sp[i], s.sp[j]]
+        sig = sig_t[s.sp[i], s.sp[j]]
+        mask = (r2 < (self.cutoff * sig) ** 2) & (eps > 0)
+        d, r2, eps, sig, i, j = d[mask], r2[mask], eps[mask], sig[mask], i[mask], j[mask]
+        sr6 = (sig ** 2 / r2) ** 3
+        src6 = (1 / self.cutoff ** 2) ** 3
+        U = float(np.sum(4 * eps * (sr6 ** 2 - sr6 - (src6 ** 2 - src6))))
+        coef = -24 * eps * (2 * sr6 ** 2 - sr6) / r2
+        fij = coef[:, None] * d
+        np.add.at(f, i, fij)
+        np.add.at(f, j, -fij)
+        return f, U
 
     def _tables(self, s):
         n = len(s.species)
@@ -93,6 +119,8 @@ class LennardJones(Force):
     def compute(self, s):
         if s.n < 2:
             return np.zeros_like(s.pos), 0.0
+        if s.n >= self.pairlist_threshold:
+            return self._compute_pairlist(s)
         eps_t, sig_t = self._tables(s)
         eps = eps_t[s.sp[:, None], s.sp[None, :]]
         sig = sig_t[s.sp[:, None], s.sp[None, :]]
@@ -174,3 +202,48 @@ class Drag(Force):
 
     def compute(self, s):
         return -self.gamma * s.masses[:, None] * s.vel, 0.0
+
+
+def cell_list_pairs(s, rc):
+    """All pairs (i < j) closer than rc, found by binning particles into cells of size >= rc."""
+    pos = s.pos
+    if s.box is not None:
+        lo, span = np.zeros(s.dim), s.box
+    else:
+        lo = pos.min(axis=0)
+        span = np.maximum(pos.max(axis=0) - lo, rc)
+    ncell = np.maximum((span // rc).astype(int), 1)
+    if s.periodic:
+        ncell = np.where(ncell < 3, 1, ncell)
+    cell = np.minimum(((pos - lo) / span * ncell).astype(int), ncell - 1)
+    cell = np.maximum(cell, 0)
+    flat = np.ravel_multi_index(cell.T, ncell)
+    order = np.argsort(flat, kind="stable")
+    sorted_flat = flat[order]
+    starts = np.searchsorted(sorted_flat, np.arange(np.prod(ncell)))
+    ends = np.searchsorted(sorted_flat, np.arange(np.prod(ncell)), side="right")
+    offsets = np.array(np.meshgrid(*[[-1, 0, 1]] * s.dim)).reshape(s.dim, -1).T
+    I, J = [], []
+    for c in range(int(np.prod(ncell))):
+        a = order[starts[c]:ends[c]]
+        if not len(a):
+            continue
+        cidx = np.array(np.unravel_index(c, ncell))
+        neigh = cidx + offsets
+        if s.periodic:
+            neigh %= ncell
+        else:
+            neigh = neigh[np.all((neigh >= 0) & (neigh < ncell), axis=1)]
+        nflat = np.unique(np.ravel_multi_index(neigh.T, ncell))
+        b = np.concatenate([order[starts[n]:ends[n]] for n in nflat])
+        ii, jj = np.meshgrid(a, b, indexing="ij")
+        keep = ii < jj
+        I.append(ii[keep]); J.append(jj[keep])
+    if not I:
+        return np.zeros(0, int), np.zeros(0, int)
+    i, j = np.concatenate(I), np.concatenate(J)
+    d = pos[j] - pos[i]
+    if s.periodic:
+        d -= s.box * np.round(d / s.box)
+    close = np.einsum("ij,ij->i", d, d) < rc ** 2
+    return i[close], j[close]
