@@ -1,0 +1,2377 @@
+From 0b85e6273156cc5028337498a15fedefd29ef113 Mon Sep 17 00:00:00 2001
+From: Erez Ben-Zvi <erezbenzvi2@gmail.com>
+Date: Sun, 25 Oct 2026 16:37:36 +0000
+Subject: [PATCH 6/6] echo: 8 new procedurally drawn species (Tickit, Chimell,
+ Gloamoth, Tidepup, Bramblit, Solune x3 day forms)
+
+Co-Authored-By: Devin AI <158243242+devin-ai-integration[bot]@users.noreply.github.com>
+---
+ graphics/pokemon/echo/bramblit/anim_front.png | Bin 0 -> 1145 bytes
+ graphics/pokemon/echo/bramblit/back.png       | Bin 0 -> 678 bytes
+ graphics/pokemon/echo/bramblit/footprint.png  | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/bramblit/icon.png       | Bin 0 -> 381 bytes
+ graphics/pokemon/echo/bramblit/normal.pal     |  19 +
+ graphics/pokemon/echo/bramblit/shiny.pal      |  19 +
+ graphics/pokemon/echo/chimell/anim_front.png  | Bin 0 -> 1182 bytes
+ graphics/pokemon/echo/chimell/back.png        | Bin 0 -> 723 bytes
+ graphics/pokemon/echo/chimell/footprint.png   | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/chimell/icon.png        | Bin 0 -> 393 bytes
+ graphics/pokemon/echo/chimell/normal.pal      |  19 +
+ graphics/pokemon/echo/chimell/shiny.pal       |  19 +
+ graphics/pokemon/echo/gloamoth/anim_front.png | Bin 0 -> 1444 bytes
+ graphics/pokemon/echo/gloamoth/back.png       | Bin 0 -> 879 bytes
+ graphics/pokemon/echo/gloamoth/footprint.png  | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/gloamoth/icon.png       | Bin 0 -> 451 bytes
+ graphics/pokemon/echo/gloamoth/normal.pal     |  19 +
+ graphics/pokemon/echo/gloamoth/shiny.pal      |  19 +
+ graphics/pokemon/echo/solune/anim_front.png   | Bin 0 -> 1148 bytes
+ graphics/pokemon/echo/solune/back.png         | Bin 0 -> 694 bytes
+ graphics/pokemon/echo/solune/footprint.png    | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/solune/icon.png         | Bin 0 -> 385 bytes
+ graphics/pokemon/echo/solune/normal.pal       |  19 +
+ graphics/pokemon/echo/solune/shiny.pal        |  19 +
+ .../pokemon/echo/solune_dusk/anim_front.png   | Bin 0 -> 1106 bytes
+ graphics/pokemon/echo/solune_dusk/back.png    | Bin 0 -> 670 bytes
+ .../pokemon/echo/solune_dusk/footprint.png    | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/solune_dusk/icon.png    | Bin 0 -> 392 bytes
+ graphics/pokemon/echo/solune_dusk/normal.pal  |  19 +
+ graphics/pokemon/echo/solune_dusk/shiny.pal   |  19 +
+ .../pokemon/echo/solune_tide/anim_front.png   | Bin 0 -> 1119 bytes
+ graphics/pokemon/echo/solune_tide/back.png    | Bin 0 -> 686 bytes
+ .../pokemon/echo/solune_tide/footprint.png    | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/solune_tide/icon.png    | Bin 0 -> 374 bytes
+ graphics/pokemon/echo/solune_tide/normal.pal  |  19 +
+ graphics/pokemon/echo/solune_tide/shiny.pal   |  19 +
+ graphics/pokemon/echo/tickit/anim_front.png   | Bin 0 -> 1243 bytes
+ graphics/pokemon/echo/tickit/back.png         | Bin 0 -> 743 bytes
+ graphics/pokemon/echo/tickit/footprint.png    | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/tickit/icon.png         | Bin 0 -> 396 bytes
+ graphics/pokemon/echo/tickit/normal.pal       |  19 +
+ graphics/pokemon/echo/tickit/shiny.pal        |  19 +
+ graphics/pokemon/echo/tidepup/anim_front.png  | Bin 0 -> 1089 bytes
+ graphics/pokemon/echo/tidepup/back.png        | Bin 0 -> 629 bytes
+ graphics/pokemon/echo/tidepup/footprint.png   | Bin 0 -> 128 bytes
+ graphics/pokemon/echo/tidepup/icon.png        | Bin 0 -> 352 bytes
+ graphics/pokemon/echo/tidepup/normal.pal      |  19 +
+ graphics/pokemon/echo/tidepup/shiny.pal       |  19 +
+ include/constants/species.h                   |  10 +
+ src/data/graphics/echo_pokemon.h              |  56 +++
+ src/data/graphics/pokemon.h                   |   2 +
+ src/data/pokemon/level_up_learnsets/echo.h    |  67 +++
+ src/data/pokemon/species_info.h               |   1 +
+ src/data/pokemon/species_info/echo_families.h | 468 ++++++++++++++++++
+ src/echo_loop.c                               |  45 ++
+ src/new_game.c                                |   4 +-
+ src/pokemon.c                                 |   1 +
+ tools/echo/gen_species.py                     | 411 +++++++++++++++
+ 58 files changed, 1367 insertions(+), 2 deletions(-)
+ create mode 100644 graphics/pokemon/echo/bramblit/anim_front.png
+ create mode 100644 graphics/pokemon/echo/bramblit/back.png
+ create mode 100644 graphics/pokemon/echo/bramblit/footprint.png
+ create mode 100644 graphics/pokemon/echo/bramblit/icon.png
+ create mode 100644 graphics/pokemon/echo/bramblit/normal.pal
+ create mode 100644 graphics/pokemon/echo/bramblit/shiny.pal
+ create mode 100644 graphics/pokemon/echo/chimell/anim_front.png
+ create mode 100644 graphics/pokemon/echo/chimell/back.png
+ create mode 100644 graphics/pokemon/echo/chimell/footprint.png
+ create mode 100644 graphics/pokemon/echo/chimell/icon.png
+ create mode 100644 graphics/pokemon/echo/chimell/normal.pal
+ create mode 100644 graphics/pokemon/echo/chimell/shiny.pal
+ create mode 100644 graphics/pokemon/echo/gloamoth/anim_front.png
+ create mode 100644 graphics/pokemon/echo/gloamoth/back.png
+ create mode 100644 graphics/pokemon/echo/gloamoth/footprint.png
+ create mode 100644 graphics/pokemon/echo/gloamoth/icon.png
+ create mode 100644 graphics/pokemon/echo/gloamoth/normal.pal
+ create mode 100644 graphics/pokemon/echo/gloamoth/shiny.pal
+ create mode 100644 graphics/pokemon/echo/solune/anim_front.png
+ create mode 100644 graphics/pokemon/echo/solune/back.png
+ create mode 100644 graphics/pokemon/echo/solune/footprint.png
+ create mode 100644 graphics/pokemon/echo/solune/icon.png
+ create mode 100644 graphics/pokemon/echo/solune/normal.pal
+ create mode 100644 graphics/pokemon/echo/solune/shiny.pal
+ create mode 100644 graphics/pokemon/echo/solune_dusk/anim_front.png
+ create mode 100644 graphics/pokemon/echo/solune_dusk/back.png
+ create mode 100644 graphics/pokemon/echo/solune_dusk/footprint.png
+ create mode 100644 graphics/pokemon/echo/solune_dusk/icon.png
+ create mode 100644 graphics/pokemon/echo/solune_dusk/normal.pal
+ create mode 100644 graphics/pokemon/echo/solune_dusk/shiny.pal
+ create mode 100644 graphics/pokemon/echo/solune_tide/anim_front.png
+ create mode 100644 graphics/pokemon/echo/solune_tide/back.png
+ create mode 100644 graphics/pokemon/echo/solune_tide/footprint.png
+ create mode 100644 graphics/pokemon/echo/solune_tide/icon.png
+ create mode 100644 graphics/pokemon/echo/solune_tide/normal.pal
+ create mode 100644 graphics/pokemon/echo/solune_tide/shiny.pal
+ create mode 100644 graphics/pokemon/echo/tickit/anim_front.png
+ create mode 100644 graphics/pokemon/echo/tickit/back.png
+ create mode 100644 graphics/pokemon/echo/tickit/footprint.png
+ create mode 100644 graphics/pokemon/echo/tickit/icon.png
+ create mode 100644 graphics/pokemon/echo/tickit/normal.pal
+ create mode 100644 graphics/pokemon/echo/tickit/shiny.pal
+ create mode 100644 graphics/pokemon/echo/tidepup/anim_front.png
+ create mode 100644 graphics/pokemon/echo/tidepup/back.png
+ create mode 100644 graphics/pokemon/echo/tidepup/footprint.png
+ create mode 100644 graphics/pokemon/echo/tidepup/icon.png
+ create mode 100644 graphics/pokemon/echo/tidepup/normal.pal
+ create mode 100644 graphics/pokemon/echo/tidepup/shiny.pal
+ create mode 100644 src/data/graphics/echo_pokemon.h
+ create mode 100644 src/data/pokemon/level_up_learnsets/echo.h
+ create mode 100644 src/data/pokemon/species_info/echo_families.h
+ create mode 100644 tools/echo/gen_species.py
+
+diff --git a/graphics/pokemon/echo/bramblit/anim_front.png b/graphics/pokemon/echo/bramblit/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..38c82eee22de3f51bc720e502a42eba11081eec3
+GIT binary patch
+literal 1145
+zcmV-<1cv*GP)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATXKAds?hINO3^&-LmS-lAMEc?TvflN;;P~K=}CZ000000000000000ZtfEO000C8
+zNkl<Zc%1E)y=xp-6vcmc)@z&vp?lX+L<*DH^&b!|3T{$_fN;tv5UB|yDjd0#I;AwE
+z5e5@i0f|6_x=1ek2N)vU4_ZRNO|o7!aS@bxcB8Onc2dmO+Yec-33|<Zyff#VcjtW^
+zxNQILrv5`P*)R46fL_2L1~fSzfG83M3Zhd1CM`ffnyqs@1lmM9G{fS}m5MzDfmR@3
+zA<rim%oN}{3T<qX0ZRo8gBrplAl9H=cIXrUqKFa!K`SdsJPJ_I<hM2q`~3w(jX#}l
+zGVLSD$!zQh+6kyJbmMi<6Cicaj!HMBgaN%0db9fh^4tfQiS{yB3Zx%8W}F8Q6YZ_Q
+zVNsx$g+?LOOj!cs&@viPq8QI)9P;D{Saqe3to8*U?H?R~BmJfz9ZI`pQ|DyfM5!%m
+z36RF>+D|B4bz0RWa#I+jyh;*R5_7lUjsSd}eGD>lT$vQEFgD-OV^;y1XyeCED**vc
+zonHs!_P3)11nL2XuOHW!sZ<o8Gr}-31ObqmRshFx@#Q|{675ug)J+foHLdP3RuF~3
+zQ}RWTbcwwQvt{3{7xxj15T*VwWec~x2e6MtTia2ongiwm?gP7_C0n@dZsPC(h4bA-
+z;~Bt%<NS3ws|DC)u>`wOfEY;8?JeDrN@nX4#MFb7zZ-)%8ZqQcyf9#cII1n=VBZ^n
+z?Ql2FJ9dC|HwM6nu_f#<7Tw`)IspLWjuW+=tDih!weiDv9rD2nU@Pcg+(Ra_4!g0u
+zx5nV-X%g8`L6p+MWxH%|LsS1@N&=DA`G5-(h+ULGD*87j5bI!J@n#}{bY2NqyBtad
+zu#_02hEl77#7F`WK=VyRlSu$tZC=L2K1pmKnsfnfo|{09!!|JNFJPjR3B-o8aU4T%
+zqg(!w3Lwa^58xoU(KWJ&Qk*eL5Yn^UA*e(Ca211@g}vTN92a~q3yp#ybm2!%lt-Ee
+zj9E#3^*p4n!u}&t_`I@oG7>QU=^yMJ;i$XH^+>=-8#Dl@5{MG`0fW`7R%O5lK$0q8
+z%)uICP4swd!bql3G>x2h;@o1-pYIA5#drbZ-NvdHFaXjN{A2NUeN4=?ybLpZ{kUFG
+zmzV2`XL7l+Sp*C}Ke&4Nr57-2TK$W^f$}&kop!w3rPRMrVDL0wc1agfSDxMToA&Qt
+z0Q;fLMAQ~Ic6h^_-^A(O8Vo|w-?!x2_X|0-pC9hSVBa*^gli9qfRQoCJqNH$tpm?K
+z1I8DQU|xPed8fE7Bn*_U2Ob5a_dwvZTY<+I#7x;pPoqNd%#C_@vH6fQm#360Y!nqN
+zu1e}`N%Sz5_aAb$;l=;}@+G43%hivMsDCvzKUlW?&8=W>Retyn(fS$NjaWu`00000
+LNkvXXu0mjf8Ds(1
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/bramblit/back.png b/graphics/pokemon/echo/bramblit/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..72b1eaa5d942ac4afa5ab706e4e2847296c8ee45
+GIT binary patch
+literal 678
+zcmV;X0$KfuP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATXKAds?hINO3^&-LmS-lAMEc?TvflN;;P~K=}CZ000000000000000ZtfEO0006p
+zNkl<Zc%1E&v2GJV5Qe{59|9_7?Nl_}T}fr+o=1p8k=`#rL6s89l&Rg25=6&)SUL#_
+zg~qW2t=WwfkceV0#qQnhS*D@R7I$;A|NisO-0Z;px?lgfL=QMkW{)cX^q&BX0%8vU
+zB=ZdS6JV@>lvE%(l#)VJ+6Eu*DNO)VDHFk{lyV3lm<mv;@!>2sim@Q@A}a1vDQMHE
+zEm)6wz={Sx(9rTK0%C0+rUmrU6jNulD6lU2uVD$Jsb~r6d<&3z6)D0JV7r`&`i!uE
+z8V9g4Wz1+I5M2N!tYi6?rUaaG*H?o|7=8lEHtqw2D;WS#klmNE_l33Hbr^x8XRsT4
+zpe+s-R_U_<tmAvuI1ZdCE8hV&sGqui{{+I_=Td#Efkq_s0#3mBo0n^ek`2~sp4Tr3
+zKyl0y4^Y^;lLipx>FZ{_jUnpcb@<((kCO(?{-hA*9W)`$papZT2b!|bcs51I)Fg(b
+zXip;9lUEVon!P^Xi)7d|+WB^Kw5QMr2!lHGTN1CELCRcZG(<t;Wh$7YLjxYMz$ySn
+zrn#hnLgxW9Nu?G5b1|G1<P%2sjrcaxfx6syzsG<Dp0-AZ6AO$YP4Mtz4&eCIws7Hq
+zBVgMw>r%D1XTkq@+lAP`_VVm>DH>zI2Rsio*KqkRaN3BP1;Fh&z?%*bn(a9rUL&@?
+z06u~eDbkGk1`3ZFu+JCdE6%9YJpo`eTksepC0cY)=~AEZRl1S<7eQB*#kYDjApigX
+M07*qoM6N<$f(~vi{Qv*}
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/bramblit/footprint.png b/graphics/pokemon/echo/bramblit/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/bramblit/icon.png b/graphics/pokemon/echo/bramblit/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..6a6fd3c796418a1d3bc926815e14f92af235f01a
+GIT binary patch
+literal 381
+zcmV-@0fPRCP)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6}
+zdwadTwEzGAdz?y~%}TU`TJFV*#jGjz_9@k3L6m#V#iY&llqq6jT0ucU^LsW*00039
+zNkl<Zc%1E$El&eM5Qd-osOZwLcSsDC1W&>bXe|K}5Fjc+A{$K4AV@GMQg_&ELh3>E
+z&s>7qoi+tZMHg{fk{T=(jC-HSd=IR>=~XFASKS@m5-mXJNm(kl&l1!+qUQO#0tf(f
+zTMGD4DFHFSSk$GH7kg%Xh#Ni<B<;j*RG@Zxu?=v<Lj}}ex4Q>W^eQl(j+o^D<sl)U
+z8?SI908drYEcWdUQbIty%sKXDyBQ9EO^AWy3Z#yLe9{a7A}qHmhcqDs-Z-Fs-oGDB
+zf`k~zBG<RvMKt}i1udX4j8A;Ig|XV0`Lp@ipOMd=TNu0C*m!Fvn_YjU+3#ohEBk+k
+bb$W+yq|}^Sp3NN!00000NkvXXu0mjfaJZss
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/bramblit/normal.pal b/graphics/pokemon/echo/bramblit/normal.pal
+new file mode 100644
+index 00000000..59d3dbd9
+--- /dev/null
++++ b/graphics/pokemon/echo/bramblit/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++153 202 123
++90 172 58
++72 113 64
++242 221 178
++234 203 146
++156 131 115
++237 141 123
++226 74 58
++151 56 64
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/bramblit/shiny.pal b/graphics/pokemon/echo/bramblit/shiny.pal
+new file mode 100644
+index 00000000..0124a579
+--- /dev/null
++++ b/graphics/pokemon/echo/bramblit/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++133 202 175
++58 172 142
++54 113 113
++205 240 178
++175 234 146
++122 149 115
++225 235 123
++207 226 58
++140 145 64
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/chimell/anim_front.png b/graphics/pokemon/echo/chimell/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..79e056406445a9bb600f731db2aec4be204b7563
+GIT binary patch
+literal 1182
+zcmV;P1Y!G$P)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATZsvg2;+Qh+Rh0r{}nI=zmeAIxI-|`0xM#00000000000000000000{FTjU000Cj
+zNkl<Zc%1E)zi%8x6vsbr?|im`h~HqxG6=!hJ?IR70Ea|J5iEgd4+*(La%Wd?g61M2
+zB_g80jZyvrn*vJb4~P^ONOaK^D4-a5ra_#~v6o`@$IR@-k!UDjq`RG+_ucot@9mq}
+zFZ}yMq8kMuce4S8b{|AJKfulam=9g$#_ZV!Kt6Rmy$`_L2cqA(6tHshkNbJ)qcfP^
+zF4nV@VLIC7<b=78&JO_S3}Al-$t|qt9$Nr2NP?j=m>!y62h;CorU{6O%Jp$ns4N8J
+zPIK3a>@fh;T|O%dZ<qBXYV1MQtabUi7KEAr<D;(uu)Ns-hypoe`iu~!oNPcvB>>bf
+zqowt2KzV7g^dm1Gfh@YjLmod-)GH~JAG1kHw>Gvk0)%wpG8TZMB$a~*)CTEy)Pe5-
+z3!*jv)ErEKF{h0XRR!~r!(5KW<?E<Cl$<AgVfdZT6A$^})PX4ZkcIK(kcF|gi54E7
+zR6V|1{$*Nbmyzt|nz8gd8nm2279)EjP0?(~q?-+yZ1|Qi5kM4HM_<C~=&N!~1Auga
+zY_|*9ZqF|j*_D8|0#5)BoNt+m<mEU@qg7^CdRWT(5#ZH*=O>kiY&`-@H;xj(D|>N>
+zH;4ezWgYVfpS%GsVgQgk-!Y<C3@vprz!pC^WgS};y8tZZ<c^(U@fNKLP^7ukJ^gDt
+z;CObocj42h-bG|*{<Csc0OCdk;9(R3)B9!Hhu`rbE^G|I^p4r#>}T`CHn(V%_VA<y
+zX!qrXgEH$dO}}L5qY_w2w!d`><e@!1AH+n5Lle;4|1lsx6rH-OJUr3*Q!;xPbG7~d
+z@sCIN@~Tfxc&bTYZubEUoFCMXT7fM0Yd><WJRSlC@=mExU~W?@1yVPyIXSAHIv7;T
+z!MFQ{RJ~B!0}d-U0nUFM08E=45Z!|5z1JQOU~fhiK0#5rK8|)ys2?n{28jZR1qN7>
+zu1yq(G0#;XT%kb3IB>A00L$+-052(CfouS<q6t7=FK1q0G&#6vBG>#SiExzyDFT&~
+zh5{)BMops00q|cs4em3*XzhHK0+IJNtA|BXP|$J~e*~J`vi30Wa6>vp(A+v?@zFT(
+zaH75>Fd0q0(Z{37y_6(W0>gQM;RT_3K)%-$7(T61VAvu86Mq>Ni7fxAL7_}oAJL7F
+zL$PRB@B(A#n@KkHlUQJ6!x6w}((_3l$bMZY=>n^}S(nw_Ru5Y0;<C;Z7;2v*Fl^u<
+z6&O!lsvlB;aa@KhDWoBK4_w28tw;v@vjUWRI(O<-MjT@K&2e}-W?e%e58Bo9c7CS<
+zoZWdl@vzjr{5T@{bwgnM7TIYC41KwD?yq+n0;6>?zYS;KzW>uUoZaairvk$#R_TW-
+wrMeDQ6#CF1`W^&_SZ)zet~>?}|55$$H}c3oi}Ef&-2eap07*qoM6N<$g0Ec@!vFvP
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/chimell/back.png b/graphics/pokemon/echo/chimell/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..01090a402c711206056d6bd016677135f7d95052
+GIT binary patch
+literal 723
+zcmV;^0xbQBP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATZsvg2;+Qh+Rh0r{}nI=zmeAIxI-|`0xM#00000000000000000000{FTjU0007B
+zNkl<Zc$~GAzfTlF6vscaw+V%XGj{|k^^Q&(5lb5r>Cr@b8m}}|@;6XPEU%HC7<x4}
+z)&x2$I2s#_%v^aOHx~1Im$P$<-Pt#vdEfWmydC)OLlj>M06hm#unE9H&WN<U30UL4
+zzD6VfYG_RcAin4V5bv<&Ao^Vg@!90S@)lS7Nm$j-)%8aJs%XsC(SKB!df)<vN_neN
+zY7-92AeXlQMu1QD&ifJ&a)?9xJLHoJr5M6!Me8AqQl;`zD_GM8T@<^{0F5wY#cHGp
+z&||C_FdsnD9JvGnvjQ`jYZM;34?yclp;3WQ-m&U~1tzKlmR`Sd0&9Q)=*j}{R(es|
+zsuB<qK&;{vfGWAD0eS8ArES?%fRNSzi;oSl$ab7bSZ#trQkEI;@6iP0T%hMpJ{<p`
+z1<Z3%H-YBQngi|>r2*v3(QnQpU^Q8*X<sU1%NWubh!9HvM881*uq0(Oi_jZxTp(I$
+z2H(z?pz?-pTitPD>DeJbub+(WDj7RJ)yulr5q&sETKgEplN=L`mb*<l0W!>mDhXA1
+z=#|^Dk1F3-5MHv{zcRNIzAc5gYe2jR=InAfH2}4@9MK#r?&bU8X1xV`8yrLEu*J?s
+z3;1<@oOyVpTEM6KxkP7lOAOKkK&<jKWMB<+Wx5Ab)0*_WylnTRzeG&rwQ+w}4bTG%
+zv-9XzNU)Q8g~S;PI}w=fp}d^H75XTxy0NPirzXa5(_Cj~l7h4+{AjMjTV^I?@tcQj
+z-~;2BrakKH2I)8%oW&pk)wy9|8>T<?_idQ&v3laF`4`B`u0_FLr_%rc002ovPDHLk
+FV1oM)LCpXF
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/chimell/footprint.png b/graphics/pokemon/echo/chimell/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/chimell/icon.png b/graphics/pokemon/echo/chimell/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..5c853979a37df0281b32b71b18a4e66de013806e
+GIT binary patch
+literal 393
+zcmV;40e1e0P)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6}
+zdwadTwEzGAb92q4toF2nTJFV*#jGjz_9^yaQj~km#iY%>DV$<rT0ucU=|r?&0003L
+zNkl<Zc%1E$F;2rk5JjJ@C>VjX3*rD=g5CuUmECazi;B2Ff-WgjK{x_8prHaOTmU&o
+z2o*H3*T^^uu{0E38&g9Ezgj(g{h9q5_$`UZdMW_80P1N*ue$SF!@U?##bN6RACjOr
+z2&+y;u^a@_O;y9v)UTc;FYyOoQ{ZGr_d(q@U;|(degh1^CAn_E2n-{ep$y6(jn8F~
+zfc6|cxv&nI0B6J15pfOnZg};4zbF7@aLF~W4Ub&0Nb0r9NXmhvDeC|SP{#mc*j3LO
+zK#7&HpIg3%0Bl_Y4p7G4CK-(1_HE|5h=@d|ne8HKGExir4Vbr;id0h(X)AP)S%uTB
+nP-m;0Zz=+QsQ+{L6X);=^-J=Nr5Em200000NkvXXu0mjfDI})O
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/chimell/normal.pal b/graphics/pokemon/echo/chimell/normal.pal
+new file mode 100644
+index 00000000..01876ee5
+--- /dev/null
++++ b/graphics/pokemon/echo/chimell/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++221 181 130
++200 138 68
++136 93 70
++211 167 231
++184 116 232
++127 81 165
++58 44 72
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/chimell/shiny.pal b/graphics/pokemon/echo/chimell/shiny.pal
+new file mode 100644
+index 00000000..64aa55e7
+--- /dev/null
++++ b/graphics/pokemon/echo/chimell/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++176 219 130
++127 200 68
++94 129 70
++241 167 188
++232 116 162
++155 81 124
++58 44 72
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/gloamoth/anim_front.png b/graphics/pokemon/echo/gloamoth/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..a451c937edcca8dc25567d617e77186bff6f0562
+GIT binary patch
+literal 1444
+zcmV;V1zY-wP)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATXMQv0OZmN-%QvxOMQ5FrQ&M^5w<q*sz?7g!uUI000000000000000$R{&!000Fq
+zNkl<Zc%1E*zi%8x7>1v3&L$*9m^nvsFwOcx5mBAve;|>J=psiVE<?H?n%ERrR0J9v
+zisalN`6^59EFpy&Bxop?vuH>PmIYY~DSW$b;y7V<DdxxSUF<|i2pXojnVoOn@7-@_
+zcAkTOvza5ib(1gj5nUAcLACBLPS^7&#OYOc^KkV<-UvWk{G&tHk(HZ17pR6MpJO_B
+zY-<!jqPlA(<d)AMkyY>#k23qa?=!Rkg{fV<wmy<UBAkMgsBRr<kQJ9f+JpcnVRMMf
+z(2ii%1u*Mut{XG$1tI_@>_BOI^>EeXx^@^+XeV*FO1`$-6tDpTN&|9gyZ2;!Q`Z8v
+zP-yRBlZ`&708Er5q0~|)NvbsH$4jtuT|heJ!qpUQ1N82~+n1e-P{UpF%K|9TQeK3~
+zROxzNqVgj8mDHNly8zdi<JAwg-~VX)%N}jNj9S{(;m;oyk(U0Wx3nfpCm)*##Ml^x
+z0N+0Y%^YXfL~rz@gL`;Dp%G(8t?A#4hN=gsuSGxYhDt6@YM@vyQ>gNjDKMkis!Kh2
+z1>ioEzh*hy0aU-=^)KrU18jBuvaq>jzJ3>K6P|YAJOD=XA@y#V0GR31>O$+&yZahA
+zh`bCSQxSOaVrK)$KaT3HP)sz^(&{FN78(L!!HhLM8W7@t2H;LZpk6Ql#j@)+6xFbq
+z&^xcY163tyh`;aV!i6Hv71?m-ID^F?LqWCYB8n%s?H2RnL2gY}dochzs?%#I#e>{G
+zMU}-s)`^_M(+Ln~Iryz-_|a&fyyfmrOo_>SfN0aOrmc+XkW|itG5*nQ)Qanzn{ysA
+zkYVBqBsL|09(a>*df{qn@6&`e1tCCo;Tnbq_Fij4hk$Bd`#TJ9Fzfsjp$;HM#ukNt
+zVG3Y~oh}{%+)Q19LG6JV!xjvxWjM%(G|DpJg!;@A=RAa)R7s~kQEaNI$UyNOV90<o
+zUEJ6!2owWs(SW_$to1O|Fv#nxRgClKO=2H9v}|Wo!6&HO-p=UwjApFKrP1N|{1LnD
+z|Mriyzk?{ZL)V=bzzCu=6colqACD+L;?Wb=X&{P55h&*<M425yl%7MBmE#e`5{Qf<
+zN<+fg^a3XG0YSnd$|o*ChY;Y8<!arSV9^4C$Shz=yDiRsR*|25&(2%`%7NeA_M>>X
+zx+-ffK@(8~I+`&8i2$bbaRefsKqdf5Kt(!7Kfb=n(kTIHm+$U>)6q8I^aaebpJtoe
+zw;lcdrYwDBEKlx2{>m7EgswwYU5yb)x#)K91X3>M-%egRo<KB!B@q4knsEf8?)h(Z
+z8^kcF0X|O*kZq)Z82z*hbB;hPVB{o_S-_at3<RR?F==^3Lza2>Z;cTM_{HZqq%|Mj
+zh1!IE7tU)J)Fcp@il9uH2Z%QSxY4OO*aC(+XNU7QPArQS#dBYKKkUBaI`!6iIbcM*
+z5HMOQeKBAZYM9jV&jAMUKvh{1qG5EJILj4e@s1mh14f*=v)dgG0WhpoG01RrsP^J{
+zsyu+GNmN8!<@f*tiD(*tQDz{<D@fx%NB|5v@Jn9*3DTnvV52->047OXq`-;?4DbXZ
+z<-*mpE|RUJp(YT$3)e*Rz!<zAS8od#Ahm&m$R!v73@rc$0Lv~xtpJG8TM*{}l?S3a
+zV8~3r-=)YbU}UMaF$k3eHE)mahc~ET$eb5&?;@SW@<EjWR73DQQ2$f225hV1(6s@3
+yP-HY(wlfYGFX0Edq#0{6iWJYyABhzIRr?F~X{%4Ay%g~P0000<MNUMnLSTZ<q?+ge
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/gloamoth/back.png b/graphics/pokemon/echo/gloamoth/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..1385cc674125e81aa65d398385edf3a38483f50a
+GIT binary patch
+literal 879
+zcmV-#1CacQP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATXMQv0OZmN-%QvxOMQ5FrQ&M^5w<q*sz?7g!uUI000000000000000$R{&!0008|
+zNkl<Zc$}@2F>f135QV=PQjm}|vl0S<l}VMV2&h-3I&fk2PL(PM*|~AzAdNdI>8y(I
+zPjH<ge}D*o!HFp%LItzyN|puQrr6uPBj_^Q-0kk0_ujnQJ^0^-*q3LTUk1}I;CQ+N
+z;J8B}zp(>Y(V-alt6c`yQHWueAx>Kjxqb{g09LMObQGio#L0d`Ay@Z>z-jBf?cI0Q
+zbhN86peQ(0i~BfD8XW~Ol#^D(rpY2L0SZNAmC3S#7$_8<DT<DQBjwOiFm<jCK}J9y
+zP%9-L-+Czy53!Jv9Ay!)2+~Xrhe#834rAa6#F*lcAz;n7NIvBn3^*`=!&IbDRaNT~
+zAZCIJL8&iaTrAaq0gZuQfJ5r)vRazj9f9-KrzMaK`RCGKoQq1N^=Tl6C4%Qbf2o`A
+zF!q+orvTyr8FL4~xn^BPtWp#3Ge^a-g5fN;+Jq!ysbBK+$DizJo7^Z)z!@BbBd~@|
+zdozruA)xLG5a(8IoTJB-Q^b7$sNaPEQ1fa*Bj-?hGd>Ri?jd@pmc-Z4oAC|LdFsRI
+zP48I~QozSHa=8Th&^yalt;FyNI0Y9!e$cW5+xN3K1NmyG<qL33>JsEv5(V#(i-hn%
+z^{y%Y{tSRQoD@I|!0L?w50f+6#eRtd>TB;~;4$wbbgsYgg<&0ll-2zOoki`UoAE=J
+zLc8cKqGqZc^!=^|rd@Padfi#<0E&+-8J%y7rrlO!uD&2P>ERyVw(z-E3L=;Ne)48h
+z_UVJ4_r^f&K4tY2f&rU_PeJ+hf~s0(+Mj^vJ)6Hg&_@h?<}JWJlz$EU8=MeBUk-;m
+ztu^h4Bcey+od~RH2N0*_wpqbtHUrRgE+`@g3kTFy^*7+P{mYw7^2Ffo#l^P{(74zZ
+z5d;Jx1S|&4b^zIj=H$EjrLeawCn}4yO`6~=ov3xk-~`}d-J);viE;q-ZJNXd^k!mT
+z4*?}EGX6HK0Dfc*oFeb3LphTIRUl5_ArR-#ySW(x{0F&*;MCtO%;Nw6002ovPDHLk
+FV1fz0mn;AP
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/gloamoth/footprint.png b/graphics/pokemon/echo/gloamoth/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/gloamoth/icon.png b/graphics/pokemon/echo/gloamoth/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..7951c6b6e4306cce9c8f23711e60b8e35197df6d
+GIT binary patch
+literal 451
+zcmV;!0X+VRP)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6>
+zb924Dz5oCJL28s@l%%A^|L${~)nY-tq+0goDfafP)zxbDlqq6jT0ucU0xrFh0003_
+zNkl<Zc%1Fhy=qiZ6b0aK4riJ<;=O98O&Z@o!NOv|_|wf5G$4XZ?*sT6_99qo;Vpy|
+z7EX~$0#@3XfcR5c<XkhkA{lZlW+d2&t*&zIz1e&1wfIY9s6c?~4SdX?YS6)}RmTu#
+zYtl``9B7Eo$saHl7}8zN)mF`%L3Pd7nX2A7s8ts&0wrQ+3twmh+1Tex7bfD}hl$~>
+z?cH_z`=wal-Yq%gL&o{UjTh!l9jZccW-V3U-rZYkXo-%F-t+p&sK3(OzfSc1nFoye
+z=_i{Q%o{Ip+R5{&MQkK^>W+3Lzr})-mTG6|*Oyx8!eRz-MRs-2)f`+MGo`CVazA0#
+z>u={oRBen%D4ARbJbskgek#)vbbEszt*N&p_41BQ9p|KWxhhUdQDyT|R?d{Ntdx>h
+t&UH(o{>|BAcmE9ec;J5=TK`NOege5?;b+?7nGpa0002ovPDHLkV1n5w+2H^H
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/gloamoth/normal.pal b/graphics/pokemon/echo/gloamoth/normal.pal
+new file mode 100644
+index 00000000..c98061fe
+--- /dev/null
++++ b/graphics/pokemon/echo/gloamoth/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++154 132 177
++92 60 144
++74 48 114
++246 184 117
++240 144 48
++159 97 58
++242 229 197
++234 216 176
++156 139 132
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/gloamoth/shiny.pal b/graphics/pokemon/echo/gloamoth/shiny.pal
+new file mode 100644
+index 00000000..a3f4fe9d
+--- /dev/null
++++ b/graphics/pokemon/echo/gloamoth/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++186 132 156
++144 60 110
++104 48 94
++184 244 117
++140 240 48
++101 153 58
++217 240 197
++193 234 176
++132 149 132
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune/anim_front.png b/graphics/pokemon/echo/solune/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..96dd499d4adc4e0d5b20dde326247238b5f36eb9
+GIT binary patch
+literal 1148
+zcmV-?1cUpDP)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATai|d+>@npIt!z;)MUyNT`TN`S95G>d>Q=m;e9&000000000000000T=j(V000CB
+zNkl<Zc%1E*F>f426vuyW@8ZND$c$r0uA;khmj)l7fJo_Rjsj}i&9z4w=s3Di(M2MS
+zUE4@ez5slJ!z-nr!=`c?X9gnS=%V#d%+Bu2?s5eZ1&C>OZuUR#{oi}D^Zp0_`XP|5
+z1Z=6*0QuN90V<hn5nM>vG7OUkfJ`cYu68C2cvg|r{;^TL>??1e1Q<~%hs}~f9p(@~
+z2DSZ9WWrlp0eYE=$%YVW3-1qx2?gZFBmr=zry>gF>{$hH=X^9yC{!a@kX}zk6r=^n
+z*&Rm|YE%HIBF`fVe(VGN5?q|xQM7jgpq90T%U5Twcd>s>Qd>Ug;~Es!R8?-}>y?;L
+zk%bMMdH!yPgDO!hkDoqI--r(*17F2G0D7w7A&|6df5chXYPvZ4D%ll0uojN}<2Jc~
+z%>dbk<vXP31%Ra`1KFO7x_kGa?SVtcknK5&EE}MqumCctv3(S1*3SoilSEcnT3=0X
+zP6Ol{1K|4Pv*3XY`{oNkG(a)DZHy%w9Y=X^#!RQ>uiOF-*f}aa_&gXhEpjLpk8O!`
+z_e&2U)y7;d7C(Q<x50AnsEQ)&xj9R6bl-cZFA$jntlK)Dha><fGbsuXdQWW&AT_EC
+zCgy->kTM@pRl0AvsH`cV+$buPEdsbXXs!k{3RYVXt;7Cv;Isv}0C<FGm3(0}z)fK~
+z4mYL^%XOHTX?;okRL$ZjjHSo{T!9<6EdX%20QBpcMHAo*Akk&Cx}mH9IJ**H-0!Mu
+zT^_3Nlukfs8`bmw@n0Hk4WrUYrD3`i2zs(wfyk$Cn<6JsAik}n5+&)qGKn;dKcjK`
+ze~?HN(;Fsa0p;6su%JFv3589$u|=$5@Frpk-ar6cb4Mi<Drk@>vOA_zf%K~#J=LQz
+zRP93Y0%<A`i7gaA{5EQ}%{5i0`WKt+R(C>7w5;Ym*ljD28n9t~MS}^Mcmw-^gTvYH
+zyK5c<#`5^E@kSy5xF>rkS_-7n4}pJ&6AySfPgl2shy7Au%)Q2mGv$pPk^$RuQG+K3
+z9UhjJKAJh|Dmxe;b*HKoNME>x1_t3=DzKCEJoqE66_D$V(P*SjDi36iH#5L@v_kZ4
+zV;Sw71P^3bb1|K*=K$miaNu^1Y8MV?E~W)gEWWV-wiFmk8;7pp=I83x*Ci+YVvp}E
+zQA;x0vm^y=fiVLW35=jo+8rmfl4VnYs91_gRpFMvP$jw!Gag|*YDoz|ynaZ^o(PQ6
+zfV`qZf$&mmcm!xAbO{VMgR8ODk^hD}QDj~eoDHvkz4v2_q%&3(es+0Utv2Ps0#bR<
+z1Q<yEPW^p(V8ch4078U@akZ9O&=q_0o~1p4z+h8#eaDfH)^+xejz0k_k_0f!`IDXi
+O0000<MNUMnLSTY1mHo5;
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune/back.png b/graphics/pokemon/echo/solune/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..54111ae8757175c3f137083d7119c33840312f27
+GIT binary patch
+literal 694
+zcmV;n0!jUeP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATai|d+>@npIt!z;)MUyNT`TN`S95G>d>Q=m;e9&000000000000000T=j(V0006(
+zNkl<Zc%0>wKW-C26vlsVyp~eI8yk_<4i{L33&0JM8>HJ3s8U5Jow)*4q?BoL5erN7
+z!BhyNu#+laWQJm9c4zJN37BR_?|tw4-oG9Aua53>nBbAu`>^J8J4B}K6)-~uc-BjA
+z6%0ERCTWNQhM|JI>Lma$>`>@55qJj%hT5OPh{(Vx(kUY)p#bI<hW13+IWn0h22P;J
+zAR&p-00jzwVOJv%lrJ`40P`c$%aa%vEE<WPBV`FWprfHv#);HC?<oMJ9K@Jj2{F3Z
+zuzBKuqNf1hh<YA#IO|y^55B&0U5R{Tj={^4pDqG+G<^I%Xk^&da3G?Dh1l09tAyPu
+z=+S^bH%ZH|tudyJneLZpj!F1oOQSjI-f1dOH-Ib&DMJDRezw#I$m;Nmc(GQQ<q}!1
+zBjI=DQccH{WSZ~6rRkcw6j%;+tGG`!1f;oYV#Hc&ZEz)oP^{AJb~FL+o-P+9Al5qo
+zTO{V2BcO%{TgMRl4XBI{8Xuz{u!|<2s;Uhufc0^krN0P>&0|&9sZrNi8NUuL=D_?@
+zU55r7p0WPyU6SxK=iP^-hk+Gb<MRH%`FYx01F$ZGPXK-g$Ga8~>&Phb#v5RDm25rh
+zYk<%*AU=(tZ9dJgqQP1O#9Foiy+3&lpo!^jPqq(@U3LIrQNISnVIX@S0b$(t0DnbY
+zlJnAGh!RV&3WK+RJSJ>h7%#vC#KH#P%{Ieb^R8ejs1iY9z|W7}C`xISX5BE19Vuip
+chr0Fi5Ag4S{25rO)Bpeg07*qoM6N<$g7z^sl>h($
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune/footprint.png b/graphics/pokemon/echo/solune/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune/icon.png b/graphics/pokemon/echo/solune/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..b817ebbddfc639e2789318c4e45dde5bdcadcfc5
+GIT binary patch
+literal 385
+zcmV-{0e=38P)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6}
+zdwadTwEzGAdz?y~%}TU`TJFV*#jGjz_9@k3L6m#V#iY&llqq6jT0ucU^LsW*0003D
+zNkl<Zc%1FhJxT*{6a?_!u1k^?VYjsqf+z3<VyCB&?QByCR>m@wX|>TdSMUrLX>DW+
+z3$fZ@ATcEQTdav7wrRwv9>e>Xc?_FJx~?i@+=yvbWF=mu4GFDlmTh#a!AOkLN(Bap
+z8O<*}sp~?Fy-5J=FP7%AU*B4E#E7=<JN4DNBkRV)X5BH&#7yT8xehE$BuuCCw~vh3
+zYGiz}(mzDv{qV8WpJ72N&W_4`J$E5gxDpB4$I_NYvD<Mg5ebZwE~S(Rwhp`$jpCy{
+z%WLTs8U+{mmlw1O`fGE!<&vJO6|wVNmU=lzU=*DFc>g4Xa6YMgFC9fub7k&VWb2P@
+f0RM6LLvi>7<ma5H)RRjw00000NkvXXu0mjfTUo9>
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune/normal.pal b/graphics/pokemon/echo/solune/normal.pal
+new file mode 100644
+index 00000000..2bd17cc7
+--- /dev/null
++++ b/graphics/pokemon/echo/solune/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++246 181 123
++240 138 58
++159 93 64
++255 226 132
++255 212 72
++168 136 72
++249 240 216
++246 234 208
++163 149 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune/shiny.pal b/graphics/pokemon/echo/solune/shiny.pal
+new file mode 100644
+index 00000000..7e9bbcf8
+--- /dev/null
++++ b/graphics/pokemon/echo/solune/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++194 244 123
++156 240 58
++111 153 64
++166 253 132
++111 255 72
++85 161 72
++233 248 216
++219 246 208
++147 156 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune_dusk/anim_front.png b/graphics/pokemon/echo/solune_dusk/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..be185e16fbfd5e77280dd07c098b3e4a7c3530ff
+GIT binary patch
+literal 1106
+zcmV-Y1g-mtP)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATXniylP6KQaF6vvF*l$@`qZh`S95G>d>Q=m;e9&000000000000000{V0(0000Bs
+zNkl<Zc%1E)F>f426vuyW@07%#kT(vtu8QuQ&JDhN0t!CB)u~RF(6vVzN{%j6bdjh`
+zofN<qfKOn25`Ancr*U>5QXI}&55>&v&g^bLLeQYRW^d>I^MC(&Z+7Mn@1iHPGg1H`
+z;Y}uQ0hsR09DwnU?fg%v0i|f4h8?XLm;lH)Czv%U28E_#1HqN80UwMf9SJf^L~?ha
+zZ3#QcD%=?#Pg@dX#&-#W3<jD@@B}qr&A~L2;1x6gt=8*ILLgum@YRXkYZF{q#07?n
+zm#41|u(U#UHTJ^t(Gb_lAiEE3Xt(-)<rLrV&X0n~ZCv@o`|UN{nAaj5o2RcIDS6D<
+zSkEA1m;*4-e35k>?2Xr*{U~r00jFR1v51iwploaeJf<7cq>vG8-lMf&6plPVMk~?X
+z-NR%%>@?s48Ld!?VvK>xCIlM`3{fy_osIn*QHUi!0$(W4W&qaPW8nG>2?P|_H=hGy
+z0IJEIva}R?&uTdZt}GXe@V2%g!ToPT249D=TvThQjvq&jZa-vbmM+T8&-B)pL5=z4
+z4-XhdfV;WO3c3GNQ%TRT0@$+c@2^N-w628IjZXp6pqdyqe;bfcj|5fF7m17<5GIN?
+zZL0xp1%}IUl-XqvW8(ZX;G_dM2Y7@SO~0@N;1;l$#uL-V;bxhXi{_B}x&D=|qO??N
+z09WCrT?POyjsf$kQPBpt5|HFD>aQe!4{-J`0j2w0`^M!HjZf(X#A~B|zKj2NXlLYK
+zb08tM-wKF(EN5ygN;nc)4kWQC<zSMD4YOtqgFeu%gq>8Rr^qD8Eb%bc+|{;(+@i?A
+zv?U=pjQII010A#p5)UKm3dtlyixL^CAAj5H@i?^u;khji>NA08QECSw_u!z<fy|@9
+zu)d=S1;FlnV}0Ijbykcbx5Gswp8}$MW23>?JUyZ}f=Ksdj?!`<T3eL*Ow)93>Ofws
+za^B!TVhS0pyvNCVL2Xe+E79?j!&V0MxAzdk3cV~2$4GrsB@SdL+`<6kxGxn-QU?;Z
+zv^N;07{l``gy0Vf$D1YKZ?sCxozk**|CuHZq&#0Nx7Glx6>#8EgW+)H`Jw`<<F71$
+z1-GB9mM9@N7!SYptB8Pdw9JaRADY(~j3sDdFyapG-Z-tRqycDR#geXc42A}DmmwWb
+zuA~eg-alk*&kRN&keBp05MCGqj{u`WpTTfTxSSf3<Zq=DrSPWUbaMUcy|z^YS6Z$7
+zuZxp<v~3TLA-4x@KneL__K)p>?Q?^5g-fROSk7Q-_2q3#H=@DdL+!a*(j3zJ?|&74
+Y0=ZQLO!%U>umAu607*qoM6N<$f@snLcmMzZ
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_dusk/back.png b/graphics/pokemon/echo/solune_dusk/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..5b10fd3836f73c9799e82f2b1c1acfa3d49e351b
+GIT binary patch
+literal 670
+zcmV;P0%84$P)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATXniylP6KQaF6vvF*l$@`qZh`S95G>d>Q=m;e9&000000000000000{V0(00006h
+zNkl<Zc%1E&zit#U5Qo2+3sEW<-xVpz<q1~dNzzh5wIxucicq@n7Lih>xfeNc5`732
+z;-aul75?Zjh3(zF^+vn^)2zMz`TNb-vkU*@k+7|q7V9$ahNFUBI2#pc_7M9A!EMRA
+zuz3aq4|@D4U>Xgd6bQ*w1JK1|2sxMoC?z5$F`Zz5!Z<>z%05Ryfe<yA?XUvS+i`?c
+zRU9ZI2%9s@m!>d=kZOWNL0FUsQCn@;JoTASA`YK7%T;GFL<9)UweJZA2+!n2#di;&
+zc3Wf^((~Q`eQkw@2N5GSgzmm72oSpsHBffP>iB)NNM2>j&46@B%t6zUmY1GFTXh#k
+z@9WV#86+VFG=N?V5K_gtKsdj#m}K8StkS?a;~aFI=KU<w@SAaF+AFHFX`g#%8ZH=q
+z@!j09r>qBvyIez5Dj9Js&N=6-s}c})TGz$&0D^yZv#J1b!2`G*h;>{Y0u9`|Chc)w
+zfm(?kc^z>1B%rPv1=jHEsLL{(M#bi#Zkl}Em%TE6?42%w<;SMU1@6E66nwS_=RWuk
+z*)I~-m-znqz{yGO+-On7H39e;7v60Na<s?OMHWc0GD?WQMzAiQR*+sehk!U&5Ju<&
+zi+0a;cl2^--%BBgjrt`j_9N_l62yME1NbB6vt5uaLbA9KXE1pS$V1kqjtT-CfH>Fy
+zycrU%+y4q$L!AMcKv*96X|l39-*rovdGeOc5}IzEzmt!Hv$Vkv_5c6?07*qoM6N<$
+Ef=eGR8UO$Q
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_dusk/footprint.png b/graphics/pokemon/echo/solune_dusk/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_dusk/icon.png b/graphics/pokemon/echo/solune_dusk/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..dc0bda86a4c1d1b2749eb442e9613eb53a776d14
+GIT binary patch
+literal 392
+zcmV;30eAk1P)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6}
+zdwadTwEzGAb92q4toF2nTJFV*#jGjz_9^yaQj~km#iY%>DV$<rT0ucU=|r?&0003K
+zNkl<Zc%1FhJx&}!5QgEW+Y?x@sAo?Axg$$BpI|QFbQ5y~GN&AYBS2=Y95`@B!U2%j
+zkO)mgxZ5jc5kCv#U>IrT97{<4qN-Q*RsU4+FO`QNvYkmbKyk_HHNAvXXKim8Ws&8_
+z&ZI9mC*sGquFppZc)2MbV~Gp<BA%~i2atS7RY5urN8p(+KO^h=?}sw7m9n5+S6{ah
+zW{%b(ZQY-d-1~*w&uv}L8`4Ex6I0cEGPT=vnKg9X?tH#DJNsR?btVd-8IOw!lkKv<
+zdMNg*Jvi;3-~Z0TG2H-A9CKm-rI!^`VF07+rZJuMrLgQQrh^xRr!jU`8%>uX+_3@v
+mR<b#pH&Y&h|LgEx*WnM3-lIi41}X3W0000<MNUMnLSTZAs;?{n
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_dusk/normal.pal b/graphics/pokemon/echo/solune_dusk/normal.pal
+new file mode 100644
+index 00000000..3ff00341
+--- /dev/null
++++ b/graphics/pokemon/echo/solune_dusk/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++163 141 188
++106 74 162
++82 56 124
++220 177 237
++198 132 242
++135 90 171
++249 240 216
++246 234 208
++163 149 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune_dusk/shiny.pal b/graphics/pokemon/echo/solune_dusk/shiny.pal
+new file mode 100644
+index 00000000..4eb7b332
+--- /dev/null
++++ b/graphics/pokemon/echo/solune_dusk/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++197 141 167
++162 74 128
++114 56 104
++247 177 195
++242 132 174
++161 90 131
++233 248 216
++219 246 208
++147 156 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune_tide/anim_front.png b/graphics/pokemon/echo/solune_tide/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..9834a0491a8c3c8b55879ce46d1ef09ece9a6a7e
+GIT binary patch
+literal 1119
+zcmV-l1fctgP)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATW=*-%66&KVqG<>+Oc(@?w#z`S95G>d>Q=m;e9&000000000000000Dt!JG000B(
+zNkl<Zc%1E)v2Ghj5Qe`w(y|pJ@vJNwtPD!(lp>;^AO`XP^c%=(*fMUCE==cC=?uh;
+zRNDa@7ip6xphX}>I!mc!1dw+f1Cc@Dv?=!X?)FG3K#(+nw>fh7bLOA9y}b|KuLVoz
+zA{hWue3OkO0yF>5RDcPWwPgY;dbtPK0Fd6&60J<@X6FST^)^xq+7NKFrS-7f)kNTr
+z`Lv%{Xh%iNAgz`r7NQ~wrtI`<7S`d)y+ok-bec{<uP8vfsE{AJ&7?iy+|@FizCL=p
+zgJXWhd*S$`jjvbW8Bz*F!~LpK2p}Def;GH-em$|s`J2w5%;1?ldHlTQ@Gj69$o)bf
+zJ=g`Hr7;0N4$#V^TlurO7Y1RlL2&d{`Nzb^iWY*0^Zmz_0n&xp2Q>GKM1ge2qPK4C
+z)hcviz58THcZ`x{Jq+Zok$^S|hSlR<h=@WMxkf?M8i46q54bpv!4=JL@4f)U0OT7t
+ztaW6YPfI@;-rC`?_%?M#fvsZhGnWBaJItq$PaZ~(emh+E<EX7YolJiHl5b-Vt%Hyt
+zZaMH*N6DDBLxOVCB4dD6*PLfo|Dxq2gw_GfTq=-C6)jSEKnzGRkD!{lW{F0w{W%XY
+zy(r|f$1V~0F&NHz(I(b5x)5XH|Br#gB3ubh03IMllP9ba_#q7Y@x*j7T(yZER)^G!
+z@>9JF>&T}7KF9axGXQWp0nFRVMN{A{AhpA2@g(_sfp?b*tp7t7#pN@NS6L{CuZ{Bh
+ze*M3f&PDz;0x8x~0x9>{G7rU(u$(|_E4W)uAbLl+oIpZ~GTbB(F1V?e5r{vQoj#Wm
+zh_+gqPNAI;h)i=Noq{9;LjKd6&02-^(r_&C(q%j4nE*{hk=wA-B#<!Q0x(>-qpp^K
+zXVSSBJ$StPKDp<CK(1GSF?+I~v;cGl73AO_?V?l!LLiWmAEN*GvkV#p@@mY2r2!8>
+zy5qn&O8|rJShV+OZ_$Q>Hij{JmhJVB5->^vS<$v|4FmMzzErTadTrvC4uD~@9=trS
+zI?6onMnHI@<zjAF$L7}4(r|{eC&SU|6o9D$9{ko1A;HXLc)UFs=0HCA#sN6+AE(U*
+z3s*naYhM>`%rCnD-?{RYWV@rJ|Lstr1{fpI8ep^zNC~7|wO2_B7+OQI8XwF7h8AiT
+z0!GYkfY|{w1rqon6!5>N1medPfV>8B7q(fI;gvD)05B>n0t`Qbv%ZNOQkAVfDp`Pn
+zqm7H-ZvWiOfVWQb@agohj5hIL0x2Fe1s2lt^dIAaiw|KUh#gw`Wh~8LO853d$NY+b
+l!MZMd%BmU*&g}ni{RN-y2|#sV`UC&~002ovPDHLkV1n~&5P|>z
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_tide/back.png b/graphics/pokemon/echo/solune_tide/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..d6cf84626fd5e963917171c5ce741313a396fbbf
+GIT binary patch
+literal 686
+zcmV;f0#W^mP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATW=*-%66&KVqG<>+Oc(@?w#z`S95G>d>Q=m;e9&000000000000000Dt!JG0006x
+zNkl<Zc%1E&F>X^q5Qe{9KMPkdV++y7Il)tM0wfL)7o5Q*P^F4cy3kQW6DegHU&O*E
+z2%$nGg14yxiOf>$?tA;Z4qSk3yzBY*n}23U5B{$Qmh?`xh?{A*-73hI%2t6*IgI>+
+zpxZql(**GDuY@rV5KJ;54+xTOXPOJ7Ffkq=oj{)#fV!5?tw3KCCMFfDHbp<40JK#U
+zahWnnwk(*JTS}-0m?U_*@xWlLtk$d_JD>uhHeb6m%htm+2vtt;;F}BAnk*2G!G6sT
+z2Ve!i*cdY(e{Te^vrUKKz!)J6gdNW0dW%h!fTv<OTd+CG+@GghRu~>Ea>OKaJq2rE
+zcmT`_D`DB9jUk<Mg0hVeN4^2<rax1MD+c_@rIa)2S8<~%oP_5FV3>j8_M31lmZAq;
+z&4$sjW!r0~E6T{`X8^vZ8bZXj$eB@9Rq3h(OqeLd!D74v-aWZo)qqj&0JKW3&Ub+Z
+zZnTM)^(!#1Vy=%d4(O^*e&#f>QTKbDOMkQiV0}Apn$*d&tc;(dqb0EX)HKAg=dSi0
+z;Jtfv_%7v(gfm>fABTtOh7EuaGXTFr;7t;oX4w-W?|pi1Q$&*Bs&~|ul>AtK+M}yt
+zz^Ha9uFAams_-9RA4qQyo-Py6#M|xvJ(z_ws9%DOXTj>*jzE|qew&t|-t-7D^`%jP
+z!E3<WCT*MtZ-5;z3TuE@n}mz@yMmp=ye%XW@XI|nj;Ul$TXG~!9O=q>2~8L058al4
+Ukv$&6Z~y=R07*qoM6N<$f}9aIdH?_b
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_tide/footprint.png b/graphics/pokemon/echo/solune_tide/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_tide/icon.png b/graphics/pokemon/echo/solune_tide/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..0781e0f7007f69533b3a25d0bca5e9f6969abb17
+GIT binary patch
+literal 374
+zcmV-+0g3*JP)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6>
+zb924Dz5oCJL28s@l%%A^|L${~)nY-tq+0goDfafP)zxbDlqq6jT0ucU0xrFh00032
+zNkl<Zc%1E$u}T9$5Qe{9P9aIL+la0B1S!NKy?x#wAqXkm%GTC0d4j~+2M}ybYa#d)
+zX>Yc<GhD)0>?JPt3W9$%e9ZpL{5$ZQl6_&}Siq5i&K*=aU@eq6h-SnXppv#@aiq!f
+zRuWK27J-m}Jr6z^%)o*Rhbi0*7V6!bX9y0aYYN!ZyGc8lf`#pCzJjHBx}2y)s6iN8
+zw+aIlUQ{<IU{Lxe^iENE7(ru_)wT&LYT(fVrnp%30hV;J03Uz~GGv|r_jClH>l5(Q
+z6_h;B({dEk@UG<<(L(_cg{yC&SE_n_NDLqv^A&O{lRt6ffAeFKeer(|fAt(b0T*+v
+UuV)n#d;kCd07*qoM6N<$f^7|;`Tzg`
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/solune_tide/normal.pal b/graphics/pokemon/echo/solune_tide/normal.pal
+new file mode 100644
+index 00000000..68b1137f
+--- /dev/null
++++ b/graphics/pokemon/echo/solune_tide/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++143 186 223
++74 146 218
++63 98 157
++180 235 237
++134 226 242
++98 145 171
++249 240 216
++246 234 208
++163 149 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/solune_tide/shiny.pal b/graphics/pokemon/echo/solune_tide/shiny.pal
+new file mode 100644
+index 00000000..f2e47042
+--- /dev/null
++++ b/graphics/pokemon/echo/solune_tide/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++189 141 223
++149 74 218
++107 56 157
++191 178 237
++152 134 242
++108 91 171
++233 248 216
++219 246 208
++147 156 151
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/tickit/anim_front.png b/graphics/pokemon/echo/tickit/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..b7522ba28094aaa615b3d26eaa6da420e2842384
+GIT binary patch
+literal 1243
+zcmV<11SI>3P)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATX}miG0XVT!BsO%zxmpK$dhvxVylNl&EE6fcW_E000000000000000?%S(-000DL
+zNkl<Zc%1E)&u<$=6vscaj?=J+b|yqknnPvs58#l0ph#)YsYHE^K@g-~NKWMjoFJ#B
+zSLaYePIWKInMln!!g7j~TM0gas><F8kz8V84~Loc{_t+#hAQzcJ2US)-}m0k?93P5
+zG*cO4UaT!{%N&5Pju}4A0nFSbh8qWnTayytm3o}R5GGgC*#NWWThG@SA#89<G538g
+zpe6z4vXZoBT{p4-ZlNCK&b5G-8W0=#0L~@wTIT}HLx9X29fNuF4}g~%W-m$7Ch<iU
+zK)COXKbgu*a>9O;@k+l7uzPM|NXsA=10k*!UT9Qt1^(I%QUC=)Dy}{gpK4HuCt49i
+zA%tJ2w*hBrLIYZwySvJ>fjofekgt3T_V<5;Vl`Zq34md}=liGjQ0zCLaxb|KqST`b
+zK;ht`0W@}*)G+`!KX3>Y*oM_4z?$Tu4uHR#2!VH>dap#nCff;yhFcTgxwm1Uqbj&w
+z!7F8N_XJ?tr3FC20H9v+>q&rJ?{Hu78*v5?pmTD9lECpDH@ubvn8K0*7_3Ay`{j5Q
+z9ospkSOuV0O)_AbM=(5j8}5V=en<caI<0OSu}852RI2nB<5d90R-ss{xD;E~F)Hre
+z5=LM9%?0o8lz-9*1^}U$cg>x0GRcvh)#^aMHu6Uy#0P*mmBTg^%AjAQLr4uM<1Hlb
+z+ffMf+%=S|YAlD2l8o*%+8If<g_7Z!7>tJi6U`eu=N&x;U~m*RTG3!sg`#zOO#(EH
+zo*oAXa~hHa2-EGR0ka!ZU&-!G`%BNRi@DV#K&<nYc%Z%vJMvuWWRgnCE3oA{YV;3;
+z0P~G{EtD8_RCr-Un<dTZ6V|lrB<`uG(yVv!fBP>?C^<eDKeRKq^At!pGlRh1_RCJ9
+zhzx+eCnu!_UNy`(zypw>0@2wF=BaJZX60amTltWwKx~=k5@H8<+^jg6&u1`?0P%T7
+zj&X@{seU-mbjCtF<gzNUA}m{H#Ux60mErwxu5tiwR8947u51Okdo)M`6eyufzi8A)
+zTEWu*A%iFfAscl~iAB`1CV+bi<xY_m7=8T5z?oVG&`?p*Ta1z%)?L6dTpU1g#Z>oX
+zRD~$f^L;G=E)E;e`)p-0yi4sm^r}?=3I~UEdidMuRrjj>JAnadfw3(U0>itX78sFP
+zhU@e`$vF>pFT9FZLWB=ZLST4+X|qs@q`%+jr5T1N*vIg=2sp{(M2-ib3uPxT@)Ss?
+z05FUTjHCiFO<>rL3yfr$1kF~r4N8UrW28W0`XPW|4Qj9k{hx==(g1)HN8aCg-vLtk
+zLDikV9L}6b_>GvaO;)KD%HtX)6c`NKEOCjzz*|a?#sr46O!i?LhT{=KM<|AWgzsKE
+zeBNVK{2J38&G8VZnCxikQSz}eRZC1ufWc7^{m3!>0D5|G1Q?C%zDLUDHkDNBLr3=A
+zW|(c5gIH%%JlH(4oo``Nrjk@rUcqcRxRNr(@Mi0WzX8KUWavgLH;n)Q002ovPDHLk
+FV1lD%GW7re
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tickit/back.png b/graphics/pokemon/echo/tickit/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..65b232ff6c90db0b2f1a8a5d76021927f4c73b6d
+GIT binary patch
+literal 743
+zcmV<D0vP>?P)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATX}miG0XVT!BsO%zxmpK$dhvxVylNl&EE6fcW_E000000000000000?%S(-0007V
+zNkl<Zc%0RhF;5gh7>1v3IV4$PoB>3SMzo|6!ykae)&vu|&SVRr#-G41P+OolEx}(v
+zqlxw9?iUD&h0z3dNX$in+p(CL-8tN)cZ%EZGS9x>_r5d9!hgC%tLjfu1KfSOb|WBJ
+zDWFxYf`}*N#abO;yUGLev{b7`;pd($wWtH^)Nfy@dKXBLl4(=7&%%xe8(i=`6x;Oz
+z$UFCJH_Z^1r3tvF0OW1stM?tS)2QHlwws%`Rr%YX@EVXeGy*P&AEpsN0d3Q)fCB6d
+zEtpb%gxcc<yDi#{5Cfus+?A3n7Dne(M-O^(9XPZGWM=Bm9gNCz4`^%98(<AweKO2F
+zD3ToD%#Z*wqmfO(0IfA8k4fCE)Xv4MP1L+`rwgs;vt`>v(E?dMGkU|oM`*3WFUr}h
+zcOeXc!vh$;TIFilmJ$#93D|+Mnc?yPNcTUF1!8=XL*NL8knZyZaA8BD%BU~9?wNWC
+z@mK;-WN;J-i?;~Q<|#1U4ZHhgv?}EA?{Wi(rVdDnPiP#-02q}LP?+erJEYZ^%J?b*
+zQa|V9V7Y8^9JlcM!}Z{S*u|}^BA<B=T916x6WwUiO(qAS?mGoL06J71UY@wRXF`jG
+zs>deC`{D$kmlNmE$pAX*NUA8l=Dl7H-p<_Ow+t@2z!tEl0A2Ls9F~AvTduzF2Ho;4
+zCUz?uAGABB7*MQ~PInin{a!42jol~46~{y~SYcwt5s#$0(<N{UzzWt>8{ta$7H%he
+zNB~CW+6)z;0OWXFp$LTL96)ZHae$K`q7~;_t3KC&(O|4saV<#+PQo&b1Ay&C4tiD8
+Ze*v+Ap(HPF!k+*D002ovPDHLkV1lM&Q=b3;
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tickit/footprint.png b/graphics/pokemon/echo/tickit/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tickit/icon.png b/graphics/pokemon/echo/tickit/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..74b10c0fd4d88dbc801db4a74022ac6f04e20a03
+GIT binary patch
+literal 396
+zcmV;70dxL|P)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6}
+zdwadTwEzGAdz?y~%}TU`TJFV*#jGjz_9@k3L6m#V#iY&llqq6jT0ucU^LsW*0003O
+zNkl<Zc%1E$u}Z^G7=^$8rcw*ln@)mD1A<c_g>-YtGYIb0sbkz63U+ts99(<_p%2gp
+z@ELTFtm$oO6`^t+k~E2<IEnvsIh_BT!?{2F+L+x-0idT<;0AE3z#(v1-M64>8jj(h
+z=Ab=Rbx(_}11tP*jEx1Ivjns`3GTZiIl8t23e3R8j%a>NeFF;CI9SHB=snA!hflyb
+zoSzY9!P@IwJQ5ca%eN~p1|ZC%KM*4jG6!hD@e8!>fM`EsEISPPd*Cq17{~?9=Kxx=
+zt1vj70JnK`*bF}%VvtVJNOGQ}X__nwhVIVVKqK`E4RHb0FAK4DVU6}p?xK5MPsDxQ
+q`X%GhfVSml{A9}Q|8w}e=kNs>-H-oWW<*s00000<MNUMnLSTY>8nQ|N
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tickit/normal.pal b/graphics/pokemon/echo/tickit/normal.pal
+new file mode 100644
+index 00000000..f202ce0d
+--- /dev/null
++++ b/graphics/pokemon/echo/tickit/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++174 219 137
++124 200 80
++92 129 77
++236 204 127
++224 176 64
++150 116 67
++184 187 192
++140 148 168
++101 99 128
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/tickit/shiny.pal b/graphics/pokemon/echo/tickit/shiny.pal
+new file mode 100644
+index 00000000..30ef44f0
+--- /dev/null
++++ b/graphics/pokemon/echo/tickit/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++146 219 185
++80 200 158
++67 129 122
++164 234 127
++109 224 64
++83 143 67
++197 182 192
++161 140 168
++114 95 128
++248 248 240
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/tidepup/anim_front.png b/graphics/pokemon/echo/tidepup/anim_front.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f58231d78da9e5ac1c199cafcb0cbc9a06dcc67
+GIT binary patch
+literal 1089
+zcmV-H1it%;P)<h;3K|Lk000e1NJLTq002M$004jl0{{R3Nw0EQ0000mP)t-sn9!go
+zATX)V>U6a1S9YiL_44lW`ktDvkF3#3e8fLhkpKVx000000000000000f@34H000Bb
+zNkl<Zc%1E*J#QOF5Qd*QQL%&+nxQMJ33bU2prAkCf<;O-G*StwqEbrbba5JkrCi29
+z048b@D1}m`384Id5D{#{>Ldn`n*`8pCq(pdQ``sl$RmwZaiOV}ckjJBGrPC<5bolA
+z46C~sO@`9c#RBsi3k9OGRAUj%UaCf8Vo;l7DUfCh79=UQmN@epvyxn33LY2D))D0i
+z09?Xs9hsoa&u`WWWb)jMMFh|UpE$SxrY#}>5A<Q&AI{`hcGBT%+du?J3)n^2tw|zF
+z5;V(HK&;a9axD-dT0jgJBvU!8B@Q4)!9g6`l*3gA8@<S`c&89wB%#Cj?XR#r1SyK<
+zW19%nUjeWK3gg^oON%K)j1GoWx3$|m4azhF%_b-#Z%C9)nfC%1mWs{7Az=if9081(
+zGK#?9XH#z5RfBwv1_J)C=djey45rphz`R55w*k^KB;S?>=_$~F1n}M|q_4V+PU4C~
+zxmf=ClE%Ztmb=F>L8isverx;*fGF})E9+T$O89PGm7|@o)KW0sE+_k77*tXSu5pmn
+zD22fv6^A!LN;{c>m`w!Po)%@&sC1?GjfQ)2=6rZknWBtRcMb%N`kT=SEN=^N)CST6
+zBov_EKZez(yQRUW=#2|HV!Z@p<>@ZBFM+|AD);t7f&AdSz{+dBZNs34=;tm>(tm*f
+ztNrI~7&zqKo};qA<iTMg%H9?O5)ALC3XlhfaC1QLW=`!;QS#^R;x68ccqf6xx>#WD
+zT?A6|<^Hb(QkO#^u&7n<P!Pz*TA~XGM9jgT3kamCz<54^$VbJ`IRug)!!VCPEF+Nd
+zJOYsx-1cF;jz9#EO-F**HBrm>-BkoZtF<-zeBMa`b&`+7DhE~8>a`)Xh+=>k7!Q-G
+z;7v#LI0h6FQKD(U82#pXG@J(*aK&2+z{sNnj0iE^reQ_R<GinKv&ca~x`5sW%m*x~
+z%N!h>Pyr0hGARJVCr|;5iA6SrC?kUjU{nc2Fz~`|KLd<m@q&q#{D61J(H1~@2F;2A
+z4V<R{j6tId$5|~}3UW;H*Ozoij48kfK5Cr~;Na0PoT3IW{7%Tp6To;_N^1cl=Z6e1
+zc8Ux%BoLrHWHN&@d!_+kSaH9!U+MkxEcp5tPnQLz2k1>G7@a^jFgX7V_Cvt<<uTIh
+z8UbM3xS$UoJ^|l5CSTX|+(h?-GJRhZ==I?UNYB4UZ(L>Z*S`W-d42m5(z716=c@ww
+z(L0R2rFMGeo#m7eZXa7c1ojpng4p_Z^?%1E5?y@%|A~JAtSldgh*7h^00000NkvXX
+Hu0mjflj-jE
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tidepup/back.png b/graphics/pokemon/echo/tidepup/back.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..76ede2c83194cdaf96e7c534496656cad114fed0
+GIT binary patch
+literal 629
+zcmV-*0*d{KP)<h;3K|Lk000e1NJLTq002M$002M)0{{R3SVwH_0000mP)t-sn9!go
+zATX)V>U6a1S9YiL_44lW`ktDvkF3#3e8fLhkpKVx000000000000000f@34H00062
+zNkl<Zc%1E&v2GJV5Qe`wjD!RdGw}<=SGvK%0y=2YA*D+lnv^^NqM)PU1!$5Q7okLg
+z22mqL^f<1rLCJ0;B!m*~DE4k|?{apJ#1{6h_uGGF_MbKUAOHBUcA5?COKzKit;%#0
+zAhTpKsE}r{4v1qk_^W8OQ9%&Q)&q)SR+lOR`Q-*nkaIVvAUU2AsJ3(v7(;cw0;p^V
+zkb7w{1Hd?4Os)em^U2Cz2RZ_XuDR-1{G<<bj0D!2r5gZEV`SQKGigQj^`r$v$=k#6
+zGXj=vlX_=MFl_<L0V=1B`f?Bd@nX9<683TAfCI`0IJooed#J+h0}%TR3IKktLYXoT
+zIr~^lxgVyxJ_8shM*);V!i9J;y7#+EYE%ejbsemOD2N$kAhRYoP=>E5qG6V$0@}oA
+zB5>R_OQOV$BM`IOo(!3#?luzBBY?yH+f*MVrf(VONl~2p8i@HE2aFh#n0U$_Eam{5
+zIfx<Z{#YJ(D!=my(WcB!4&{Ld4?A3ao)GV$DUh=8jiaL{bO977_FJ*hDgtM%L^>Y#
+z6i~`%DS30%14N597yzdMu)8NQPe~<qYlYXZ`q8Zx@^y$?FWbE!Z`%E*{dE$7T3)Pu
+zguTZbBre|r$2Fkn^B^%Lw9#Vm;l-jAedln$zX1Gs2vGfa<U!s%Jq*BKu7+|3qT`$-
+P00000NkvXXu0mjfUD^`J
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tidepup/footprint.png b/graphics/pokemon/echo/tidepup/footprint.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..99d03f76c9e47e9da84648e3232e0a9b52eca38b
+GIT binary patch
+literal 128
+zcmeAS@N?(olHy`uVBq!ia0vp^0wB!D3?x-;bCrM;TYyi9>;M1%lai8NJv*8R6fyO5
+zaSW-Llbiqn_YWNS*L?Ap_T~H4K0UlVZ{E+4urn;=FfcSQ`1|9)kpl<5WHY)bGH^WN
+Vy6Q3CxB+MYgQu&X%Q~loCIEPYEARjS
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tidepup/icon.png b/graphics/pokemon/echo/tidepup/icon.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..97402dcdfdf05a1117e7aa4d3c3255170e466595
+GIT binary patch
+literal 352
+zcmV-m0iXVfP)<h;3K|Lk000e1NJLTq001BW002M)0{{R3iJ)km0000mP)t-sVw{6>
+zb924Dz5oCJL28s@l%%A^|L${~)nY-tq+0goDfafP)zxbDlqq6jT0ucU0xrFh0002%
+zNkl<Zc%1Fhze>Y!6vgpRew0E;;a6~Q5iBk)4uZHTWa;iAT{}7ZBoZIR*`<S{lMf&r
+zTqOzi&mblaEwz1v4xZ`qg?qT?a@Z%uzcGN(co#(F4v3>>cV)!kcnfq1I$NMpDCB?O
+zK22?VL`zJ&cP&W7@k{U2dl*O`5!A(GRy4585n?;bTT{?Ms8KZxAg4p`)o`6D64Xh5
+zDElm6PSCeJDL-5nnoZgtxLP>}qy=~&YX#IfR9M_r0VZf+y7o9aF3&1An)B~|fcooV
+yF?f?5luwe?L6@@mbJ8Z8FT~b9=)VqoUx!~k41AB*4HRPl0000<MNUMnLSTXjm6nYF
+
+literal 0
+HcmV?d00001
+
+diff --git a/graphics/pokemon/echo/tidepup/normal.pal b/graphics/pokemon/echo/tidepup/normal.pal
+new file mode 100644
+index 00000000..7bfe2d6e
+--- /dev/null
++++ b/graphics/pokemon/echo/tidepup/normal.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++169 207 234
++116 180 236
++87 118 167
++244 245 242
++238 242 250
++158 154 175
++143 172 209
++74 124 196
++63 85 144
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/graphics/pokemon/echo/tidepup/shiny.pal b/graphics/pokemon/echo/tidepup/shiny.pal
+new file mode 100644
+index 00000000..7ed4ad35
+--- /dev/null
++++ b/graphics/pokemon/echo/tidepup/shiny.pal
+@@ -0,0 +1,19 @@
++JASC-PAL
++0100
++16
++152 208 160
++40 32 48
++205 167 234
++174 116 236
++121 81 167
++249 243 242
++246 238 250
++163 151 175
++189 141 209
++148 74 196
++106 56 144
++255 255 255
++0 0 0
++0 0 0
++0 0 0
++0 0 0
+diff --git a/include/constants/species.h b/include/constants/species.h
+index bf5122e1..c80376d0 100644
+--- a/include/constants/species.h
++++ b/include/constants/species.h
+@@ -1692,6 +1692,16 @@ enum __attribute__((packed)) Species
+ 
+     SPECIES_CUSTOM_START = SPECIES_GLIMMORA_MEGA,
+     // Add any custom species between here and SPECIES_CUSTOM_END
++    // ECHO SPECIES BEGIN
++    SPECIES_TICKIT,
++    SPECIES_CHIMELL,
++    SPECIES_GLOAMOTH,
++    SPECIES_TIDEPUP,
++    SPECIES_BRAMBLIT,
++    SPECIES_SOLUNE,
++    SPECIES_SOLUNE_TIDE,
++    SPECIES_SOLUNE_DUSK,
++    // ECHO SPECIES END
+     SPECIES_CUSTOM_END,
+ 
+     SPECIES_EGG = SPECIES_CUSTOM_END,
+diff --git a/src/data/graphics/echo_pokemon.h b/src/data/graphics/echo_pokemon.h
+new file mode 100644
+index 00000000..e5494306
+--- /dev/null
++++ b/src/data/graphics/echo_pokemon.h
+@@ -0,0 +1,56 @@
++// Generated by tools/echo/gen_species.py. Do not edit.
++const u32 gMonFrontPic_Tickit[] = INCGFX_U32("graphics/pokemon/echo/tickit/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Tickit[] = INCGFX_U32("graphics/pokemon/echo/tickit/back.png", ".4bpp.smol");
++const u16 gMonPalette_Tickit[] = INCGFX_U16("graphics/pokemon/echo/tickit/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Tickit[] = INCGFX_U16("graphics/pokemon/echo/tickit/shiny.pal", ".gbapal");
++const u8 gMonIcon_Tickit[] = INCGFX_U8("graphics/pokemon/echo/tickit/icon.png", ".4bpp");
++const u8 gMonFootprint_Tickit[] = INCGFX_U8("graphics/pokemon/echo/tickit/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_Chimell[] = INCGFX_U32("graphics/pokemon/echo/chimell/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Chimell[] = INCGFX_U32("graphics/pokemon/echo/chimell/back.png", ".4bpp.smol");
++const u16 gMonPalette_Chimell[] = INCGFX_U16("graphics/pokemon/echo/chimell/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Chimell[] = INCGFX_U16("graphics/pokemon/echo/chimell/shiny.pal", ".gbapal");
++const u8 gMonIcon_Chimell[] = INCGFX_U8("graphics/pokemon/echo/chimell/icon.png", ".4bpp");
++const u8 gMonFootprint_Chimell[] = INCGFX_U8("graphics/pokemon/echo/chimell/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_Gloamoth[] = INCGFX_U32("graphics/pokemon/echo/gloamoth/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Gloamoth[] = INCGFX_U32("graphics/pokemon/echo/gloamoth/back.png", ".4bpp.smol");
++const u16 gMonPalette_Gloamoth[] = INCGFX_U16("graphics/pokemon/echo/gloamoth/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Gloamoth[] = INCGFX_U16("graphics/pokemon/echo/gloamoth/shiny.pal", ".gbapal");
++const u8 gMonIcon_Gloamoth[] = INCGFX_U8("graphics/pokemon/echo/gloamoth/icon.png", ".4bpp");
++const u8 gMonFootprint_Gloamoth[] = INCGFX_U8("graphics/pokemon/echo/gloamoth/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_Tidepup[] = INCGFX_U32("graphics/pokemon/echo/tidepup/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Tidepup[] = INCGFX_U32("graphics/pokemon/echo/tidepup/back.png", ".4bpp.smol");
++const u16 gMonPalette_Tidepup[] = INCGFX_U16("graphics/pokemon/echo/tidepup/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Tidepup[] = INCGFX_U16("graphics/pokemon/echo/tidepup/shiny.pal", ".gbapal");
++const u8 gMonIcon_Tidepup[] = INCGFX_U8("graphics/pokemon/echo/tidepup/icon.png", ".4bpp");
++const u8 gMonFootprint_Tidepup[] = INCGFX_U8("graphics/pokemon/echo/tidepup/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_Bramblit[] = INCGFX_U32("graphics/pokemon/echo/bramblit/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Bramblit[] = INCGFX_U32("graphics/pokemon/echo/bramblit/back.png", ".4bpp.smol");
++const u16 gMonPalette_Bramblit[] = INCGFX_U16("graphics/pokemon/echo/bramblit/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Bramblit[] = INCGFX_U16("graphics/pokemon/echo/bramblit/shiny.pal", ".gbapal");
++const u8 gMonIcon_Bramblit[] = INCGFX_U8("graphics/pokemon/echo/bramblit/icon.png", ".4bpp");
++const u8 gMonFootprint_Bramblit[] = INCGFX_U8("graphics/pokemon/echo/bramblit/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_Solune[] = INCGFX_U32("graphics/pokemon/echo/solune/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_Solune[] = INCGFX_U32("graphics/pokemon/echo/solune/back.png", ".4bpp.smol");
++const u16 gMonPalette_Solune[] = INCGFX_U16("graphics/pokemon/echo/solune/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_Solune[] = INCGFX_U16("graphics/pokemon/echo/solune/shiny.pal", ".gbapal");
++const u8 gMonIcon_Solune[] = INCGFX_U8("graphics/pokemon/echo/solune/icon.png", ".4bpp");
++const u8 gMonFootprint_Solune[] = INCGFX_U8("graphics/pokemon/echo/solune/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_SoluneTide[] = INCGFX_U32("graphics/pokemon/echo/solune_tide/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_SoluneTide[] = INCGFX_U32("graphics/pokemon/echo/solune_tide/back.png", ".4bpp.smol");
++const u16 gMonPalette_SoluneTide[] = INCGFX_U16("graphics/pokemon/echo/solune_tide/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_SoluneTide[] = INCGFX_U16("graphics/pokemon/echo/solune_tide/shiny.pal", ".gbapal");
++const u8 gMonIcon_SoluneTide[] = INCGFX_U8("graphics/pokemon/echo/solune_tide/icon.png", ".4bpp");
++const u8 gMonFootprint_SoluneTide[] = INCGFX_U8("graphics/pokemon/echo/solune_tide/footprint.png", ".1bpp");
++
++const u32 gMonFrontPic_SoluneDusk[] = INCGFX_U32("graphics/pokemon/echo/solune_dusk/anim_front.png", ".4bpp.smol");
++const u32 gMonBackPic_SoluneDusk[] = INCGFX_U32("graphics/pokemon/echo/solune_dusk/back.png", ".4bpp.smol");
++const u16 gMonPalette_SoluneDusk[] = INCGFX_U16("graphics/pokemon/echo/solune_dusk/normal.pal", ".gbapal");
++const u16 gMonShinyPalette_SoluneDusk[] = INCGFX_U16("graphics/pokemon/echo/solune_dusk/shiny.pal", ".gbapal");
++const u8 gMonIcon_SoluneDusk[] = INCGFX_U8("graphics/pokemon/echo/solune_dusk/icon.png", ".4bpp");
++const u8 gMonFootprint_SoluneDusk[] = INCGFX_U8("graphics/pokemon/echo/solune_dusk/footprint.png", ".1bpp");
+diff --git a/src/data/graphics/pokemon.h b/src/data/graphics/pokemon.h
+index 9726fafa..a070d5d2 100644
+--- a/src/data/graphics/pokemon.h
++++ b/src/data/graphics/pokemon.h
+@@ -27684,3 +27684,5 @@ const u32 gObjectEventPic_Substitute[] = INCGFX_COMP("graphics/pokemon/question_
+     const u32 gMonFrontPic_Egg[] = INCGFX_U32("graphics/pokemon/egg/anim_front.png", ".4bpp.smol");
+     const u16 gMonPalette_Egg[] = INCGFX_U16("graphics/pokemon/egg/normal.pal", ".gbapal");
+     const u8 gMonIcon_Egg[] = INCGFX_U8("graphics/pokemon/egg/icon.png", ".4bpp");
++
++#include "echo_pokemon.h"
+diff --git a/src/data/pokemon/level_up_learnsets/echo.h b/src/data/pokemon/level_up_learnsets/echo.h
+new file mode 100644
+index 00000000..b1c3f847
+--- /dev/null
++++ b/src/data/pokemon/level_up_learnsets/echo.h
+@@ -0,0 +1,67 @@
++// Generated by tools/echo/gen_species.py. Do not edit.
++static const struct LevelUpMove sTickitLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_BUG_BITE),
++    LEVEL_UP_MOVE( 1, MOVE_METAL_CLAW),
++    LEVEL_UP_MOVE( 1, MOVE_QUICK_ATTACK),
++    LEVEL_UP_MOVE( 1, MOVE_IRON_DEFENSE),
++    LEVEL_UP_MOVE(14, MOVE_FURY_CUTTER),
++    LEVEL_UP_MOVE(20, MOVE_BULLET_PUNCH),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sChimellLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_CONFUSION),
++    LEVEL_UP_MOVE( 1, MOVE_METAL_SOUND),
++    LEVEL_UP_MOVE( 1, MOVE_ASTONISH),
++    LEVEL_UP_MOVE( 1, MOVE_HEAL_BELL),
++    LEVEL_UP_MOVE(16, MOVE_PSYBEAM),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sGloamothLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_GUST),
++    LEVEL_UP_MOVE( 1, MOVE_BITE),
++    LEVEL_UP_MOVE( 1, MOVE_SILVER_WIND),
++    LEVEL_UP_MOVE( 1, MOVE_FEINT_ATTACK),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sTidepupLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_WATER_GUN),
++    LEVEL_UP_MOVE( 1, MOVE_AQUA_JET),
++    LEVEL_UP_MOVE( 1, MOVE_GROWL),
++    LEVEL_UP_MOVE( 1, MOVE_ICE_SHARD),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sBramblitLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_VINE_WHIP),
++    LEVEL_UP_MOVE( 1, MOVE_MACH_PUNCH),
++    LEVEL_UP_MOVE( 1, MOVE_BULLET_SEED),
++    LEVEL_UP_MOVE( 1, MOVE_DRAIN_PUNCH),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sSoluneLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_EMBER),
++    LEVEL_UP_MOVE( 1, MOVE_QUICK_ATTACK),
++    LEVEL_UP_MOVE( 1, MOVE_FLAME_WHEEL),
++    LEVEL_UP_MOVE( 1, MOVE_TAIL_WHIP),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sSoluneTideLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_WATER_GUN),
++    LEVEL_UP_MOVE( 1, MOVE_QUICK_ATTACK),
++    LEVEL_UP_MOVE( 1, MOVE_BUBBLE_BEAM),
++    LEVEL_UP_MOVE( 1, MOVE_TAIL_WHIP),
++    LEVEL_UP_END
++};
++
++static const struct LevelUpMove sSoluneDuskLevelUpLearnset[] = {
++    LEVEL_UP_MOVE( 1, MOVE_HEX),
++    LEVEL_UP_MOVE( 1, MOVE_QUICK_ATTACK),
++    LEVEL_UP_MOVE( 1, MOVE_SHADOW_SNEAK),
++    LEVEL_UP_MOVE( 1, MOVE_TAIL_WHIP),
++    LEVEL_UP_END
++};
+diff --git a/src/data/pokemon/species_info.h b/src/data/pokemon/species_info.h
+index f7616e53..854d747e 100644
+--- a/src/data/pokemon/species_info.h
++++ b/src/data/pokemon/species_info.h
+@@ -159,6 +159,7 @@ const struct SpeciesInfo gSpeciesInfo[] =
+     #include "species_info/gen_7_families.h"
+     #include "species_info/gen_8_families.h"
+     #include "species_info/gen_9_families.h"
++    #include "species_info/echo_families.h"
+ 
+     [SPECIES_EGG] =
+     {
+diff --git a/src/data/pokemon/species_info/echo_families.h b/src/data/pokemon/species_info/echo_families.h
+new file mode 100644
+index 00000000..96d047d7
+--- /dev/null
++++ b/src/data/pokemon/species_info/echo_families.h
+@@ -0,0 +1,468 @@
++// Generated by tools/echo/gen_species.py. Do not edit.
++    [SPECIES_TICKIT] =
++    {
++        .baseHP        = 55,
++        .baseAttack    = 62,
++        .baseDefense   = 70,
++        .baseSpeed     = 66,
++        .baseSpAttack  = 48,
++        .baseSpDefense = 60,
++        .types = MON_TYPES(TYPE_BUG, TYPE_STEEL),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_SWARM, ABILITY_LIGHT_METAL, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_GREEN,
++        .speciesName = _("Tickit"),
++        .cryId = CRY_KRICKETOT,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Clockwork"),
++        .height = 4,
++        .weight = 60,
++        .description = COMPOUND_STRING(
++            "Its shell ticks in time with the island's\n"
++            "bell. It is said to remember every hour\n"
++            "it has ever lived, even the ones that\n"
++            "were undone"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Tickit,
++        .frontPicSize = MON_COORDS_SIZE(48, 56),
++        .frontPicYOffset = 3,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Tickit,
++        .backPicSize = MON_COORDS_SIZE(64, 64),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Tickit,
++        .shinyPalette = gMonShinyPalette_Tickit,
++        .iconSprite = gMonIcon_Tickit,
++        .iconPalIndex = 5,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Tickit)
++        .levelUpLearnset = sTickitLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_CHIMELL] =
++    {
++        .baseHP        = 70,
++        .baseAttack    = 55,
++        .baseDefense   = 90,
++        .baseSpeed     = 40,
++        .baseSpAttack  = 75,
++        .baseSpDefense = 85,
++        .types = MON_TYPES(TYPE_STEEL, TYPE_PSYCHIC),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_LEVITATE, ABILITY_NONE, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_BROWN,
++        .speciesName = _("Chimell"),
++        .cryId = CRY_BRONZOR,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Toll"),
++        .height = 6,
++        .weight = 320,
++        .description = COMPOUND_STRING(
++            "It drifts to the old belfry each dusk.\n"
++            "People who hear it ring twice say they\n"
++            "feel they have heard that exact sound\n"
++            "before"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Chimell,
++        .frontPicSize = MON_COORDS_SIZE(56, 64),
++        .frontPicYOffset = 3,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Chimell,
++        .backPicSize = MON_COORDS_SIZE(64, 64),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Chimell,
++        .shinyPalette = gMonShinyPalette_Chimell,
++        .iconSprite = gMonIcon_Chimell,
++        .iconPalIndex = 2,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Chimell)
++        .levelUpLearnset = sChimellLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_GLOAMOTH] =
++    {
++        .baseHP        = 50,
++        .baseAttack    = 66,
++        .baseDefense   = 50,
++        .baseSpeed     = 82,
++        .baseSpAttack  = 60,
++        .baseSpDefense = 52,
++        .types = MON_TYPES(TYPE_BUG, TYPE_DARK),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_SHIELD_DUST, ABILITY_INSOMNIA, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_PURPLE,
++        .speciesName = _("Gloamoth"),
++        .cryId = CRY_DUSTOX,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Twilight"),
++        .height = 7,
++        .weight = 95,
++        .description = COMPOUND_STRING(
++            "It only flies at dusk. The eye spots\n"
++            "on its wings stare back at anyone who\n"
++            "wanders the island after the light\n"
++            "changes"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Gloamoth,
++        .frontPicSize = MON_COORDS_SIZE(64, 64),
++        .frontPicYOffset = 4,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Gloamoth,
++        .backPicSize = MON_COORDS_SIZE(64, 64),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Gloamoth,
++        .shinyPalette = gMonShinyPalette_Gloamoth,
++        .iconSprite = gMonIcon_Gloamoth,
++        .iconPalIndex = 3,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Gloamoth)
++        .levelUpLearnset = sGloamothLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_TIDEPUP] =
++    {
++        .baseHP        = 68,
++        .baseAttack    = 58,
++        .baseDefense   = 60,
++        .baseSpeed     = 52,
++        .baseSpAttack  = 58,
++        .baseSpDefense = 64,
++        .types = MON_TYPES(TYPE_WATER),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_SWIFT_SWIM, ABILITY_THICK_FAT, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_BLUE,
++        .speciesName = _("Tidepup"),
++        .cryId = CRY_SPHEAL,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Shore Pup"),
++        .height = 5,
++        .weight = 210,
++        .description = COMPOUND_STRING(
++            "It sleeps on the pier and barks when\n"
++            "the tide turns. Fishers on Verran set\n"
++            "their days by its call"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Tidepup,
++        .frontPicSize = MON_COORDS_SIZE(64, 48),
++        .frontPicYOffset = 5,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Tidepup,
++        .backPicSize = MON_COORDS_SIZE(64, 56),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Tidepup,
++        .shinyPalette = gMonShinyPalette_Tidepup,
++        .iconSprite = gMonIcon_Tidepup,
++        .iconPalIndex = 3,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Tidepup)
++        .levelUpLearnset = sTidepupLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_BRAMBLIT] =
++    {
++        .baseHP        = 60,
++        .baseAttack    = 74,
++        .baseDefense   = 62,
++        .baseSpeed     = 58,
++        .baseSpAttack  = 40,
++        .baseSpDefense = 56,
++        .types = MON_TYPES(TYPE_GRASS, TYPE_FIGHTING),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_IRON_FIST, ABILITY_OVERGROW, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_GREEN,
++        .speciesName = _("Bramblit"),
++        .cryId = CRY_CHESPIN,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Thornfist"),
++        .height = 4,
++        .weight = 120,
++        .description = COMPOUND_STRING(
++            "It spars with tree trunks at dawn.\n"
++            "The leaves on its back harden into\n"
++            "thorns when it is cornered"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Bramblit,
++        .frontPicSize = MON_COORDS_SIZE(56, 48),
++        .frontPicYOffset = 2,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Bramblit,
++        .backPicSize = MON_COORDS_SIZE(64, 48),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Bramblit,
++        .shinyPalette = gMonShinyPalette_Bramblit,
++        .iconSprite = gMonIcon_Bramblit,
++        .iconPalIndex = 5,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Bramblit)
++        .levelUpLearnset = sBramblitLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_SOLUNE] =
++    {
++        .baseHP        = 58,
++        .baseAttack    = 60,
++        .baseDefense   = 54,
++        .baseSpeed     = 72,
++        .baseSpAttack  = 70,
++        .baseSpDefense = 60,
++        .types = MON_TYPES(TYPE_FIRE),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_FLASH_FIRE, ABILITY_NONE, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_RED,
++        .speciesName = _("Solune"),
++        .cryId = CRY_VULPIX,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Daybreak"),
++        .height = 6,
++        .weight = 140,
++        .description = COMPOUND_STRING(
++            "Its tail takes a new element with each\n"
++            "new day. On the first morning it burns\n"
++            "like the sunrise"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_Solune,
++        .frontPicSize = MON_COORDS_SIZE(64, 56),
++        .frontPicYOffset = 4,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_Solune,
++        .backPicSize = MON_COORDS_SIZE(64, 64),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_Solune,
++        .shinyPalette = gMonShinyPalette_Solune,
++        .iconSprite = gMonIcon_Solune,
++        .iconPalIndex = 5,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(Solune)
++        .levelUpLearnset = sSoluneLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_SOLUNE_TIDE] =
++    {
++        .baseHP        = 58,
++        .baseAttack    = 60,
++        .baseDefense   = 54,
++        .baseSpeed     = 72,
++        .baseSpAttack  = 70,
++        .baseSpDefense = 60,
++        .types = MON_TYPES(TYPE_WATER),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_WATER_ABSORB, ABILITY_NONE, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_BLUE,
++        .speciesName = _("Solune"),
++        .cryId = CRY_VULPIX,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Daybreak"),
++        .height = 6,
++        .weight = 140,
++        .description = COMPOUND_STRING(
++            "On the second day its tail flows like\n"
++            "the tide. It grows restless as evening\n"
++            "approaches"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_SoluneTide,
++        .frontPicSize = MON_COORDS_SIZE(64, 56),
++        .frontPicYOffset = 4,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_SoluneTide,
++        .backPicSize = MON_COORDS_SIZE(64, 56),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_SoluneTide,
++        .shinyPalette = gMonShinyPalette_SoluneTide,
++        .iconSprite = gMonIcon_SoluneTide,
++        .iconPalIndex = 3,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(SoluneTide)
++        .levelUpLearnset = sSoluneTideLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
++    [SPECIES_SOLUNE_DUSK] =
++    {
++        .baseHP        = 58,
++        .baseAttack    = 60,
++        .baseDefense   = 54,
++        .baseSpeed     = 72,
++        .baseSpAttack  = 70,
++        .baseSpDefense = 60,
++        .types = MON_TYPES(TYPE_GHOST),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = { ABILITY_CURSED_BODY, ABILITY_NONE, ABILITY_NONE },
++        .bodyColor = BODY_COLOR_PURPLE,
++        .speciesName = _("Solune"),
++        .cryId = CRY_VULPIX,
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("Daybreak"),
++        .height = 6,
++        .weight = 140,
++        .description = COMPOUND_STRING(
++            "On the last day its tail fades into a\n"
++            "cold wisp. It seems to know that the\n"
++            "world is about to end"),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_SoluneDusk,
++        .frontPicSize = MON_COORDS_SIZE(64, 56),
++        .frontPicYOffset = 4,
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_SoluneDusk,
++        .backPicSize = MON_COORDS_SIZE(64, 56),
++        .backPicYOffset = 0,
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_SoluneDusk,
++        .shinyPalette = gMonShinyPalette_SoluneDusk,
++        .iconSprite = gMonIcon_SoluneDusk,
++        .iconPalIndex = 2,
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT(SoluneDusk)
++        .levelUpLearnset = sSoluneDuskLevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    },
+diff --git a/src/echo_loop.c b/src/echo_loop.c
+index 6af56526..d0f0d7f2 100644
+--- a/src/echo_loop.c
++++ b/src/echo_loop.c
+@@ -12,6 +12,8 @@
+ #include "string_util.h"
+ #include "constants/flags.h"
+ #include "constants/vars.h"
++#include "constants/moves.h"
++#include "constants/species.h"
+ 
+ // Pokémon Echo: the island relives the same three days. Phases advance with steps
+ // (not the real-time clock); at the end of day 3 or on a blackout the world resets.
+@@ -35,6 +37,47 @@ static const u8 *const sJournalEntries[ECHO_JOURNAL_COUNT] =
+     COMPOUND_STRING("Wake. Remember. Change something.\nThe island forgets. I don't."),
+ };
+ 
++static const u16 sSoluneForms[ECHO_DAYS_PER_LOOP] = {SPECIES_SOLUNE, SPECIES_SOLUNE_TIDE, SPECIES_SOLUNE_DUSK};
++static const u16 sSoluneMoves[ECHO_DAYS_PER_LOOP][2] =
++{
++    {MOVE_EMBER, MOVE_FLAME_WHEEL},
++    {MOVE_WATER_GUN, MOVE_BUBBLE_BEAM},
++    {MOVE_HEX, MOVE_SHADOW_SNEAK},
++};
++
++// Day-bound species (Solune) take the form, type and signature moves of the current day.
++static void UpdateDayForms(void)
++{
++    u32 i, j, k, slot, day = VarGet(VAR_ECHO_PHASE) / ECHO_PHASES_PER_DAY;
++
++    for (i = 0; i < PARTY_SIZE; i++)
++    {
++        struct Pokemon *mon = &gPlayerParty[i];
++        u16 species = GetMonData(mon, MON_DATA_SPECIES);
++        for (j = 0; j < ECHO_DAYS_PER_LOOP; j++)
++        {
++            if (species != sSoluneForms[j] || j == day)
++                continue;
++            species = sSoluneForms[day];
++            SetMonData(mon, MON_DATA_SPECIES, &species);
++            for (slot = 0; slot < MAX_MON_MOVES; slot++)
++            {
++                u16 move = GetMonData(mon, MON_DATA_MOVE1 + slot);
++                for (k = 0; k < 2; k++)
++                {
++                    if (move == sSoluneMoves[j][k])
++                    {
++                        move = sSoluneMoves[day][k];
++                        SetMonData(mon, MON_DATA_MOVE1 + slot, &move);
++                    }
++                }
++            }
++            CalculateMonStats(mon);
++            break;
++        }
++    }
++}
++
+ bool32 EchoLoop_IsActive(void)
+ {
+     return FlagGet(FLAG_ECHO_LOOP_ACTIVE);
+@@ -66,6 +109,7 @@ bool32 EchoLoop_OnStep(void)
+     }
+     VarSet(VAR_ECHO_PHASE, phase);
+     SetTimeOfDay(EchoLoop_GetHours());
++    UpdateDayForms();
+     ScriptContext_SetupScript(EventScript_EchoPhaseChange);
+     return TRUE;
+ }
+@@ -115,6 +159,7 @@ static void ResetWorld(void)
+     ZeroPlayerPartyMons();
+     gPlayerParty[0] = partner;
+     CalculatePlayerPartyCount();
++    UpdateDayForms();
+     HealPlayerParty();
+     ClearBag();
+     SetMoney(&gSaveBlock1Ptr->money, ECHO_LOOP_START_MONEY);
+diff --git a/src/new_game.c b/src/new_game.c
+index 7fa83a07..bc7c53db 100644
+--- a/src/new_game.c
++++ b/src/new_game.c
+@@ -216,8 +216,8 @@ void NewGameInitData(void)
+ #if ECHO_DEV_QUICKSTART
+     FlagSet(FLAG_SYS_POKEMON_GET);
+     EchoLoop_Begin();
+-    ScriptGiveMon(SPECIES_TREECKO, 15, ITEM_NONE);
+-    ScriptGiveMon(SPECIES_ZIGZAGOON, 15, ITEM_NONE);
++    ScriptGiveMon(SPECIES_TICKIT, 15, ITEM_NONE);
++    ScriptGiveMon(SPECIES_SOLUNE, 15, ITEM_NONE);
+     SetWarpDestination(MAP_GROUP(ECHO_LOOP_START_MAP), MAP_NUM(ECHO_LOOP_START_MAP), WARP_ID_NONE, ECHO_LOOP_START_X, ECHO_LOOP_START_Y);
+     WarpIntoMap();
+ #else
+diff --git a/src/pokemon.c b/src/pokemon.c
+index 4f75db15..26b2d97c 100644
+--- a/src/pokemon.c
++++ b/src/pokemon.c
+@@ -463,6 +463,7 @@ const struct NatureInfo gNaturesInfo[NUM_NATURES] =
+ 
+ #if P_LVL_UP_LEARNSETS >= GEN_9
+ #include "data/pokemon/level_up_learnsets/gen_9.h" // Scarlet/Violet
++#include "data/pokemon/level_up_learnsets/echo.h"
+ #elif P_LVL_UP_LEARNSETS >= GEN_8
+ #include "data/pokemon/level_up_learnsets/gen_8.h" // Sword/Shield
+ #elif P_LVL_UP_LEARNSETS >= GEN_7
+diff --git a/tools/echo/gen_species.py b/tools/echo/gen_species.py
+new file mode 100644
+index 00000000..9f8b602b
+--- /dev/null
++++ b/tools/echo/gen_species.py
+@@ -0,0 +1,411 @@
++#!/usr/bin/env python3
++"""Pokémon Echo: procedurally drawn species sprites + species data (no AI, pure geometry).
++
++Each creature is a list of shaded primitives (ellipses, polygons, capsules). Rendering does
++per-primitive sphere shading with three tones, then pixel-art outlines. Outputs follow the
++pokeemerald-expansion graphics layout, plus generated C data headers.
++Run from the repo root: python3 tools/echo/gen_species.py [--preview out.png]
++"""
++import colorsys, math, os, re, sys
++from PIL import Image
++
++GFX = 'graphics/pokemon/echo'
++BG = (152, 208, 160)
++OUTLINE = (40, 32, 48)
++LIGHT = (-0.45, -0.55, 0.70)
++_l = math.sqrt(sum(c * c for c in LIGHT)); LIGHT = tuple(c / _l for c in LIGHT)
++
++def hexc(h):
++    h = h.lstrip('#'); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
++
++def mix(a, b, t):
++    return tuple(round(a[i] + (b[i] - a[i]) * t) for i in range(3))
++
++def shades(base):
++    return [mix(base, (255, 250, 230), 0.38), base, mix(base, (48, 32, 72), 0.42)]
++
++def hue_rot(c, d):
++    h, l, s = colorsys.rgb_to_hls(*(x / 255 for x in c))
++    return tuple(round(x * 255) for x in colorsys.hls_to_rgb((h + d) % 1, l, s))
++
++# ---------------------------------------------------------------- primitives
++def E(cx, cy, rx, ry, mat, ang=0, **kw): return dict(k='e', p=(cx, cy, rx, ry, ang), mat=mat, **kw)
++def P(pts, mat, **kw): return dict(k='p', p=pts, mat=mat, **kw)
++def L(x0, y0, x1, y1, w, mat, **kw): return dict(k='l', p=(x0, y0, x1, y1, w), mat=mat, **kw)
++
++def light_index(u, v, z):
++    d = u * LIGHT[0] + v * LIGHT[1] + z * LIGHT[2]
++    if v > 0.78: return 2
++    return 0 if d > 0.80 else (2 if d < 0.30 else 1)
++
++def inside_poly(x, y, pts):
++    c = False; j = len(pts) - 1
++    for i in range(len(pts)):
++        xi, yi = pts[i]; xj, yj = pts[j]
++        if (yi > y) != (yj > y) and x < (xj - xi) * (y - yi) / (yj - yi) + xi: c = not c
++        j = i
++    return c
++
++class Creature:
++    def __init__(self, mats, parts):
++        self.mats = mats          # name -> hex; name ending in '!' is a single flat tone
++        self.parts = parts
++        self.pal = [BG, OUTLINE]; self.mi = {}
++        for name, hx in mats.items():
++            self.mi[name] = len(self.pal)
++            self.pal += [hexc(hx)] if name.endswith('!') else shades(hexc(hx))
++        assert len(self.pal) <= 16, len(self.pal)
++        self.pal += [(0, 0, 0)] * (16 - len(self.pal))
++
++    def shiny_pal(self):
++        out = [BG, OUTLINE]
++        for name, hx in self.mats.items():
++            c = hexc(hx)
++            c = c if name.endswith('!') else hue_rot(c, 0.17)
++            out += [c] if name.endswith('!') else shades(c)
++        return out + [(0, 0, 0)] * (16 - len(out))
++
++    def render(self, ax=1, bx=0, ay=1, by=0, back=False):
++        W = H = 64
++        idx = [[0] * W for _ in range(H)]; part = [[-1] * W for _ in range(H)]; noo = set()
++        for pid, pr in enumerate(self.parts):
++            if back and pr.get('front'): continue
++            if pr.get('nooutline'): noo.add(pid)
++            mat = pr['mat']; k = pr['k']
++            if k == 'e':
++                cx, cy, rx, ry, ang = pr['p']; cx, cy, rx, ry = ax * cx + bx, ay * cy + by, max(rx * ax, .6), max(ry * ay, .6)
++                ca, sa = math.cos(math.radians(ang)), math.sin(math.radians(ang)); R = max(rx, ry) + 1
++                box = (cx - R, cy - R, cx + R, cy + R)
++            elif k == 'p':
++                pts = [(ax * x + bx, ay * y + by) for x, y in pr['p']]
++                xs = [q[0] for q in pts]; ys = [q[1] for q in pts]
++                box = (min(xs), min(ys), max(xs), max(ys))
++                pcx, pcy = (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
++                hw, hh = max((box[2] - box[0]) / 2, 1), max((box[3] - box[1]) / 2, 1)
++            else:
++                x0, y0, x1, y1, w = pr['p']; x0, x1, y0, y1 = ax * x0 + bx, ax * x1 + bx, ay * y0 + by, ay * y1 + by
++                hwid = max(w * ax / 2, 0.6); dx, dy = x1 - x0, y1 - y0; ll = max(dx * dx + dy * dy, 1e-6)
++                box = (min(x0, x1) - hwid - 1, min(y0, y1) - hwid - 1, max(x0, x1) + hwid + 1, max(y0, y1) + hwid + 1)
++            for y in range(max(0, int(box[1]) - 1), min(H, int(box[3]) + 2)):
++                for x in range(max(0, int(box[0]) - 1), min(W, int(box[2]) + 2)):
++                    px, py = x + .5, y + .5
++                    if k == 'e':
++                        dx_, dy_ = px - cx, py - cy
++                        u = (dx_ * ca + dy_ * sa) / rx; v = (-dx_ * sa + dy_ * ca) / ry; r2 = u * u + v * v
++                        if r2 > 1: continue
++                        z = math.sqrt(1 - r2)
++                    elif k == 'p':
++                        if not inside_poly(px, py, pts): continue
++                        u, v, z = (px - pcx) / hw, (py - pcy) / hh, 0.55
++                    else:
++                        t = max(0, min(1, ((px - x0) * dx + (py - y0) * dy) / ll))
++                        qx, qy = x0 + t * dx - px, y0 + t * dy - py
++                        dist = math.sqrt(qx * qx + qy * qy)
++                        if dist > hwid: continue
++                        s = -dist / hwid if qx + qy > 0 else dist / hwid
++                        u, v, z = s * .7, s * .7, math.sqrt(max(0, 1 - s * s))
++                    if mat is None:
++                        idx[y][x] = 0; part[y][x] = -1; continue
++                    if mat == 'outline': c = 1
++                    elif mat.endswith('!'): c = self.mi[mat]
++                    else: c = self.mi[mat] + light_index(u, v, z)
++                    idx[y][x] = c; part[y][x] = pid
++        out = [row[:] for row in idx]
++        for y in range(H):
++            for x in range(W):
++                nb = [(x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)]
++                nb = [(a, b) for a, b in nb if 0 <= a < W and 0 <= b < H]
++                if idx[y][x] == 0:
++                    if any(idx[b][a] for a, b in nb): out[y][x] = 1
++                elif part[y][x] not in noo:
++                    me = self.parts[part[y][x]]['mat']
++                    for a, b in nb:
++                        q = part[b][a]
++                        if q > part[y][x] and q not in noo and self.parts[q]['mat'] != me:
++                            out[y][x] = 1; break
++        return out
++
++def bbox(img):
++    ys = [y for y in range(64) if any(img[y])]; xs = [x for x in range(64) if any(img[y][x] for y in range(64))]
++    return min(xs), min(ys), max(xs) + 1, max(ys) + 1
++
++def r8(n): return min(64, (n + 7) // 8 * 8)
++
++def to_png(rows, pal, path):
++    im = Image.new('P', (len(rows[0]), len(rows)))
++    im.putpalette([c for rgb in pal for c in rgb]); im.putdata([v for r in rows for v in r]); im.save(path)
++
++def write_pal(pal, path):
++    with open(path, 'w', newline='\r\n') as f:
++        f.write('JASC-PAL\n0100\n16\n' + ''.join('%d %d %d\n' % c for c in pal))
++
++def load_pal(path):
++    ln = open(path).read().split('\n')[3:19]
++    return [tuple(int(v) for v in l.split()) for l in ln]
++
++ICON_PALS = [load_pal('graphics/pokemon/icon_palettes/pal%d.pal' % i) for i in range(6)]
++
++def make_icon(img, pal):
++    rgb = [[pal[v] if v else None for v in r] for r in img]
++    small = [[None] * 32 for _ in range(32)]
++    for y in range(32):
++        for x in range(32):
++            blk = [rgb[2 * y + j][2 * x + i] for j in (0, 1) for i in (0, 1)]
++            cols = [c for c in blk if c]
++            if len(cols) < 2: continue
++            small[y][x] = OUTLINE if OUTLINE in cols and len(cols) < 4 else max(set(cols), key=cols.count)
++    best = None
++    for pi, ip in enumerate(ICON_PALS):
++        err = 0; rows = []
++        for r in small:
++            row = []
++            for c in r:
++                if c is None: row.append(0); continue
++                j = min(range(1, 16), key=lambda k: sum((c[t] - ip[k][t]) ** 2 for t in range(3)))
++                err += sum((c[t] - ip[j][t]) ** 2 for t in range(3)); row.append(j)
++            rows.append(row)
++        if best is None or err < best[0]: best = (err, pi, rows)
++    _, pi, rows = best
++    rows = [[0] * 32] * 2 + rows[:30]           # sit lower in the 32x32 cell
++    bob = rows[1:] + [[0] * 32]
++    return pi, rows + bob
++
++FOOT = [[0] * 16 for _ in range(16)]
++for (cx, cy, r) in [(8, 10, 3.6), (3.5, 5.5, 1.7), (7, 3.2, 1.7), (11, 3.6, 1.7), (13.5, 6.5, 1.6)]:
++    for y in range(16):
++        for x in range(16):
++            if (x + .5 - cx) ** 2 + (y + .5 - cy) ** 2 <= r * r: FOOT[y][x] = 1
++
++# ---------------------------------------------------------------- creatures
++def tickit():
++    return Creature({'green': '#7cc850', 'brass': '#e0b040', 'metal': '#8c94a8', 'white!': '#f8f8f0'}, [
++        L(38, 40, 50, 28, 5, 'green'), L(50, 28, 47, 56, 4, 'green'), E(46, 57, 4, 2, 'metal'),
++        L(24, 44, 20, 56, 3, 'green'), E(19, 57, 3, 2, 'metal'),
++        E(33, 43, 16, 11, 'green'),
++        E(37, 35, 13, 11, 'brass'), E(37, 35, 8, 7, 'white!'),
++        L(37, 35, 37, 30, 1, 'outline', nooutline=1), L(37, 35, 41, 36, 1, 'outline', nooutline=1),
++        L(29, 46, 27, 57, 3, 'green'), E(26, 58, 3, 2, 'metal'),
++        E(18, 32, 10, 9, 'green'),
++        L(16, 24, 10, 11, 1, 'metal'), L(21, 24, 25, 9, 1, 'metal'), E(10, 10, 2, 2, 'brass'), E(25, 8, 2, 2, 'brass'),
++        E(14, 30, 4, 4.5, 'white!', front=1), E(13, 30.5, 2, 2.6, 'outline', front=1, nooutline=1),
++        E(12.5, 29, .7, .7, 'white!', front=1, nooutline=1),
++        L(10, 37, 14, 38, 1, 'outline', front=1, nooutline=1),
++    ])
++
++def chimell():
++    return Creature({'bronze': '#c88a44', 'psy': '#b874e8', 'dark!': '#3a2c48', 'white!': '#f8f8f0'}, [
++        E(32, 9, 15, 4, 'psy'), E(32, 9, 11, 2, None),
++        E(32, 16, 4, 4, 'bronze'), E(32, 16, 1.8, 1.8, None),
++        E(32, 28, 12, 12, 'bronze'),
++        P([(20, 28), (44, 28), (51, 49), (13, 49)], 'bronze'),
++        E(32, 49, 19, 5, 'bronze'), E(32, 50, 15, 3, 'dark!'),
++        L(18, 42, 46, 42, 2, 'psy'),
++        E(27, 34, 3, 4, 'white!', front=1), E(37, 34, 3, 4, 'white!', front=1),
++        E(27, 35, 1.5, 2.2, 'outline', front=1, nooutline=1), E(37, 35, 1.5, 2.2, 'outline', front=1, nooutline=1),
++        E(32, 56, 4, 4, 'psy'),
++        E(8, 30, 2, 3, 'psy'), E(56, 36, 2, 3, 'psy'), E(52, 20, 1.5, 2, 'psy'),
++    ])
++
++def gloamoth():
++    return Creature({'wing': '#5c3c90', 'spot': '#f09030', 'fur': '#ead8b0', 'white!': '#f8f8f0'}, [
++        P([(34, 30), (60, 8), (63, 36), (44, 44)], 'wing'), P([(36, 40), (57, 44), (51, 59), (38, 50)], 'wing'),
++        E(52, 23, 4, 4, 'spot'),
++        E(32, 39, 7, 14, 'fur'),
++        P([(29, 30), (4, 6), (1, 36), (20, 44)], 'wing'), E(12, 25, 5.5, 5.5, 'spot'), E(12, 25, 2, 2, 'outline', nooutline=1),
++        P([(28, 40), (7, 44), (13, 59), (26, 50)], 'wing'), E(16, 49, 3, 3, 'spot'),
++        E(32, 28, 9, 4, 'fur'), E(32, 21, 7, 6, 'fur'),
++        L(29, 16, 21, 5, 2, 'fur'), L(35, 16, 43, 5, 2, 'fur'),
++        E(28.5, 20, 2.5, 3, 'white!', front=1), E(35.5, 20, 2.5, 3, 'white!', front=1),
++        E(28.5, 20.5, 1.4, 1.8, 'outline', front=1, nooutline=1), E(35.5, 20.5, 1.4, 1.8, 'outline', front=1, nooutline=1),
++    ])
++
++def tidepup():
++    return Creature({'blue': '#74b4ec', 'belly': '#eef2fa', 'flip': '#4a7cc4', 'white!': '#ffffff'}, [
++        E(54, 52, 7, 3, 'flip', ang=-25),
++        E(35, 43, 20, 14, 'blue'), E(29, 49, 12, 8, 'belly'),
++        E(21, 30, 13, 12, 'blue'), E(15, 35, 6.5, 4.5, 'belly'),
++        E(23, 17, 3, 4, 'blue'),
++        E(12, 33, 2, 1.5, 'outline', front=1, nooutline=1),
++        E(17, 27, 2.6, 3.2, 'outline', front=1, nooutline=1), E(16.3, 26, .8, .8, 'white!', front=1, nooutline=1),
++        E(25, 27, 2.4, 3, 'outline', front=1, nooutline=1), E(24.3, 26, .8, .8, 'white!', front=1, nooutline=1),
++        L(9, 36, 4, 35, 1, 'outline', front=1, nooutline=1), L(9, 38, 4, 40, 1, 'outline', front=1, nooutline=1),
++        E(27, 55, 7, 3, 'flip', ang=15),
++    ])
++
++def bramblit():
++    spikes = []
++    for a in range(-20, 200, 26):
++        r = math.radians(a + 180); ux, uy = math.cos(r), math.sin(r) * -1
++        cx, cy = 36 - ux * 14, 38 - uy * 13; px, py = -uy, ux
++        spikes.append(P([(cx + px * 5, cy + py * 5), (cx - px * 5, cy - py * 5), (cx - ux * 10, cy - uy * 10)], 'leaf'))
++    return Creature({'leaf': '#5aac3a', 'tan': '#eacb92', 'glove': '#e24a3a', 'white!': '#f8f8f0'}, spikes + [
++        E(35, 41, 17, 15, 'leaf'), E(25, 41, 10, 10, 'tan'),
++        E(20, 37, 2.6, 3.6, 'white!', front=1), E(19.5, 38, 1.4, 2.2, 'outline', front=1, nooutline=1),
++        L(16, 32, 23, 34, 1, 'outline', front=1, nooutline=1),
++        E(15, 43, 2, 1.5, 'outline', front=1, nooutline=1),
++        E(29, 59, 5, 2, 'tan'), E(42, 59, 5, 2, 'tan'),
++        E(18, 52, 5.5, 5, 'glove'), E(42, 53, 5.5, 5, 'glove'),
++    ])
++
++SOLUNE_FORMS = {
++    'dawn': ('#f08a3a', '#ffd448', [(40, 44), (52, 42), (60, 30), (56, 18), (60, 6), (50, 16), (46, 8), (44, 26)]),
++    'tide': ('#4a92da', '#86e2f2', [(40, 44), (54, 46), (62, 36), (58, 24), (50, 28), (54, 20), (46, 16), (44, 30)]),
++    'dusk': ('#6a4aa2', '#c684f2', [(40, 44), (50, 40), (56, 32), (62, 22), (54, 26), (58, 12), (48, 22), (44, 30)]),
++}
++
++def solune(form):
++    fur, acc, tail = SOLUNE_FORMS[form]
++    return Creature({'fur': fur, 'acc': acc, 'cream': '#f6ead0', 'white!': '#ffffff'}, [
++        P(tail, 'acc'),
++        L(46, 48, 48, 57, 3, 'fur'),
++        E(36, 44, 14, 9, 'fur'),
++        L(28, 48, 27, 58, 3, 'fur'), L(41, 49, 43, 58, 3, 'fur'),
++        E(24, 44, 6, 7, 'cream'),
++        P([(14, 24), (11, 9), (21, 20)], 'fur'), P([(22, 22), (29, 8), (29, 25)], 'fur'),
++        P([(15, 21), (13, 13), (19, 20)], 'acc', nooutline=1),
++        E(20, 30, 10, 9, 'fur'),
++        P([(13, 29), (3, 35), (14, 38)], 'cream'), E(4, 35, 1.5, 1.5, 'outline', front=1, nooutline=1),
++        E(20, 24, 2, 1.6, 'acc', nooutline=1),
++        E(17, 29, 2.5, 3.2, 'white!', front=1), E(16.4, 29.5, 1.4, 2.2, 'outline', front=1, nooutline=1),
++    ])
++
++# ---------------------------------------------------------------- species data
++SPECIES = [
++    dict(id='TICKIT', name='Tickit', art=tickit, types=('BUG', 'STEEL'), stats=(55, 62, 70, 66, 48, 60),
++         abil=('SWARM', 'LIGHT_METAL', 'NONE'), cry='KRICKETOT', color='GREEN', cat='Clockwork', h=4, w=60,
++         moves=[(1, 'BUG_BITE'), (1, 'METAL_CLAW'), (1, 'QUICK_ATTACK'), (1, 'IRON_DEFENSE'), (14, 'FURY_CUTTER'), (20, 'BULLET_PUNCH')],
++         desc='Its shell ticks in time with the island\'s\nbell. It is said to remember every hour\nit has ever lived, even the ones that\nwere undone.'),
++    dict(id='CHIMELL', name='Chimell', art=chimell, types=('STEEL', 'PSYCHIC'), stats=(70, 55, 90, 40, 75, 85),
++         abil=('LEVITATE', 'NONE', 'NONE'), cry='BRONZOR', color='BROWN', cat='Toll', h=6, w=320,
++         moves=[(1, 'CONFUSION'), (1, 'METAL_SOUND'), (1, 'ASTONISH'), (1, 'HEAL_BELL'), (16, 'PSYBEAM')],
++         desc='It drifts to the old belfry each dusk.\nPeople who hear it ring twice say they\nfeel they have heard that exact sound\nbefore.'),
++    dict(id='GLOAMOTH', name='Gloamoth', art=gloamoth, types=('BUG', 'DARK'), stats=(50, 66, 50, 82, 60, 52),
++         abil=('SHIELD_DUST', 'INSOMNIA', 'NONE'), cry='DUSTOX', color='PURPLE', cat='Twilight', h=7, w=95,
++         moves=[(1, 'GUST'), (1, 'BITE'), (1, 'SILVER_WIND'), (1, 'FEINT_ATTACK')],
++         desc='It only flies at dusk. The eye spots\non its wings stare back at anyone who\nwanders the island after the light\nchanges.'),
++    dict(id='TIDEPUP', name='Tidepup', art=tidepup, types=('WATER',), stats=(68, 58, 60, 52, 58, 64),
++         abil=('SWIFT_SWIM', 'THICK_FAT', 'NONE'), cry='SPHEAL', color='BLUE', cat='Shore Pup', h=5, w=210,
++         moves=[(1, 'WATER_GUN'), (1, 'AQUA_JET'), (1, 'GROWL'), (1, 'ICE_SHARD')],
++         desc='It sleeps on the pier and barks when\nthe tide turns. Fishers on Verran set\ntheir days by its call.'),
++    dict(id='BRAMBLIT', name='Bramblit', art=bramblit, types=('GRASS', 'FIGHTING'), stats=(60, 74, 62, 58, 40, 56),
++         abil=('IRON_FIST', 'OVERGROW', 'NONE'), cry='CHESPIN', color='GREEN', cat='Thornfist', h=4, w=120,
++         moves=[(1, 'VINE_WHIP'), (1, 'MACH_PUNCH'), (1, 'BULLET_SEED'), (1, 'DRAIN_PUNCH')],
++         desc='It spars with tree trunks at dawn.\nThe leaves on its back harden into\nthorns when it is cornered.'),
++    dict(id='SOLUNE', name='Solune', art=lambda: solune('dawn'), types=('FIRE',), stats=(58, 60, 54, 72, 70, 60),
++         abil=('FLASH_FIRE', 'NONE', 'NONE'), cry='VULPIX', color='RED', cat='Daybreak', h=6, w=140,
++         moves=[(1, 'EMBER'), (1, 'QUICK_ATTACK'), (1, 'FLAME_WHEEL'), (1, 'TAIL_WHIP')],
++         desc='Its tail takes a new element with each\nnew day. On the first morning it burns\nlike the sunrise.'),
++    dict(id='SOLUNE_TIDE', name='Solune', art=lambda: solune('tide'), types=('WATER',), stats=(58, 60, 54, 72, 70, 60),
++         abil=('WATER_ABSORB', 'NONE', 'NONE'), cry='VULPIX', color='BLUE', cat='Daybreak', h=6, w=140,
++         moves=[(1, 'WATER_GUN'), (1, 'QUICK_ATTACK'), (1, 'BUBBLE_BEAM'), (1, 'TAIL_WHIP')],
++         desc='On the second day its tail flows like\nthe tide. It grows restless as evening\napproaches.'),
++    dict(id='SOLUNE_DUSK', name='Solune', art=lambda: solune('dusk'), types=('GHOST',), stats=(58, 60, 54, 72, 70, 60),
++         abil=('CURSED_BODY', 'NONE', 'NONE'), cry='VULPIX', color='PURPLE', cat='Daybreak', h=6, w=140,
++         moves=[(1, 'HEX'), (1, 'QUICK_ATTACK'), (1, 'SHADOW_SNEAK'), (1, 'TAIL_WHIP')],
++         desc='On the last day its tail fades into a\ncold wisp. It seems to know that the\nworld is about to end.'),
++]
++
++def camel(sid): return ''.join(p.capitalize() for p in sid.split('_'))
++
++def main():
++    preview = sys.argv[sys.argv.index('--preview') + 1] if '--preview' in sys.argv else None
++    gfx_decl, info, learn = [], [], []
++    sheet = Image.new('RGB', (64 * 3 + 32, 64 * len(SPECIES)), (230, 236, 240))
++    for n, sp in enumerate(SPECIES):
++        cr = sp['art'](); d = os.path.join(GFX, sp['id'].lower()); os.makedirs(d, exist_ok=True)
++        f1 = cr.render()
++        f2 = cr.render(ay=0.95, by=60 * 0.05, ax=1.02, bx=-0.64)
++        bk = cr.render(ax=1.25, bx=-8, ay=1.25, by=-2, back=True)
++        bk = [r[::-1] for r in bk]
++        to_png(f1 + f2, cr.pal, os.path.join(d, 'anim_front.png'))
++        to_png(bk, cr.pal, os.path.join(d, 'back.png'))
++        write_pal(cr.pal, os.path.join(d, 'normal.pal')); write_pal(cr.shiny_pal(), os.path.join(d, 'shiny.pal'))
++        ipi, icon = make_icon(f1, cr.pal)
++        to_png(icon, ICON_PALS[ipi], os.path.join(d, 'icon.png'))
++        im = Image.new('P', (16, 16)); im.putpalette([255, 255, 255, 98, 98, 98]); im.putdata([v for r in FOOT for v in r]); im.save(os.path.join(d, 'footprint.png'))
++        fb, bb = bbox(f1), bbox(bk)
++        C = camel(sp['id']); p = 'graphics/pokemon/echo/' + sp['id'].lower()
++        gfx_decl += [
++            f'const u32 gMonFrontPic_{C}[] = INCGFX_U32("{p}/anim_front.png", ".4bpp.smol");',
++            f'const u32 gMonBackPic_{C}[] = INCGFX_U32("{p}/back.png", ".4bpp.smol");',
++            f'const u16 gMonPalette_{C}[] = INCGFX_U16("{p}/normal.pal", ".gbapal");',
++            f'const u16 gMonShinyPalette_{C}[] = INCGFX_U16("{p}/shiny.pal", ".gbapal");',
++            f'const u8 gMonIcon_{C}[] = INCGFX_U8("{p}/icon.png", ".4bpp");',
++            f'const u8 gMonFootprint_{C}[] = INCGFX_U8("{p}/footprint.png", ".1bpp");', '']
++        learn.append(f'static const struct LevelUpMove s{C}LevelUpLearnset[] = {{\n' +
++                     ''.join(f'    LEVEL_UP_MOVE({lv:2d}, MOVE_{m}),\n' for lv, m in sp['moves']) + '    LEVEL_UP_END\n};\n')
++        st = sp['stats']; ty = ', '.join('TYPE_' + t for t in sp['types'])
++        desc = '\n'.join(f'            "{l}\\n"' for l in sp['desc'].split('\n'))[:-4] + '"'
++        info.append(f'''    [SPECIES_{sp['id']}] =
++    {{
++        .baseHP        = {st[0]},
++        .baseAttack    = {st[1]},
++        .baseDefense   = {st[2]},
++        .baseSpeed     = {st[3]},
++        .baseSpAttack  = {st[4]},
++        .baseSpDefense = {st[5]},
++        .types = MON_TYPES({ty}),
++        .catchRate = 45,
++        .expYield = 60,
++        .genderRatio = PERCENT_FEMALE(50),
++        .eggCycles = 20,
++        .friendship = STANDARD_FRIENDSHIP,
++        .growthRate = GROWTH_MEDIUM_FAST,
++        .eggGroups = MON_EGG_GROUPS(EGG_GROUP_NO_EGGS_DISCOVERED),
++        .abilities = {{ {', '.join('ABILITY_' + a for a in sp['abil'])} }},
++        .bodyColor = BODY_COLOR_{sp['color']},
++        .speciesName = _("{sp['name']}"),
++        .cryId = CRY_{sp['cry']},
++        .natDexNum = NATIONAL_DEX_NONE,
++        .categoryName = _("{sp['cat']}"),
++        .height = {sp['h']},
++        .weight = {sp['w']},
++        .description = COMPOUND_STRING(
++{desc}),
++        .pokemonScale = 256,
++        .pokemonOffset = 0,
++        .trainerScale = 256,
++        .trainerOffset = 0,
++        .frontPic = gMonFrontPic_{C},
++        .frontPicSize = MON_COORDS_SIZE({r8(fb[2] - fb[0])}, {r8(fb[3] - fb[1])}),
++        .frontPicYOffset = {64 - fb[3]},
++        .frontAnimFrames = ANIM_FRAMES(
++            ANIMCMD_FRAME(0, 20),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 12),
++            ANIMCMD_FRAME(1, 12),
++            ANIMCMD_FRAME(0, 1),
++        ),
++        .frontAnimId = ANIM_V_SQUISH_AND_BOUNCE,
++        .backPic = gMonBackPic_{C},
++        .backPicSize = MON_COORDS_SIZE({r8(bb[2] - bb[0])}, {r8(bb[3] - bb[1])}),
++        .backPicYOffset = {64 - bb[3]},
++        .backAnimId = BACK_ANIM_V_SHAKE,
++        .palette = gMonPalette_{C},
++        .shinyPalette = gMonShinyPalette_{C},
++        .iconSprite = gMonIcon_{C},
++        .iconPalIndex = {ipi},
++        .pokemonJumpType = PKMN_JUMP_TYPE_NORMAL,
++        SHADOW(0, 0, SHADOW_SIZE_M)
++        FOOTPRINT({C})
++        .levelUpLearnset = s{C}LevelUpLearnset,
++        .teachableLearnset = sNoneTeachableLearnset,
++        .eggMoveLearnset = sNoneEggMoveLearnset,
++    }},
++''')
++        for j, img in enumerate([f1, f2, bk]):
++            sheet.paste(Image.frombytes('RGB', (64, 64), bytes(c for r in img for v in r for c in (cr.pal[v] if v else (230, 236, 240)))), (64 * j, 64 * n))
++        sheet.paste(Image.frombytes('RGB', (32, 32), bytes(c for r in icon[:32] for v in r for c in (ICON_PALS[ipi][v] if v else (230, 236, 240)))), (192, 64 * n + 16))
++    hdr = '// Generated by tools/echo/gen_species.py. Do not edit.\n'
++    open('src/data/graphics/echo_pokemon.h', 'w').write(hdr + '\n'.join(gfx_decl))
++    open('src/data/pokemon/species_info/echo_families.h', 'w').write(hdr + ''.join(info))
++    open('src/data/pokemon/level_up_learnsets/echo.h', 'w').write(hdr + '\n'.join(learn))
++    consts = ''.join(f'    SPECIES_{sp["id"]},\n' for sp in SPECIES)
++    sh = open('include/constants/species.h').read()
++    sh = re.sub(r'(// ECHO SPECIES BEGIN\n).*?(    // ECHO SPECIES END)', lambda m: m.group(1) + consts + m.group(2), sh, flags=re.S)
++    open('include/constants/species.h', 'w').write(sh)
++    if preview:
++        sheet.resize((sheet.width * 2, sheet.height * 2), Image.NEAREST).save(preview)
++
++if __name__ == '__main__':
++    main()
+-- 
+2.34.1
+

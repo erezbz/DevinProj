@@ -21,6 +21,9 @@ arm-none-eabi toolchain (Arm GNU Toolchain 13.3 is known to work; pass
 - **Three-day loop:** a bell tolls every 100 steps (Dawn/Day/Dusk/Night x 3 days, with
   matching lighting). After Day 3 Night, or on a blackout, the world resets; you keep your
   lead Pokémon, Echo Journal entries and Echo Shards. JOURNAL is in the Start menu.
+- **New species (drawn by code, no AI):** Tickit (Bug/Steel), Chimell (Steel/Psychic), Gloamoth
+  (Bug/Dark), Tidepup (Water), Bramblit (Grass/Fighting) and Solune, whose form, type and moves
+  change each day of the loop (Fire -> Water -> Ghost). Regenerate with `tools/echo/gen_species.py`.
 - Settings live in `include/config/echo.h`. `ECHO_DEV_QUICKSTART` is a development shortcut.
 
 ## Testing
