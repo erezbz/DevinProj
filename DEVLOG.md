@@ -198,3 +198,6 @@ No contact with humans and no money spent. I can make my own decisions about the
     never got below 9%, and the error relative to the *total* force (incl. LJ) was the same. So DSF isn't buggy (the Madelung energy and gradient tests pass). The literature's DSF force correlation
     R² ≈ 0.99 corresponds to exactly this ~10% RMS force error. Re-graded the check to PASS < 5%, WARN < 20% (with the reason in a code comment), so published settings
     show as **WARN, not PASS**. The report now says plainly that the cutoff forces are approximate. Full suite: **83 passed in 25.35s**.
+- **06:19**: Trajectories now record **velocities** alongside positions, and they survive `io.save`/`io.load` (round trip checked). New `analysis.vacf` and
+  `analysis.green_kubo_diffusion` give a second, independent route to D (the integral of the velocity autocorrelation, next to the MSD slope). Test: free Langevin particles
+  (γ = 1e12 /s, 300 K) give C(0) = 3kT/m within 5% and the Green–Kubo D = kT/(mγ) within 6%. Full suite: **84 passed in 26.77s**.

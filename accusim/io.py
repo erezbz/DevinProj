@@ -21,6 +21,8 @@ def save(trajectory: Trajectory, system, path):
         data["frame_len"] = lens
         data["positions"] = np.concatenate(trajectory.positions)
         data["species"] = np.concatenate(trajectory.species)
+        if len(trajectory.velocities) == len(trajectory.positions):
+            data["velocities"] = np.concatenate(trajectory.velocities)
     np.savez_compressed(path, **data)
 
 
@@ -36,4 +38,6 @@ def load(path) -> tuple[Trajectory, list]:
         cuts = np.cumsum(z["frame_len"])[:-1]
         tr.positions = np.split(z["positions"], cuts)
         tr.species = np.split(z["species"], cuts)
+        if "velocities" in z:
+            tr.velocities = np.split(z["velocities"], cuts)
     return tr, json.loads(bytes(z["species_meta"]).decode())

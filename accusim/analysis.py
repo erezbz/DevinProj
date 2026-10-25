@@ -72,3 +72,23 @@ def wall_pressure(system, duration):
     V = float(np.prod(system.box))
     area = 2 * V * float(np.sum(1 / system.box))
     return system.wall_impulse / (area * duration)
+
+
+def vacf(trajectory, max_lag=None):
+    """Velocity autocorrelation <v(0).v(t)> averaged over particles and time origins (fixed particle set).
+    Returns (lag times, C(t))."""
+    V = np.asarray(trajectory.velocities)
+    if V.ndim != 3:
+        raise ValueError("vacf needs recorded velocities of a constant particle set")
+    n = len(V)
+    max_lag = n // 2 if max_lag is None else max_lag
+    C = np.array([np.mean(np.einsum("tij,tij->ti", V[:n - k], V[k:])) for k in range(max_lag)])
+    t = np.asarray(trajectory.t)
+    return t[:max_lag] - t[0], C
+
+
+def green_kubo_diffusion(trajectory, max_lag=None):
+    """Self-diffusion D = (1/d) * integral of the VACF (trapezoid), an independent route to the MSD slope."""
+    t, C = vacf(trajectory, max_lag)
+    dim = np.asarray(trajectory.velocities).shape[2]
+    return float(np.sum(0.5 * (C[1:] + C[:-1]) * np.diff(t))) / dim

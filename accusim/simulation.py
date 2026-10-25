@@ -24,6 +24,7 @@ class Trajectory:
     charge: list = field(default_factory=list)
     counts: list = field(default_factory=list)
     positions: list = field(default_factory=list)
+    velocities: list = field(default_factory=list)
     species: list = field(default_factory=list)
 
     @property
@@ -85,6 +86,7 @@ class Simulation:
         tr.counts.append(s.counts())
         if positions:
             tr.positions.append(s.pos.copy())
+            tr.velocities.append(s.vel.copy())
             tr.species.append(s.sp.copy())
 
     def run(self, duration=None, steps=None, record_every=1, positions=True):
