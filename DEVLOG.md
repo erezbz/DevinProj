@@ -129,3 +129,7 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **05:54**: Added **`HarmonicAngle`** (three-body bond-angle springs, analytic gradient; it conserves angular momentum because it is rotationally invariant)
   and **Coulomb `exclude=`** (id pairs with no interaction, so atoms in the same molecule don't attract each other). Both pass the numerical
   F = −∇U checks, periodic and open. The exclusion test checks that exactly that one pair's energy is removed. 61 → 63 tests, all pass.
+- **05:53**: Added `examples/water_cluster.py`: 8 flexible SPC/Fw waters with real parameters. Mean O–H 1.0178 Å (r0 1.012), mean H–O–H 111.1°.
+  P and L are conserved to ~1e-15, and the energy drift of 4e-4 is a WARN at dt = 0.2 fs. The example exposed a **report bug**: the header said
+  "all applicable checks passed" while showing WARN rows. It now reads "no failures, N warnings" or "PROBLEMS FOUND: n failed, m warnings".
+  I re-ran the solar system and ozone examples and pasted their real current output into the README. 64/64 tests pass.

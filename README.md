@@ -31,8 +31,9 @@ Accuracy report (all applicable checks passed)
   [PASS] angular momentum         6.80e-14  max |L(t)-L0| / sum |r x p|
   [PASS] mass-energy              0.00e+00  rest mass + released/c^2
   [PASS] charge                   0.00e+00  total charge
-  [PASS] relativity               3.78e-08  (v/c)^2 of fastest particle: Newtonian error ~ this size
-  [PASS] timestep error           1.29e-08  est. position error at dt, observed order 4.0/4
+  [PASS] timestep vs physics      1.62e-02  dt / shortest timescale (closest approach / speed, 8e+05 s) at end of run
+  [PASS] relativity               3.78e-08  (v/c)^2 of fastest particle: Newtonian error ~ this size (v = 0.000194 c)
+  [PASS] timestep error           1.29e-08  est. position error at dt (relative to system size), observed order 4.0/4
 ```
 
 ## What's inside
@@ -72,10 +73,10 @@ python -m accusim examples/models/ozone.json [--convergence] [--gif out.gif]
 ```
 
 ```
-450 particles, 3 species, dt = 5e-11 s
-final counts: {'O': 112, 'O2': 262, 'O3': 38}
-Accuracy report (all applicable checks passed)
-  [PASS] energy                   2.93e-15  ...
+450 particles, 3 species, dt = 1e-11 s
+Accuracy report (no failures, 1 warning)
+  [PASS] energy                   2.39e-15  ...
+  [WARN] reaction timestep        5.00e-02  max rate*dt of contact reactions: rates biased low by ~2%
 ```
 
 ## Interactive 3D viewer
@@ -98,6 +99,7 @@ One force evaluation takes 0.044 s for 2,000 atoms (0.36 s with all pairs) and 0
 - `chemistry.py`: reversible A + B ⇌ C with 0.5 eV of binding energy. The particle simulation gives C = 114 and exact Gillespie kinetics gives C = 111.
 - `enzyme.py`: **biology**. Michaelis-Menten E + S ⇌ ES → E + P with diffusing molecules (Brownian dynamics).
   The particle simulation gives P = 242, against 237 ± 9 from exact Gillespie.
+- `water_cluster.py`: **molecular**. Eight flexible SPC/Fw water molecules (bonds + angles + Lennard-Jones + Coulomb with intramolecular exclusions), 2 ps NVE. Momentum and angular momentum are conserved to 1e-15; energy drift is 4e-4 at dt = 0.2 fs, reported as a WARN.
 - `star_cluster.py`: **astronomy**. A 400-star Plummer cluster run for 2 crossing times. The virial ratio goes from 1.04 to 1.02,
   energy drift is 1e-7, and angular momentum holds to 3e-16. Add `--gif` for a rotating 3D animation.
 - `fusion.py`: D + T → He-4 + n. The 17.589 MeV comes out of the mass defect automatically, and the neutron gets 14.05 MeV. The report also flags that the neutron's 0.17 c makes Newtonian kinematics about 3% off.
@@ -106,7 +108,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 59 tests cover:
+`python -m pytest`. The 64 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.

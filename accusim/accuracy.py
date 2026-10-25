@@ -46,7 +46,14 @@ class AccuracyReport:
         return all(c.status != FAIL for c in self.checks)
 
     def __str__(self):
-        head = "Accuracy report " + ("(all applicable checks passed)" if self.ok else "(PROBLEMS FOUND)")
+        nf = sum(c.status == FAIL for c in self.checks)
+        nw = sum(c.status == WARN for c in self.checks)
+        if nf:
+            head = f"Accuracy report (PROBLEMS FOUND: {nf} failed, {nw} warnings)"
+        elif nw:
+            head = f"Accuracy report (no failures, {nw} warning{'s' * (nw != 1)})"
+        else:
+            head = "Accuracy report (all applicable checks passed)"
         return "\n".join([head] + [c.row() for c in self.checks])
 
     @classmethod
