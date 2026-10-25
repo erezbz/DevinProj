@@ -73,3 +73,13 @@ def test_temperature_counts_constrained_degrees_of_freedom():
     sim.run(steps=1, positions=False)  # RATTLE projects out the bond-stretch velocities
     assert Q_u > 0
     assert abs(s.temperature() - 300.0) / 300.0 < 0.05  # 5 dof per dumbbell, not 6 (which would read ~250 K)
+
+
+def test_matrix_shake_reports_unreachable_tolerance_quickly():
+    import pytest
+    s = System(3)
+    s.add_species("A", 1.0)
+    a, b = s.add("A", [[1e6, 0.0, 0.0], [1e6 + 1.0, 0.0, 0.0]], vel=[[0.0, 1.0, 0.0], [0.0, -1.0, 0.0]])
+    sim = Simulation(s, [], integrator=Rattle([(a, b, 1.0)], tol=1e-15, method="matrix"), dt=0.01)
+    with pytest.raises(RuntimeError, match="stalled"):
+        sim.run(steps=50, positions=False)

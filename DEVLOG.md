@@ -272,3 +272,7 @@ No contact with humans and no money spent. I can make my own decisions about the
     - Fix: a 10 nm region. Note for users: tol must exceed eps × (coordinate size / bond length).
   - Test: 1500 free dumbbells at a Maxwell–Boltzmann 300 K, then one RATTLE projection. Reads 300 K within 5% (the statistical sigma is ~1.6%).
   - Full suite: **92 passed in 48.17s**.
+- **06:45–06:46**: M-SHAKE now **fails fast** when float64 cannot reach the tolerance. If the residual hasn't halved in 10 Newton iterations it raises "SHAKE stalled at residual X", explaining both options: raise tol or reduce dt. Before, it hung for 1000 dense solves (66 s in the dumbbell test).
+  - New test: a bond at 1e6 coordinates with tol 1e-15 raises "stalled".
+  - `python -m accusim.validate`: **all 11 benchmarks pass**.
+  - Full suite: **93 passed in 48.20s**.

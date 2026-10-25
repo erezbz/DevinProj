@@ -205,11 +205,17 @@ class Rattle(Integrator):
         ro = self._mi(s, s.pos[ia] - s.pos[ib])
         s.vel += 0.5 * dt * sim.acc
         new = s.pos + dt * s.vel
+        best, stall = np.inf, 0
         for _ in range(self.max_iter):
             r = self._mi(s, new[ia] - new[ib])
             diff = d2 - np.einsum("ij,ij->i", r, r)
-            if np.max(np.abs(diff) / d2) <= self.tol:
+            res = np.max(np.abs(diff) / d2)
+            if res <= self.tol:
                 break
+            best, stall = (res, 0) if res < 0.5 * best else (best, stall + 1)
+            if stall >= 10:  # Newton converges quadratically, so a stall means float64 cannot reach tol here
+                raise RuntimeError(f"SHAKE stalled at relative residual {res:.1e} > tol {self.tol:.0e}: raise tol "
+                                   "(float64 limit ~ eps * coordinate size / bond length) or reduce dt")
             g = np.linalg.solve(2 * C * (r @ ro.T), diff)
             for idx, sign in ((ia, 1.0), (ib, -1.0)):
                 dx = sign * (g * inv[idx])[:, None] * ro
