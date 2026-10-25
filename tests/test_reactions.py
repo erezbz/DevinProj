@@ -144,3 +144,11 @@ def test_report_warns_about_relativistic_speeds():
     sim = Simulation(s, dt=1e-20)
     sim.run(steps=2, positions=False)
     assert sim.accuracy_report()["relativity"].status == "FAIL"
+
+
+def test_report_flags_coarse_reaction_timestep():
+    s = gas(n_a=20, n_b=20)
+    rx = [Reaction(["A", "B"], ["C"], rate=1e12, radius=Q(1, "nm"))]
+    sim = Simulation(s, reactions=rx, dt=1e-12, seed=0)
+    sim.run(steps=2, positions=False)
+    assert sim.accuracy_report()["reaction timestep"].status == "FAIL"
