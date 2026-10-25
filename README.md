@@ -107,6 +107,7 @@ One force evaluation takes 0.044 s for 2,000 atoms (0.36 s with all pairs) and 0
 - `chemistry.py`: reversible A + B ⇌ C with 0.5 eV of binding energy. The particle simulation gives C = 114 and exact Gillespie kinetics gives C = 111.
 - `enzyme.py`: **biology**. Michaelis-Menten E + S ⇌ ES → E + P with diffusing molecules (Brownian dynamics).
   The particle simulation gives P = 242, against 237 ± 9 from exact Gillespie.
+- `rahman_argon.py`: **history**. Reproduces Rahman (1964), the first MD simulation of a real liquid: 864 argon atoms at 94.4 K and 1.374 g/cm³. accusim gets **D = (2.54 ± 0.13)e-5 cm²/s** from four 10 ps blocks (Rahman and experiment: 2.43e-5) and a g(r) first peak at 3.75 Å (Rahman ~3.7 Å). Wall time 94 s on a laptop-class CPU.
 - `water_cluster.py`: **molecular**. Eight flexible SPC/Fw water molecules (bonds + angles + Lennard-Jones + Coulomb with intramolecular exclusions), 2 ps NVE. Momentum and angular momentum are conserved to 1e-15; energy drift is 4e-4 at dt = 0.2 fs, reported as a WARN.
 - `star_cluster.py`: **astronomy**. A 400-star Plummer cluster run for 2 crossing times. The virial ratio goes from 1.04 to 1.02,
   energy drift is 1e-7, and angular momentum holds to 3e-16. Add `--gif` for a rotating 3D animation.
@@ -116,7 +117,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 68 tests cover:
+`python -m pytest`. The 69 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.

@@ -7,6 +7,7 @@ He found the diffusion coefficient D = 2.43e-5 cm^2/s (experiment: 2.43e-5) and 
 import os
 import sys
 import time
+from types import SimpleNamespace
 
 import numpy as np
 
@@ -33,14 +34,20 @@ melt.run(duration=Q(10, "ps"), positions=False)
 print(f"{s.n} atoms, box {L * 1e10:.2f} A, melted and thermalised: T = {s.temperature():.1f} K")
 
 sim = Simulation(s, [lj], integrator=VelocityVerlet(), dt=Q(10, "fs"))
-prod_ps = float(sys.argv[1]) if len(sys.argv) > 1 else 10.0
+prod_ps = float(sys.argv[1]) if len(sys.argv) > 1 else 40.0
 tr = sim.run(duration=Q(prod_ps, "ps"), record_every=5)
-t, r2 = msd(tr, box=L)
-half = len(t) // 2
-D = np.polyfit(t[half:], r2[half:], 1)[0] / 6
+# D from independent 10 ps blocks (fit the linear part, t > 2 ps), reported as mean +/- standard error
+per_block = int(round(Q(10, "ps").value / (5 * sim.dt)))
+Ds = []
+for b0 in range(0, len(tr.t) - per_block, per_block):
+    blk = SimpleNamespace(t=tr.t[b0:b0 + per_block + 1], positions=tr.positions[b0:b0 + per_block + 1])
+    t, r2 = msd(blk, box=L)
+    late = t > Q(2, "ps").value
+    Ds.append(np.polyfit(t[late], r2[late], 1)[0] / 6)
+D, dD = np.mean(Ds), (np.std(Ds, ddof=1) / np.sqrt(len(Ds)) if len(Ds) > 1 else float("nan"))
 r, g = rdf(s, 0.49 * L, bins=120)
 print(f"NVE production {prod_ps:g} ps: mean T = {np.mean(2 * np.array(tr.kinetic) / (3 * (s.n - 1) * k_B.value)):.1f} K")
-print(f"diffusion D = {D * 1e4:.3g} cm^2/s   (Rahman 1964: 2.43e-5, experiment: 2.43e-5)")
+print(f"diffusion D = ({D * 1e9:.2f} +/- {dD * 1e9:.2f})e-5 cm^2/s from {len(Ds)} blocks   (Rahman 1964: 2.43e-5, experiment: 2.43e-5)")
 print(f"g(r) first peak at {r[np.argmax(g)] * 1e10:.2f} A, height {g.max():.2f}   (Rahman: ~3.7 A)")
 print(sim.accuracy_report())
 print(f"wall time {time.perf_counter() - t0:.0f} s")

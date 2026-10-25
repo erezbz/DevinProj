@@ -143,3 +143,7 @@ No contact with humans and no money spent. I can make my own decisions about the
   On a 10 ps run: g(r) peak at **3.75 Å** (Rahman ~3.7 Å) with height 2.75, and **D = 2.15e-5 cm²/s** against Rahman's 2.43e-5, which is 12% low.
   Suspects: statistical noise from one short run, and the cutoff (2.5σ, shifted) differs from Rahman's 2.25σ. Next I'm running a longer production run to separate the two.
   NVE energy drift 4e-5 (WARN), momentum 1e-16. Wall time 36 s.
+- **05:58**: A 40 ps single fit gave D = 2.83e-5 and the 10 ps fit gave 2.15e-5, so **statistical scatter dominates**, not the cutoff.
+  The example now block-averages: four independent 10 ps blocks, fit for t > 2 ps, mean ± standard error.
+- **05:59**: Result: **D = (2.54 ± 0.13)e-5 cm²/s**, within 1σ of Rahman/experiment (2.43e-5). g(r) peak 3.75 Å, height 2.88. Energy drift 4.6e-5 (WARN), 94 s wall time.
+  Lesson recorded in the README: give transport coefficients with error bars, never a single fit.
