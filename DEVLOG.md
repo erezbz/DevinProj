@@ -109,3 +109,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   it samples 200 particles and measures the RMS force error against exact summation, so a tree run reports its own approximation error.
   Test added. 54/54 tests pass.
 - **05:48**: Added `accusim/io.py`, which saves and loads trajectories (compressed .npz). It supports a particle count that changes from reactions. Round-trip test passes.
+- **05:49**: Added **`python -m accusim.validate`**, a scorecard of 8 textbook benchmarks with answers that don't come from accusim:
+  Kepler closure (9e-9), oscillator (6e-13), measured Verlet order 2.00008, Madelung (5e-8), D-T Q-value 17.5893 MeV (2e-7),
+  decay law (1.1%, 1.2σ stochastic), Gillespie against the rate equation (2e-4), and Einstein diffusion (1.3e-3). All PASS. Wrapped as a test.

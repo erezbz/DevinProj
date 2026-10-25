@@ -47,6 +47,22 @@ Accuracy report (all applicable checks passed)
 | Accuracy | Applicability-aware conservation checks, relativistic-speed check, reaction-timestep bias check, `calibrate_dt` (halves dt until energy tolerance met), Richardson timestep-error estimate with observed order, pre-flight `suggest_dt`. |
 | Viz | GIF animations and energy-error plots (matplotlib). |
 
+## It proves itself: `python -m accusim.validate`
+
+```
+benchmark                                         expected       accusim    rel.err  result
+Circular orbit closes after Kepler period                0   9.06807e-09    9.1e-09  PASS
+Harmonic oscillator x(t) = A cos(wt)              0.916093      0.916093    6.3e-13  PASS
+Velocity Verlet convergence order                        2       2.00008    4.0e-05  PASS
+NaCl Madelung constant (Ewald)                     1.74756       1.74756    5.3e-08  PASS
+D-T fusion Q-value from mass defect                17.5893       17.5893    1.8e-07  PASS
+First-order decay N(t) = N0 exp(-kt)               7357.59          7278    1.1e-02  PASS
+Gillespie A+B->C vs rate equation                  166.667         166.7    2.0e-04  PASS
+Einstein diffusion <r^2> = 6Dt                       6e-16   5.99245e-16    1.3e-03  PASS
+```
+
+(The decay row is a stochastic sample: 7278 against 7358 is 1.2 standard deviations.)
+
 ## No-code models: JSON + command line
 
 Describe a whole simulation in JSON, with units written as strings, then run it:
@@ -90,7 +106,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 53 tests cover:
+`python -m pytest`. The 57 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.
