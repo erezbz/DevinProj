@@ -79,6 +79,14 @@ Accuracy report (no failures, 1 warning)
   [WARN] reaction timestep        5.00e-02  max rate*dt of contact reactions: rates biased low by ~2%
 ```
 
+## Preparing and analysing systems
+
+- `minimize(sim)`: FIRE energy minimisation, to relax hand-built structures before dynamics. Tested: it finds the LJ dimer minimum
+  at 2^(1/6)σ to 1e-6 and relaxes a distorted triatomic to its rest bond length and angle.
+- `rdf(system, rmax)`: radial distribution function g(r). Tested: ideal gas → 1, and the FCC peak at a/√2.
+- `msd(trajectory)`: mean squared displacement against time.
+- `accusim.io.save/load`: compressed .npz trajectories, including runs where the particle count changes.
+
 ## Interactive 3D viewer
 
 Add `--html out.html` to the CLI, or call `accusim.viz.export_html(trajectory, system, path)`.
@@ -108,7 +116,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 64 tests cover:
+`python -m pytest`. The 68 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.

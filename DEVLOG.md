@@ -133,3 +133,7 @@ No contact with humans and no money spent. I can make my own decisions about the
   P and L are conserved to ~1e-15, and the energy drift of 4e-4 is a WARN at dt = 0.2 fs. The example exposed a **report bug**: the header said
   "all applicable checks passed" while showing WARN rows. It now reads "no failures, N warnings" or "PROBLEMS FOUND: n failed, m warnings".
   I re-ran the solar system and ozone examples and pasted their real current output into the README. 64/64 tests pass.
+- **05:55**: Added `accusim/minimize.py` (**FIRE** energy minimisation) and `accusim/analysis.py` (**g(r)**, **MSD**).
+  First run: minimize called `sim.update_forces()`, which returns nothing (it stores the forces on the sim), so the tuple unpack failed. Fixed by using `sim.potential()`.
+  The molecule test then missed by 1.2e-6 on the angle: the default stopping force (1e-6 × initial) was too loose, so it is now 1e-9 × initial.
+  Tests: LJ dimer at 2^(1/6)σ, distorted triatomic relaxes to r0/θ0, ideal-gas g(r) = 1, FCC first peak at a/√2. **68/68 tests pass.**

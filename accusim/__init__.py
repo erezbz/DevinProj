@@ -6,6 +6,8 @@ conserve momentum, charge and mass-energy exactly, and a report on how
 accurate each run was.
 """
 from .accuracy import AccuracyReport
+from .analysis import msd, rdf
+from .minimize import minimize
 from .advisor import calibrate_dt, suggest_dt, timescales
 from .forces import Coulomb, Drag, Ewald, Gravity, HarmonicAngle, HarmonicBond, LennardJones, UniformField
 from .integrators import Brownian, Langevin, VelocityVerlet, Yoshida4
@@ -19,6 +21,6 @@ __all__ = [
     "AccuracyReport", "BarnesHut", "calibrate_dt", "Brownian", "Coulomb", "Drag", "Ewald", "G", "Gravity", "HarmonicAngle", "HarmonicBond", "Langevin",
     "LennardJones", "N_A", "Q", "Quantity", "Reaction", "Simulation", "Species", "System",
     "Trajectory", "UniformField", "UnitError", "VelocityVerlet", "Yoshida4", "c", "gillespie",
-    "k_B", "k_e", "parse_unit", "suggest_dt", "timescales",
+    "k_B", "k_e", "minimize", "msd", "parse_unit", "rdf", "suggest_dt", "timescales",
 ]
 __version__ = "0.1.0"
