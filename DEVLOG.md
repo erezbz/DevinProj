@@ -239,3 +239,6 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Test: an 8³ NaCl lattice given 30 random kicks agrees with fresh lists to ≤ 1e-12 (forces and energy), with 1 < rebuilds < 15.
   - Benchmark: 4096 ions, 20 force calls: skin 0.0: 8.89 s, 20 rebuilds; skin 0.6: 3.34 s, 1 rebuilds.
   - Full suite: **88 passed in 59.83s**.
+- **06:35**: README now documents `vacf`, `green_kubo_diffusion`, `wall_pressure` and the Verlet list. Checks:
+  - `python -m accusim.validate`: **11/11 benchmarks passed**. DSF Madelung is 1.2e-3, unchanged by the skin.
+  - `ruff --select F,E9,B` on the changed files: no new findings. The only 2 left are B905 `zip(strict=)` in `model.py`, which predate this work.

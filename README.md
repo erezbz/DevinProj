@@ -100,6 +100,8 @@ Bonds, angles and same-molecule Coulomb exclusions are generated automatically. 
   at 2^(1/6)σ to 1e-6 and relaxes a distorted triatomic to its rest bond length and angle.
 - `rdf(system, rmax)`: radial distribution function g(r). Tested: ideal gas → 1, and the FCC peak at a/√2.
 - `msd(trajectory, box)`: mean squared displacement against time, unwrapping periodic boundaries.
+- `vacf(trajectory)` and `green_kubo_diffusion(trajectory)`: velocity autocorrelation and D from its integral, an independent check of the MSD slope. Tested: free Langevin particles give the exact kT/(mγ).
+- `wall_pressure(system, duration)`: mechanical pressure from momentum delivered to reflecting walls. Tested: kinetic-theory 2K/(3V).
 - `pressure(sim)`: pressure for *any* force set, from box rescaling (−dU/dV), so no per-force virial code is needed. Tested against NkT/V and an independent pairwise LJ virial (1e-5).
 - `accusim.io.save/load`: compressed .npz trajectories, including runs where the particle count changes.
 
@@ -114,7 +116,7 @@ Pass `sim=` (the CLI does this) to draw bonds and a live **energy-error panel**,
 `BarnesHut(theta=0.5)` gives O(N log N) gravity, with measured force errors under 1% (θ = 0.6) and under 0.2% (θ = 0.3), and θ = 0 exact.
 One force evaluation for 10,000 stars takes 1.5 s; all-pairs gravity doesn't fit in memory at that size.
 
-Lennard-Jones automatically switches to an O(N) cell list once there are 400 or more particles.
+Lennard-Jones and `DampedShiftedCoulomb` switch to an O(N) cell list once there are 400 or more particles. On top of that, an exact Verlet list (with a skin) skips most rebuilds: 864-atom LJ runs 2.8x faster, and 4096-ion DSF force calls 2.7x faster, with results identical to 1e-12.
 One force evaluation takes 0.044 s for 2,000 atoms (0.36 s with all pairs) and 0.17 s for 8,000 atoms.
 
 ## Examples (`examples/`)
