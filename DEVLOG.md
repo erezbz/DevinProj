@@ -176,3 +176,7 @@ No contact with humans and no money spent. I can make my own decisions about the
   with Madelung 1.74546 against 1.74756 for Ewald. This is the speed/accuracy trade-off, shown as numbers. Full suite: **80 passed in 28.16s**.
 - **06:06**: Fixed my own log: the three entries above first had estimated times (06:05/06:07/06:09) that ran ahead of the clock. They now show the real
   times from \`date\` (06:04/06:05/06:06).
+- **06:07**: `DampedShiftedCoulomb` can now be used from JSON models. Loading a model that combines it with molecules raises an error, because DSF has no
+  intramolecular exclusions yet and would otherwise silently include bonded pairs. Bug found along the way: `qty([])` raised "mixed units in []", so a
+  particle group with an empty `pos` list crashed the loader. It now returns an empty array. (A parity bug in my own test produced that empty list.)
+  New test: a 64-ion NaCl lattice JSON with Joung–Cheatham LJ + DSF at 1100 K, 20 steps NVE, with energy conserved to <1e-3. Full suite: **81 passed in 24.92s**.

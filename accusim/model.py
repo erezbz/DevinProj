@@ -31,6 +31,8 @@ def qty(x):
         num, _, unit = x.strip().partition(" ")
         return Q(float(num), unit.strip() or "1")
     if isinstance(x, list):
+        if not x:
+            return np.zeros(0)
         items = [qty(v) for v in x]
         if all(isinstance(v, Quantity) for v in items):
             dims = {v.dim for v in items}
@@ -50,7 +52,7 @@ def _energy(x):
 
 from .tree import BarnesHut
 
-FORCE_TYPES = {"BarnesHut": BarnesHut, "Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "LennardJones": F.LennardJones,
+FORCE_TYPES = {"BarnesHut": BarnesHut, "Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "DampedShiftedCoulomb": F.DampedShiftedCoulomb, "LennardJones": F.LennardJones,
                "HarmonicBond": F.HarmonicBond, "HarmonicAngle": F.HarmonicAngle, "UniformField": F.UniformField, "Drag": F.Drag}
 INTEGRATORS = {"VelocityVerlet": I.VelocityVerlet, "Yoshida4": I.Yoshida4, "Langevin": I.Langevin,
                "Brownian": I.Brownian}
@@ -122,6 +124,8 @@ def build(model: dict) -> tuple[Simulation, dict]:
             f["params"] = {k: (_energy(e), qty(sg)) for k, (e, sg) in f["params"].items()}
         else:
             f = {k: qty(v) for k, v in f.items()}
+        if kind is F.DampedShiftedCoulomb and exclude:
+            raise ValueError("DampedShiftedCoulomb has no intramolecular exclusions yet; use Coulomb with molecules")
         if kind is F.Coulomb and exclude:
             f["exclude"] = list(f.get("exclude", [])) + exclude
         forces.append(kind(**f))

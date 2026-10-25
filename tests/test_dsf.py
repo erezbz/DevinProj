@@ -59,3 +59,34 @@ def test_dsf_cell_list_path_matches_dense():
     fd, ud = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=10 ** 9).compute(s)
     fc, uc = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=1).compute(s)
     assert abs(uc / ud - 1) < 1e-12 and np.allclose(fc, fd, rtol=1e-9, atol=1e-12)
+
+
+def test_dsf_from_json_model(tmp_path):
+    import json
+
+    import pytest
+
+    from accusim.model import load
+    n = np.stack(np.meshgrid(*[np.arange(4)] * 3, indexing="ij"), -1).reshape(-1, 3)
+    odd = n.sum(1) % 2 == 1
+    g = n * 2.82e-10
+    model = {
+        "dim": 3, "box": "11.28 A", "periodic": True, "seed": 1, "temperature": "1100 K",
+        "species": {"Na": {"mass": "22.99 u", "charge": "1 e"}, "Cl": {"mass": "35.45 u", "charge": "-1 e"}},
+        "particles": [{"species": "Na", "pos": g[~odd].tolist()}, {"species": "Cl", "pos": g[odd].tolist()}],
+        "forces": [{"type": "LennardJones", "params": {"Na": ["1.4754 kJ/mol", "2.159 A"], "Cl": ["0.0128 kJ/mol", "4.830 A"]},
+                    "cutoff": 2.5},
+                   {"type": "DampedShiftedCoulomb", "rcut": "5.5 A"}],
+        "dt": "1 fs", "duration": "20 fs",
+    }
+    path = tmp_path / "salt.json"
+    path.write_text(json.dumps(model))
+    sim, _ = load(str(path))
+    tr = sim.run(steps=20)
+    E = np.asarray(tr.total_energy)
+    assert np.all(np.isfinite(E)) and abs(E[-1] / E[0] - 1) < 1e-3
+    model["molecules"] = [{"atoms": [["Na", [0, 0, 0]], ["Cl", [2.8e-10, 0, 0]]], "bonds": [[0, 1, "100 N/m", "2.8 A"]],
+                           "at": [[5e-10, 5e-10, 5e-10]]}]
+    path.write_text(json.dumps(model))
+    with pytest.raises(ValueError, match="exclusions"):
+        load(str(path))
