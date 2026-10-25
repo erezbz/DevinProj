@@ -183,3 +183,4 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:08**: Replaced the DSF+molecules guard with proper support. `DampedShiftedCoulomb(exclude=...)` takes id pairs, as `Coulomb` does, in both the
   dense and cell-list paths, and JSON molecules feed their same-molecule pairs to it automatically. New test: 50 excluded pairs in a 512-ion melt give
   identical results in both paths and differ from the unexcluded energy. Full suite: **82 passed in 27.87s**.
+- **06:08**: Added `DampedShiftedCoulomb` to `accusim.__all__` (ruff F401). Pyflakes is clean again across the package and tests.

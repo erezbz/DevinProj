@@ -24,6 +24,7 @@ __all__ = [
     "Brownian",
     "Coulomb",
     "Drag",
+    "DampedShiftedCoulomb",
     "Ewald",
     "G",
     "Gravity",
