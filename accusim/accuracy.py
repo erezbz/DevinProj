@@ -96,6 +96,19 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
+        approx = [f for f in sim.forces if not getattr(f, "exact", True)]
+        if approx and s.n >= 2:
+            from .tree import direct_subset
+            sub = np.random.default_rng(0).choice(s.n, size=min(s.n, 200), replace=False)
+            errs = []
+            for f in approx:
+                F_ap = f.compute(s)[0][sub]
+                F_ex = direct_subset(f, s, sub)
+                errs.append(float(np.sqrt(np.mean(np.sum((F_ap - F_ex) ** 2, 1)) / np.mean(np.sum(F_ex ** 2, 1)))))
+            e = max(errs)
+            checks.append(Check("force approximation", _grade(e, 1e-3, 1e-2), e,
+                                f"RMS relative force error vs exact summation ({len(sub)} sampled particles)"))
+
         from .forces import Coulomb
         if s.periodic and any(type(f) is Coulomb for f in sim.forces):
             checks.append(Check("electrostatics", WARN, None,

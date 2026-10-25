@@ -137,7 +137,7 @@ def export_html(trajectory, system, path, max_frames=300, title="accusim", radiu
     scale = float(np.max(hi - lo) / 2) or 1.0
     data = {
         "title": title, "species": [sp.name for sp in system.species], "r": radius,
-        "t": [float(trajectory.t[i]) for i in idx], "extent": 1.0, "mid": [0, 0, 0],
+        "t": [float(trajectory.t[i]) for i in idx], "extent": 1.75, "mid": [0, 0, 0],
         "frames": [np.round(((p - (lo + hi) / 2) / scale).ravel(), 4).tolist() for p in pos],
         "sp": [trajectory.species[i].tolist() for i in idx],
     }

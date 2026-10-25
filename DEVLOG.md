@@ -104,3 +104,7 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **05:48**: Added `viz.export_html`, a **self-contained interactive 3D viewer** (canvas plus about 30 lines of JS, no CDN):
   drag to rotate, scroll to zoom, play/pause, timeline slider. It is also available as the CLI flag `--html`. Smoke test added.
   This is the first step from "script" toward "application". 53/53 tests pass.
+- **05:48**: Viewer screenshot check (headless Chrome): it renders the ozone run with legend, controls and slider. A rotated box's corners
+  were clipped, so I raised the view extent to 1.75. Added a **`force approximation` report check**: for approximate forces (Barnes-Hut),
+  it samples 200 particles and measures the RMS force error against exact summation, so a tree run reports its own approximation error.
+  Test added. 54/54 tests pass.

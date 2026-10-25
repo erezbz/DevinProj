@@ -75,3 +75,12 @@ class BarnesHut(Force):
             if len(rest):
                 stack.extend((c, rest) for c in node.children)
         return m[:, None] * acc, 0.5 * float(np.sum(m * phi))
+
+
+def direct_subset(force, s, sub):
+    """Exact gravitational force on particles `sub` from all particles (for error estimates)."""
+    d = s.pos[None, :, :] - s.pos[sub][:, None, :]
+    r2 = np.einsum("ijk,ijk->ij", d, d) + force.eps2
+    same = sub[:, None] == np.arange(s.n)[None, :]
+    inv = np.where(same, 0.0, 1 / np.sqrt(np.where(same, 1.0, r2)))
+    return force.G * s.masses[sub, None] * np.einsum("ij,ijk->ik", s.masses[None, :] * inv ** 3, d)

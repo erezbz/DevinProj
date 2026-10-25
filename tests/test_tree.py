@@ -27,3 +27,13 @@ def test_theta_zero_is_exact():
 def test_force_error_is_small_and_controlled_by_theta(theta, tol):
     ferr, uerr = _err(theta)
     assert ferr < tol and uerr < tol
+
+
+def test_report_measures_tree_force_error():
+    from accusim import Simulation, Yoshida4
+    s, a, M = plummer(n=600, seed=2)
+    sim = Simulation(s, [BarnesHut(softening=0.01 * a, theta=0.7)], integrator=Yoshida4(), dt=1e10)
+    sim.run(steps=3, positions=False)
+    chk = sim.accuracy_report()["force approximation"]
+    ferr, _ = _err(0.7, n=600)
+    assert chk.status in ("PASS", "WARN") and 0 < chk.value < 2e-2
