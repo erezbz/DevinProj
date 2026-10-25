@@ -163,3 +163,6 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:03**: Quality pass. Checked packaging: `pip install` into a clean venv works and `python -m accusim.validate` passes from the installed copy.
   Ran ruff: no pyflakes errors (no unused names or undefined variables). Applied the safe auto-fixes (import order, stale noqa, sorted `__all__`) and renamed an
   ambiguous variable. The remaining style notes are one-line semicolons in the matplotlib helpers, left alone. Examples re-run OK. Full suite: **75 passed in 22.80s**.
+- **06:05**: Reflecting walls now **record the momentum they absorb** (`System.wall_impulse`), and `analysis.wall_pressure(system, duration)` turns
+  that into pressure. This is a second, independent pressure route (wall impulse instead of the virial or box rescaling). Test: 2000 argon atoms in a 10×15×20 nm
+  reflecting box at 300 K, 100 ps run, with wall pressure checked against kinetic theory 2K/(3V) within 4%. Full suite: **76 passed in 26.80s**.

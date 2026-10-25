@@ -35,6 +35,7 @@ class System:
         self.sp = np.zeros(0, dtype=int)
         self.ids = np.zeros(0, dtype=int)
         self.eint = np.zeros(0)  # internal (excitation/heat) energy per particle, J
+        self.wall_impulse = 0.0  # momentum delivered to reflecting walls, kg m/s
         self._next_id = 0
 
     def add_species(self, name, mass, charge=0.0, radius=0.0, diffusion=0.0) -> Species:
@@ -132,7 +133,10 @@ class System:
                 break
             self.pos = np.where(low, -self.pos, self.pos)
             self.pos = np.where(high, 2 * self.box - self.pos, self.pos)
-            self.vel = np.where(low | high, -self.vel, self.vel)
+            hit = low | high
+            m = np.array([self.species[k].mass for k in self.sp])
+            self.wall_impulse += float(np.sum(2 * m[:, None] * np.abs(self.vel) * hit))
+            self.vel = np.where(hit, -self.vel, self.vel)
 
     def copy(self) -> System:
         other = System.__new__(System)

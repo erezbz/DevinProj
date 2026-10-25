@@ -62,3 +62,13 @@ def pressure(sim, h=1e-6):
     s.box, s.pos = (box0 if np.ndim(box0) else float(box0)), pos0
     dUdV = (U[0] - U[1]) / (2 * h * V0)
     return 2 * s.kinetic_energy() / (s.dim * V0) - dUdV
+
+
+def wall_pressure(system, duration):
+    """Mechanical pressure on reflecting walls: momentum delivered (System.wall_impulse,
+    reset it to 0 before measuring) per unit wall area per unit time."""
+    if system.box is None or system.periodic:
+        raise ValueError("wall_pressure needs a reflecting (non-periodic) box")
+    V = float(np.prod(system.box))
+    area = 2 * V * float(np.sum(1 / system.box))
+    return system.wall_impulse / (area * duration)
