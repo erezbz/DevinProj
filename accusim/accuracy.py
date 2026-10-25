@@ -103,6 +103,18 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
+        from .integrators import Langevin
+        if isinstance(integ, Langevin) and len(tr.t) >= 4:
+            from .units import k_B as KB
+            half = len(tr.t) // 2
+            kin = np.asarray(tr.kinetic[half:])
+            n = np.array([sum(c.values()) for c in tr.counts[half:]], dtype=float)
+            T_meas = float(np.mean(2 * kin / (s.dim * np.maximum(n, 1) * KB.value)))
+            dev = abs(T_meas - integ.T) / integ.T
+            tol = max(0.02, 3 * np.sqrt(2 / (s.dim * max(s.n, 1))))
+            checks.append(Check("thermostat", PASS if dev <= tol else (WARN if dev <= 0.1 else FAIL), dev,
+                                f"mean T over 2nd half {T_meas:.4g} K vs target {integ.T:.4g} K"))
+
         from .advisor import timescales
         from .integrators import Brownian
         if not isinstance(integ, Brownian):

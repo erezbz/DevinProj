@@ -9,7 +9,7 @@ import time
 
 import numpy as np
 
-from .forces import Ewald, Gravity, HarmonicBond
+from .forces import Ewald, Gravity, HarmonicBond, LennardJones
 from .integrators import Brownian, VelocityVerlet, Yoshida4
 from .reactions import Reaction, gillespie
 from .simulation import Simulation
@@ -111,7 +111,19 @@ def diffusion():
     return "Einstein diffusion <r^2> = 6Dt", 6 * D * 1e-7, float(np.mean(np.sum(s.pos ** 2, 1))), "m^2", 0.03
 
 
-BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, dt_fusion, decay, mass_action, diffusion]
+def lj_dimer():
+    from .minimize import minimize
+    sig = 3.4e-10
+    s = System(3)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add("Ar", [[0, 0, 0], [4.5e-10, 0.3e-10, 0]])
+    sim = Simulation(s, [LennardJones({"Ar": (1.65e-21, sig)}, cutoff=5)], dt=Q(5, "fs"))
+    minimize(sim)
+    return "FIRE: LJ dimer minimum at 2^(1/6) sigma", 2 ** (1 / 6) * sig * 1e10, \
+        float(np.linalg.norm(s.pos[1] - s.pos[0])) * 1e10, "A", 1e-6
+
+
+BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, dt_fusion, decay, mass_action, diffusion, lj_dimer]
 
 
 def main():

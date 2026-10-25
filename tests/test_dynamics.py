@@ -130,3 +130,25 @@ def test_report_flags_dt_too_large_for_bond_vibration():
     sim = Simulation(s, [HarmonicBond([tuple(ids)], k=1e-3, r0=Q(1, "nm"))], dt=Q(20, "ps"))
     sim.run(steps=3, positions=False)
     assert sim.accuracy_report()["timestep vs physics"].status == "FAIL"
+
+
+def _gas(T0):
+    s = System(3, box=Q(5, "nm"), periodic=True)
+    s.add_species("Ar", Q(39.948, "u"))
+    s.add("Ar", np.random.default_rng(1).uniform(0, 5e-9, (300, 3)))
+    s.maxwell_boltzmann(T0, np.random.default_rng(2))
+    return s
+
+
+def test_report_confirms_thermostat_reached_target():
+    from accusim import Langevin
+    sim = Simulation(_gas(100.0), integrator=Langevin(300.0, Q(5, "1/ps")), dt=Q(5, "fs"), seed=3)
+    sim.run(duration=Q(20, "ps"), positions=False)
+    assert sim.accuracy_report()["thermostat"].status == "PASS"
+
+
+def test_report_flags_unequilibrated_thermostat():
+    from accusim import Langevin
+    sim = Simulation(_gas(1000.0), integrator=Langevin(100.0, Q(1, "1/ns")), dt=Q(5, "fs"), seed=3)
+    sim.run(duration=Q(10, "ps"), positions=False)
+    assert sim.accuracy_report()["thermostat"].status == "FAIL"
