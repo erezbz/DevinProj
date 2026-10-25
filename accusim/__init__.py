@@ -8,7 +8,7 @@ accurate each run was.
 from .accuracy import AccuracyReport
 from .advisor import calibrate_dt, suggest_dt, timescales
 from .analysis import msd, pressure, rdf
-from .forces import Coulomb, Drag, Ewald, Gravity, HarmonicAngle, HarmonicBond, LennardJones, UniformField
+from .forces import Coulomb, Drag, Ewald, DampedShiftedCoulomb, Gravity, HarmonicAngle, HarmonicBond, LennardJones, UniformField
 from .integrators import Brownian, Langevin, VelocityVerlet, Yoshida4
 from .minimize import minimize
 from .reactions import Reaction, gillespie

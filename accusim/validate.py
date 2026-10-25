@@ -123,7 +123,21 @@ def lj_dimer():
         float(np.linalg.norm(s.pos[1] - s.pos[0])) * 1e10, "A", 1e-6
 
 
-BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, dt_fusion, decay, mass_action, diffusion, lj_dimer]
+def madelung_dsf():
+    from .forces import DampedShiftedCoulomb
+    n = 8
+    s = System(3, box=float(n), periodic=True)
+    s.add_species("Na", 1.0, charge=1.0)
+    s.add_species("Cl", 1.0, charge=-1.0)
+    g = np.stack(np.meshgrid(*[np.arange(n)] * 3, indexing="ij"), -1).reshape(-1, 3).astype(float)
+    odd = g.sum(1) % 2 == 1
+    s.add("Na", g[~odd])
+    s.add("Cl", g[odd])
+    _, U = DampedShiftedCoulomb(rcut=3.9, alpha=0.6, k=1.0).compute(s)
+    return "NaCl Madelung, cutoff DSF (approximate)", 1.747564594633, float(-2 * U / s.n), "", 2e-3
+
+
+BENCHMARKS = [kepler_period, oscillator, verlet_order, madelung, madelung_dsf, dt_fusion, decay, mass_action, diffusion, lj_dimer]
 
 
 def main():

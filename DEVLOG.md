@@ -166,3 +166,8 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:05**: Reflecting walls now **record the momentum they absorb** (`System.wall_impulse`), and `analysis.wall_pressure(system, duration)` turns
   that into pressure. This is a second, independent pressure route (wall impulse instead of the virial or box rescaling). Test: 2000 argon atoms in a 10×15×20 nm
   reflecting box at 300 K, 100 ps run, with wall pressure checked against kinetic theory 2K/(3V) within 4%. Full suite: **76 passed in 26.80s**.
+- **06:07**: New force `DampedShiftedCoulomb` (Fennell & Gezelter 2006 damped shifted force). It is cutoff electrostatics with energy and force
+  both going to zero at rcut, a cheaper alternative to Ewald. Bug caught by the gradient test: the first version had the force sign flipped
+  (`displacements` returns r_j - r_i). Validation: NaCl 8×8×8 Madelung reads (value, rel. err) = 1.74546 PASS, against Ewald's 5e-8. It is clearly
+  labelled *approximate* in the scorecard (now 10 benchmarks, all pass). On a disordered melt it is within 3% of Ewald.
+  Full suite: **79 passed in 26.69s**.
