@@ -161,7 +161,7 @@ class Rattle(Integrator):
         new = s.pos + dt * s.vel
         for _ in range(self.max_iter):
             done = True
-            for (a, b, d), ro in zip(cons, old):
+            for (a, b, d), ro in zip(cons, old, strict=True):
                 r = self._mi(s, new[a] - new[b])
                 diff = d * d - r @ r
                 if abs(diff) > self.tol * d * d:
