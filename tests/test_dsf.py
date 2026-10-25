@@ -100,3 +100,17 @@ def test_dsf_exclusions_same_in_dense_and_cell_paths():
     fc, uc = DampedShiftedCoulomb(rcut=2.5, k=1.0, pairlist_threshold=1, exclude=ex).compute(s)
     _, u0 = DampedShiftedCoulomb(rcut=2.5, k=1.0).compute(s)
     assert abs(uc / ud - 1) < 1e-12 and np.allclose(fc, fd, rtol=1e-9, atol=1e-12) and abs(u0 - ud) > 1e-6
+
+
+def test_accuracy_report_compares_dsf_with_ewald():
+    from accusim import Simulation
+    s = rocksalt(8)
+    rng = np.random.default_rng(6)
+    s.pos = (s.pos + rng.normal(0, 0.4, s.pos.shape)) % s.box
+
+    def check(rc, a):
+        sim = Simulation(s.copy(), [DampedShiftedCoulomb(rcut=rc, alpha=a, k=1.0)], dt=1e-4)
+        sim.run(steps=2)
+        return sim.accuracy_report()["DSF vs Ewald"]
+    good, bad = check(3.9, 0.4), check(1.2, 0.1)
+    assert good.status == "PASS" and good.value < 1e-2 and bad.value > 5 * good.value

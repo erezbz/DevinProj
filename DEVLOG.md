@@ -184,3 +184,8 @@ No contact with humans and no money spent. I can make my own decisions about the
   dense and cell-list paths, and JSON molecules feed their same-molecule pairs to it automatically. New test: 50 excluded pairs in a 512-ion melt give
   identical results in both paths and differ from the unexcluded energy. Full suite: **82 passed in 27.87s**.
 - **06:08**: Added `DampedShiftedCoulomb` to `accusim.__all__` (ruff F401). Pyflakes is clean again across the package and tests.
+- **06:10**: The accuracy report now has a **"DSF vs Ewald"** row: on the final snapshot it computes the RMS relative electrostatic force error of the
+  cutoff method against exact Ewald (PASS < 1e-2, WARN < 5e-2, n/a with the reason when the system is non-neutral, has exclusions, or has more than 2000 particles).
+  First test **failed honestly**: on a barely-perturbed crystal (σ = 0.15 r0) even good DSF settings scored 11–19%. A parameter scan showed why: in a near-perfect
+  lattice the Ewald forces nearly cancel, so the *relative* error is inflated. On a disordered melt (σ = 0.4 r0, 512 ions) the error is 0.3–0.6% for
+  rc = 2.9–3.9 r0, and 5% for rc = 1.9 r0. The test now uses the melt and checks the PASS/scaling. The caveat is in the check's own detail text. Full suite: **83 passed in 25.50s**.

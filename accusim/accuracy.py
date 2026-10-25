@@ -138,7 +138,19 @@ class AccuracyReport:
             checks.append(Check("force approximation", _grade(e, 1e-3, 1e-2), e,
                                 f"RMS relative force error vs exact summation ({len(sub)} sampled particles)"))
 
-        from .forces import Coulomb
+        from .forces import Coulomb, DampedShiftedCoulomb, Ewald
+        for f in [f for f in sim.forces if isinstance(f, DampedShiftedCoulomb)]:
+            q = s.charges
+            if not (s.periodic and s.dim == 3 and np.any(q)):
+                continue
+            if f.exclude or abs(q.sum()) > 1e-9 * np.sum(np.abs(q)) or s.n > 2000:
+                checks.append(Check("DSF vs Ewald", NA, None, "needs a neutral system, no exclusions, n <= 2000"))
+                continue
+            F_d = f.compute(s)[0]
+            F_e = Ewald(k=f.k).compute(s)[0]
+            e = float(np.sqrt(np.mean(np.sum((F_d - F_e) ** 2, 1)) / np.mean(np.sum(F_e ** 2, 1))))
+            checks.append(Check("DSF vs Ewald", _grade(e, 1e-2, 5e-2), e,
+                                "RMS force error of the cutoff method vs Ewald, final snapshot (inflated for near-crystalline states)"))
         if s.periodic and any(type(f) is Coulomb for f in sim.forces):
             checks.append(Check("electrostatics", WARN, None,
                                 "plain Coulomb in a periodic box uses minimum image (long range truncated): use Ewald"))

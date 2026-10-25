@@ -41,7 +41,7 @@ Accuracy report (all applicable checks passed)
 | Area | Features |
 |---|---|
 | Units | Every input is a `Quantity` with a dimension. `Q(1, "m") + Q(1, "s")` raises `UnitError`. CODATA constants. |
-| Forces | Newtonian gravity (softening optional), Coulomb, Ewald (plus `DampedShiftedCoulomb`, a cheaper cutoff alternative validated against it) summation for periodic electrostatics (reproduces the NaCl Madelung constant to 1e-7), Lennard-Jones (mixing rules, shifted cutoff), harmonic bonds, uniform g/E fields, drag. Periodic boxes with minimum image, or reflecting walls. |
+| Forces | Newtonian gravity (softening optional), Coulomb, Ewald summation for periodic electrostatics (plus `DampedShiftedCoulomb`, a cheaper cutoff alternative validated against it) (reproduces the NaCl Madelung constant to 1e-7), Lennard-Jones (mixing rules, shifted cutoff), harmonic bonds, uniform g/E fields, drag. Periodic boxes with minimum image, or reflecting walls. |
 | Integrators | Velocity Verlet (2nd order, symplectic), Yoshida (4th order, symplectic), Langevin BAOAB (thermostat), Brownian/overdamped (diffusing molecules). |
 | Reactions | `A -> B`, `A -> B + C`, `A + B -> C`, `A + B -> C + D`, with rates and reaction radii (Doi model). Exact conservation of momentum and charge. Mass-energy is conserved: Q = Δm·c² + chemical energy is shared in the center-of-mass frame, energy thresholds are respected, and products store internal energy that later reactions can use. |
 | Kinetics | Exact Gillespie SSA for well-mixed systems, to cross-check particle simulations. |
@@ -134,7 +134,7 @@ Add `--gif` to write an animation to `examples/out/`.
 
 ## Tests
 
-`python -m pytest`. The 82 tests cover:
+`python -m pytest`. The 83 tests cover:
 - **Forces:** F = −∇U is checked numerically for every force (open and periodic), plus Newton's third law.
 - **Dynamics against exact answers:** Kepler orbits, Rouse polymer <R²> = (N−1)·3kT/k, Langevin target temperature, energy bounded over 100 eccentric orbits, the measured integrator order, and the exact harmonic-oscillator solution.
 - **Electrostatics:** Ewald reproduces the NaCl Madelung constant 1.7475646 (1 and 8 unit cells), and its forces are checked as the gradient of its energy.
