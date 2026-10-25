@@ -163,14 +163,16 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:03**: Quality pass. Checked packaging: `pip install` into a clean venv works and `python -m accusim.validate` passes from the installed copy.
   Ran ruff: no pyflakes errors (no unused names or undefined variables). Applied the safe auto-fixes (import order, stale noqa, sorted `__all__`) and renamed an
   ambiguous variable. The remaining style notes are one-line semicolons in the matplotlib helpers, left alone. Examples re-run OK. Full suite: **75 passed in 22.80s**.
-- **06:05**: Reflecting walls now **record the momentum they absorb** (`System.wall_impulse`), and `analysis.wall_pressure(system, duration)` turns
+- **06:04**: Reflecting walls now **record the momentum they absorb** (`System.wall_impulse`), and `analysis.wall_pressure(system, duration)` turns
   that into pressure. This is a second, independent pressure route (wall impulse instead of the virial or box rescaling). Test: 2000 argon atoms in a 10×15×20 nm
   reflecting box at 300 K, 100 ps run, with wall pressure checked against kinetic theory 2K/(3V) within 4%. Full suite: **76 passed in 26.80s**.
-- **06:07**: New force `DampedShiftedCoulomb` (Fennell & Gezelter 2006 damped shifted force). It is cutoff electrostatics with energy and force
+- **06:05**: New force `DampedShiftedCoulomb` (Fennell & Gezelter 2006 damped shifted force). It is cutoff electrostatics with energy and force
   both going to zero at rcut, a cheaper alternative to Ewald. Bug caught by the gradient test: the first version had the force sign flipped
   (`displacements` returns r_j - r_i). Validation: NaCl 8×8×8 Madelung reads 1.74546 (rel. err 1.2e-3), against Ewald's 5e-8. It is clearly
   labelled *approximate* in the scorecard (now 10 benchmarks, all pass). On a disordered melt it is within 3% of Ewald.
   Full suite: **79 passed in 26.69s**.
-- **06:09**: The docstring said "O(N)", but the first DSF was a dense N×N computation. Fixed: DSF now uses the shared `cell_list_pairs` above 400 particles.
+- **06:06**: The docstring said "O(N)", but the first DSF was a dense N×N computation. Fixed: DSF now uses the shared `cell_list_pairs` above 400 particles.
   The cell path matches the dense path to 1e-12 (new test). Timing on 4096-ion NaCl: cell-list DSF 0.5 s, dense DSF 1.7 s, Ewald 3.6 s per evaluation,
   with Madelung 1.74546 against 1.74756 for Ewald. This is the speed/accuracy trade-off, shown as numbers. Full suite: **80 passed in 28.16s**.
+- **06:06**: Fixed my own log: the three entries above first had estimated times (06:05/06:07/06:09) that ran ahead of the clock. They now show the real
+  times from \`date\` (06:04/06:05/06:06).
