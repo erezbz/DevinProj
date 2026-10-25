@@ -114,3 +114,26 @@ def test_accuracy_report_compares_dsf_with_ewald():
         return sim.accuracy_report()["DSF vs Ewald"]
     good, bad = check(3.9, 0.4), check(1.2, 0.1)
     assert good.status == "PASS" and good.value < 1e-2 and bad.value > 5 * good.value
+
+
+def test_dsf_verlet_skin_matches_fresh_lists():
+    import numpy as np
+
+    from accusim import DampedShiftedCoulomb, System
+    n = 8
+    s = System(3, box=float(n), periodic=True)
+    s.add_species("Na", 1.0, charge=1.0)
+    s.add_species("Cl", 1.0, charge=-1.0)
+    g = np.stack(np.meshgrid(*[np.arange(n)] * 3, indexing="ij"), -1).reshape(-1, 3).astype(float)
+    odd = g.sum(1) % 2 == 1
+    s.add("Na", g[~odd])
+    s.add("Cl", g[odd])
+    rng = np.random.default_rng(5)
+    skinned = DampedShiftedCoulomb(rcut=3.9, alpha=0.6, k=1.0, skin=0.6)
+    for _ in range(30):
+        s.pos = (s.pos + rng.normal(0, 0.05, s.pos.shape)) % s.box
+        f1, u1 = skinned.compute(s)
+        f0, u0 = DampedShiftedCoulomb(rcut=3.9, alpha=0.6, k=1.0, skin=0.0).compute(s)
+        assert np.max(np.abs(f1 - f0)) <= 1e-12 * np.max(np.abs(f0))
+        assert abs(u1 - u0) <= 1e-12 * abs(u0)
+    assert 1 < skinned._vl.rebuilds < 15

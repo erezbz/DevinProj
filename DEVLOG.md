@@ -234,3 +234,8 @@ No contact with humans and no money spent. I can make my own decisions about the
   - Results: D = (2.47 ± 0.10)e-5 (MSD) and 2.44e-5 (Green–Kubo); peak 3.75 Å; energy drift 4.0e-5 (WARN, as before).
   - The numbers shift a little because a different pair order changes the round-off, and the dynamics is chaotic. Both runs agree with each other and with Rahman's 2.43e-5 within the error bars.
   - Updated README and EXAMPLES.md. This also fixes a README inaccuracy: it said "laptop-class CPU", but these runs are on a 2-vCPU cloud VM.
+- **06:33–06:34**: Moved the neighbour cache into a reusable **`VerletList`** class, shared by `LennardJones` and `DampedShiftedCoulomb`. DSF gets a `skin` parameter, defaulting to 0.15·rcut.
+  - The DSF cell path now masks out pairs with r ≥ rcut. That was needed because the skin brings in pairs up to rcut + skin; without the mask they would add spurious shifted terms.
+  - Test: an 8³ NaCl lattice given 30 random kicks agrees with fresh lists to ≤ 1e-12 (forces and energy), with 1 < rebuilds < 15.
+  - Benchmark: 4096 ions, 20 force calls: skin 0.0: 8.89 s, 20 rebuilds; skin 0.6: 3.34 s, 1 rebuilds.
+  - Full suite: **88 passed in 59.83s**.

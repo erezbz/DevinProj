@@ -75,6 +75,29 @@ class Coulomb(Force):
         return f, U
 
 
+class VerletList:
+    """Cell-list pairs within rc + skin, reused until some particle has moved more than skin/2 (exact: no pair
+    within rc can be missed). Rebuilt whenever particle IDs, box or rc change, so reactions are safe."""
+
+    def __init__(self):
+        self._state = None
+        self.rebuilds = 0
+
+    def pairs(self, s, rc, skin):
+        st = self._state
+        if st is not None and st[3].shape == s.ids.shape and np.array_equal(st[3], s.ids) \
+                and np.array_equal(st[4], s.box) and st[5] == rc and skin > 0:
+            disp = s.pos - st[2]
+            if s.periodic:
+                disp -= s.box * np.round(disp / s.box)
+            if float(np.max(np.einsum("ij,ij->i", disp, disp))) < (0.5 * skin) ** 2:
+                return st[0], st[1]
+        i, j = cell_list_pairs(s, rc + skin)
+        self._state = (i, j, s.pos.copy(), s.ids.copy(), None if s.box is None else s.box.copy(), rc)
+        self.rebuilds += 1
+        return i, j
+
+
 class LennardJones(Force):
     """12-6 Lennard-Jones with per-species epsilon/sigma (Lorentz-Berthelot mixing).
 
@@ -87,28 +110,17 @@ class LennardJones(Force):
         self.cutoff = cutoff
         self.pairlist_threshold = pairlist_threshold
         self.skin = skin  # Verlet-list skin (units of sigma): exact, the list is rebuilt before any pair can be missed
-        self._nl = None
-        self.rebuilds = 0
+        self._vl = VerletList()
 
-    def _neighbours(self, s, rc, skin):
-        nl = self._nl
-        if nl is not None and nl[3].shape == s.ids.shape and np.array_equal(nl[3], s.ids) \
-                and np.array_equal(nl[4], s.box) and nl[5] == rc:
-            disp = s.pos - nl[2]
-            if s.periodic:
-                disp -= s.box * np.round(disp / s.box)
-            if skin > 0 and float(np.max(np.einsum("ij,ij->i", disp, disp))) < (0.5 * skin) ** 2:
-                return nl[0], nl[1]
-        i, j = cell_list_pairs(s, rc + skin)
-        self._nl = (i, j, s.pos.copy(), s.ids.copy(), None if s.box is None else s.box.copy(), rc)
-        self.rebuilds += 1
-        return i, j
+    @property
+    def rebuilds(self):
+        return self._vl.rebuilds
 
     def _compute_pairlist(self, s):
         """O(N) neighbour search with a cell list: only pairs within the cutoff are visited."""
         eps_t, sig_t = self._tables(s)
         smax = float(np.max(np.where(eps_t > 0, sig_t, 0)))
-        i, j = self._neighbours(s, self.cutoff * smax, self.skin * smax)
+        i, j = self._vl.pairs(s, self.cutoff * smax, self.skin * smax)
         f = np.zeros_like(s.pos)
         if not len(i):
             return f, 0.0
@@ -384,12 +396,14 @@ class DampedShiftedCoulomb(Force):
     cost; compare against Ewald on a snapshot to quantify the error for your system.
     """
 
-    def __init__(self, rcut, alpha=None, k=KE_CONST, pairlist_threshold=400, exclude=()):
+    def __init__(self, rcut, alpha=None, k=KE_CONST, pairlist_threshold=400, exclude=(), skin=None):
         self.pairlist_threshold = pairlist_threshold
         self.exclude = [tuple(p) for p in exclude]  # id pairs with no interaction (same-molecule atoms)
         self.k = si(k, "J*m/C^2")
         self.rcut = si(rcut, "m")
         self.alpha = 2.0 / self.rcut if alpha is None else si(alpha, "1/m")
+        self.skin = 0.15 * self.rcut if skin is None else si(skin, "m")  # Verlet-list skin (exact)
+        self._vl = VerletList()
 
     def compute(self, s):
         q = s.charges
@@ -403,7 +417,7 @@ class DampedShiftedCoulomb(Force):
         where = {pid: n for n, pid in enumerate(s.ids)} if self.exclude else {}
         ex = np.array([(where[a], where[b]) for a, b in self.exclude if a in where and b in where], dtype=int).reshape(-1, 2)
         if s.n >= self.pairlist_threshold:
-            i, j = cell_list_pairs(s, rc)
+            i, j = self._vl.pairs(s, rc, self.skin)
             if len(ex):
                 lo, hi = np.minimum(ex[:, 0], ex[:, 1]), np.maximum(ex[:, 0], ex[:, 1])
                 keep = ~np.isin(i * s.n + j, lo * s.n + hi)
@@ -412,6 +426,8 @@ class DampedShiftedCoulomb(Force):
             if s.periodic:
                 d -= s.box * np.round(d / s.box)
             r = np.sqrt(np.einsum("ij,ij->i", d, d))
+            inside = r < rc
+            i, j, d, r = i[inside], j[inside], d[inside], r[inside]
             er = _erfc(a * r)
             qq = q[i] * q[j]
             U = float(np.sum(qq * (er / r - erc / rc + fshift * (r - rc))))
