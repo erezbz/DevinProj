@@ -72,3 +72,40 @@ def test_cell_list_matches_all_pairs(periodic):
     F2, U2 = LennardJones(params, pairlist_threshold=2).compute(s)
     assert U2 == pytest.approx(U1, rel=1e-10)
     assert np.allclose(F2, F1, rtol=1e-8, atol=1e-12 * np.max(np.abs(F1)))
+
+
+def _nacl(n_cells=1):
+    s = System(3, box=2.0 * n_cells, periodic=True)
+    s.add_species("Na", 1.0, charge=1.0)
+    s.add_species("Cl", 1.0, charge=-1.0)
+    for x in range(2 * n_cells):
+        for y in range(2 * n_cells):
+            for z in range(2 * n_cells):
+                s.add("Na" if (x + y + z) % 2 == 0 else "Cl", [[x, y, z]])
+    return s
+
+
+@pytest.mark.parametrize("n_cells", [1, 2])
+def test_ewald_reproduces_nacl_madelung_constant(n_cells):
+    from accusim import Ewald
+    s = _nacl(n_cells)
+    F, U = Ewald(k=1.0).compute(s)
+    madelung = -U / (s.n / 2)
+    assert madelung == pytest.approx(1.747564594633, rel=1e-7)
+    assert np.allclose(F, 0, atol=1e-6)
+
+
+def test_ewald_force_is_negative_gradient():
+    from accusim import Ewald
+    s = _system(periodic=True)
+    f = Ewald()
+    F, _ = f.compute(s)
+    h = 1e-15
+    for i in range(s.n):
+        for k in range(3):
+            s.pos[i, k] += h
+            up = f.compute(s)[1]
+            s.pos[i, k] -= 2 * h
+            down = f.compute(s)[1]
+            s.pos[i, k] += h
+            assert -(up - down) / (2 * h) == pytest.approx(F[i, k], rel=1e-4, abs=1e-6 * np.max(np.abs(F)))

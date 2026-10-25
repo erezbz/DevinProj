@@ -90,4 +90,11 @@ No contact with humans and no money spent. I can make my own decisions about the
     so the effective rate is (1−e^{−λdt})/dt, about 0.43λ. This is exactly the kind of silent error accusim exists to catch, so I added a
     **new report check, `reaction timestep`** (it flags rate·dt and the implied bias), and a test for it.
     With rate·dt = 0.1: **242 against 237 ± 9** ✔. The ozone model had rate·dt = 0.25 (now FAIL), so I set its dt to 10 ps.
-  - 48/48 tests pass.
+  - 47/47 tests pass (I first wrote 48 here by mistake; pytest reported 47).
+- **05:47**: Accuracy gap found by reading my own code: plain `Coulomb` in a periodic box uses the minimum image,
+  which silently truncates long-range electrostatics. Two fixes:
+  1. The report now raises an `electrostatics` WARN in that situation.
+  2. New `Ewald` force (real-space erfc + reciprocal k-space + self term), with exact forces.
+  Validation: the **NaCl Madelung constant**. The first run gave 1.7475665 against the exact 1.7475646 (1.1e-6), which is precisely the
+  erfc(3.5) truncation. I raised alpha to 4/rcut and kmax to 12, and now it matches to 1e-7 for 1 and 8 unit cells,
+  with zero net force on lattice ions. Ewald forces are checked as the numerical gradient of its energy. 50/50 tests pass.

@@ -48,7 +48,7 @@ def _energy(x):
     return q
 
 
-FORCE_TYPES = {"Gravity": F.Gravity, "Coulomb": F.Coulomb, "LennardJones": F.LennardJones,
+FORCE_TYPES = {"Gravity": F.Gravity, "Coulomb": F.Coulomb, "Ewald": F.Ewald, "LennardJones": F.LennardJones,
                "HarmonicBond": F.HarmonicBond, "UniformField": F.UniformField, "Drag": F.Drag}
 INTEGRATORS = {"VelocityVerlet": I.VelocityVerlet, "Yoshida4": I.Yoshida4, "Langevin": I.Langevin,
                "Brownian": I.Brownian}

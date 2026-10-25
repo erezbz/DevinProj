@@ -247,3 +247,70 @@ def cell_list_pairs(s, rc):
         d -= s.box * np.round(d / s.box)
     close = np.einsum("ij,ij->i", d, d) < rc ** 2
     return i[close], j[close]
+
+
+def _erfc(x):
+    try:
+        from scipy.special import erfc
+        return erfc(x)
+    except ImportError:  # pragma: no cover
+        import math
+        return np.vectorize(math.erfc)(x)
+
+
+class Ewald(Force):
+    """Exact periodic electrostatics by Ewald summation (3D orthorhombic box, neutral system).
+
+    U = real-space erfc sum (minimum image, r < rcut) + reciprocal sum over k-vectors + self term.
+    Defaults give ~1e-8 relative accuracy: rcut = L_min/2, alpha = 4/rcut, |n| <= kmax = 12.
+    """
+
+    def __init__(self, k=KE_CONST, alpha=None, rcut=None, kmax=12):
+        self.k = si(k, "J*m/C^2")
+        self.alpha = None if alpha is None else si(alpha, "1/m")
+        self.rcut = None if rcut is None else si(rcut, "m")
+        self.kmax = kmax
+        self._kcache = None
+
+    def _kvectors(self, box, alpha):
+        key = (tuple(box), alpha, self.kmax)
+        if self._kcache is None or self._kcache[0] != key:
+            n = np.arange(-self.kmax, self.kmax + 1)
+            N = np.stack(np.meshgrid(n, n, n, indexing="ij"), -1).reshape(-1, 3)
+            N = N[np.sum(N ** 2, axis=1) <= self.kmax ** 2]
+            N = N[np.any(N != 0, axis=1)]
+            kv = 2 * np.pi * N / box
+            k2 = np.sum(kv ** 2, axis=1)
+            self._kcache = (key, kv, np.exp(-k2 / (4 * alpha ** 2)) / k2)
+        return self._kcache[1], self._kcache[2]
+
+    def compute(self, s):
+        if s.dim != 3 or not s.periodic:
+            raise ValueError("Ewald needs a 3D periodic box")
+        q = s.charges
+        f = np.zeros_like(s.pos)
+        if not np.any(q):
+            return f, 0.0
+        if abs(q.sum()) > 1e-9 * np.sum(np.abs(q)):
+            raise ValueError("Ewald summation here requires a charge-neutral system")
+        box = s.box
+        rcut = self.rcut or 0.5 * float(np.min(box))
+        a = self.alpha or 4.0 / rcut
+        d, r2 = _pairs(s)
+        np.fill_diagonal(r2, np.inf)
+        r = np.sqrt(r2)
+        qq = q[:, None] * q[None, :]
+        inside = r < rcut
+        erfc_r = np.where(inside, _erfc(a * np.where(inside, r, 0)), 0.0)
+        U_real = 0.5 * float(np.sum(np.where(inside, qq * erfc_r / r, 0)))
+        coef = np.where(inside, qq * (erfc_r / r + 2 * a / np.sqrt(np.pi) * np.exp(-(a * r) ** 2)) / r2, 0)
+        f -= np.einsum("ij,ijk->ik", coef, d)
+        kv, w = self._kvectors(box, a)
+        V = float(np.prod(box))
+        phase = s.pos @ kv.T                     # (N, K)
+        S = (q[:, None] * np.exp(1j * phase)).sum(0)
+        U_rec = 2 * np.pi / V * float(np.sum(w * np.abs(S) ** 2))
+        im = np.imag(np.conj(S)[None, :] * np.exp(1j * phase))  # (N, K)
+        f += 4 * np.pi / V * q[:, None] * ((w[None, :] * im) @ kv)
+        U_self = -a / np.sqrt(np.pi) * float(np.sum(q ** 2))
+        return self.k * f, self.k * (U_real + U_rec + U_self)

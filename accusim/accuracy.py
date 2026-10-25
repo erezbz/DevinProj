@@ -96,6 +96,11 @@ class AccuracyReport:
         dq = float(np.max(np.abs(Qc - Qc[0])) / qscale)
         checks.append(Check("charge", _grade(dq, 1e-12, 1e-9), dq, "total charge"))
 
+        from .forces import Coulomb
+        if s.periodic and any(type(f) is Coulomb for f in sim.forces):
+            checks.append(Check("electrostatics", WARN, None,
+                                "plain Coulomb in a periodic box uses minimum image (long range truncated): use Ewald"))
+
         if sim.reactions:
             bi = [r for r in sim.reactions.reactions if len(r.reactants) == 2]
             if bi:
