@@ -242,3 +242,14 @@ No contact with humans and no money spent. I can make my own decisions about the
 - **06:35**: README now documents `vacf`, `green_kubo_diffusion`, `wall_pressure` and the Verlet list. Checks:
   - `python -m accusim.validate`: **11/11 benchmarks passed**. DSF Madelung is 1.2e-3, unchanged by the skin.
   - `ruff --select F,E9,B` on the changed files: no new findings. The only 2 left are B905 `zip(strict=)` in `model.py`, which predate this work.
+- **06:35–06:36**: New **`Rattle`** integrator: velocity Verlet with rigid bond-length constraints, SHAKE on positions and RATTLE on velocities, solved Gauss–Seidel. It uses stable particle IDs.
+  The accuracy report gets a new **"constraints"** row (worst relative bond-length violation).
+  - Tests:
+    - Free rigid rotor: length held to < 1e-10 (observed ~2e-16); energy and angular momentum < 1e-9.
+    - LJ particle hitting a rigid dumbbell off-centre: momentum < 1e-12, and the dumbbell spins up.
+  - My first collision test asserted an energy drift < 1e-5 and **failed at 6.35e-5**.
+    - I suspected the force jump at the LJ cutoff, but that was wrong: with cutoff 4σ the drift was 5.3e-5, almost unchanged.
+    - Halving dt instead gives 6.35e-5 → 1.8e-5 → 4.7e-6 (3.5x and 3.8x per halving), i.e. clean 2nd order.
+    - So the constraint forces do no work, and what's left is ordinary integration error. The collision is stiff: the A–A pair sits at r = σ, where the constraint carries the LJ force.
+    - The test now asserts < 1e-4 plus a ratio > 3 per halving.
+  - Full suite: **90 passed in 42.61s**.

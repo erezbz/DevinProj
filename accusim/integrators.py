@@ -116,6 +116,74 @@ class NoseHoover(Integrator):
         return 0.5 * self.Q * self.xi ** 2 + self.dof(s) * k_B.value * self.T * self.eta
 
 
+class Rattle(Integrator):
+    """Velocity Verlet with rigid bond-length constraints: SHAKE on positions, RATTLE on velocities (Andersen 1983).
+
+    constraints: [(id_a, id_b, length)] using stable particle IDs. Constraint forces do no work, so energy stays
+    conserved; the accuracy report checks the worst relative bond-length violation of the run (`max_violation`).
+    Constraints are solved one at a time (Gauss-Seidel), which also converges for coupled ones (e.g. rigid water).
+    """
+
+    order = 2
+    symplectic = True
+
+    def __init__(self, constraints, tol=1e-12, max_iter=1000):
+        self.constraints = [(int(a), int(b), si(d, "m")) for a, b, d in constraints]
+        self.tol = tol
+        self.max_iter = max_iter
+        self.max_violation = 0.0
+
+    @staticmethod
+    def _mi(s, d):
+        return d - s.box * np.round(d / s.box) if s.periodic else d
+
+    def step(self, sim, dt):
+        s = sim.system
+        where = {pid: n for n, pid in enumerate(s.ids)}
+        cons = [(where[a], where[b], d) for a, b, d in self.constraints if a in where and b in where]
+        inv = 1.0 / s.masses
+        old = [self._mi(s, s.pos[a] - s.pos[b]) for a, b, _ in cons]
+        s.vel += 0.5 * dt * sim.acc
+        new = s.pos + dt * s.vel
+        for _ in range(self.max_iter):
+            done = True
+            for (a, b, d), ro in zip(cons, old):
+                r = self._mi(s, new[a] - new[b])
+                diff = d * d - r @ r
+                if abs(diff) > self.tol * d * d:
+                    done = False
+                    g = diff / (2 * (inv[a] + inv[b]) * (r @ ro))
+                    new[a] += g * inv[a] * ro
+                    new[b] -= g * inv[b] * ro
+                    s.vel[a] += g * inv[a] * ro / dt
+                    s.vel[b] -= g * inv[b] * ro / dt
+            if done:
+                break
+        else:
+            raise RuntimeError("SHAKE did not converge: reduce dt")
+        s.pos = new
+        s.apply_boundaries()
+        sim.update_forces()
+        s.vel += 0.5 * dt * sim.acc
+        for _ in range(self.max_iter):
+            done = True
+            for a, b, d in cons:
+                r = self._mi(s, s.pos[a] - s.pos[b])
+                rv = r @ (s.vel[a] - s.vel[b])
+                if abs(rv) * dt > self.tol * d * d:
+                    done = False
+                    k = rv / ((inv[a] + inv[b]) * d * d)
+                    s.vel[a] -= k * inv[a] * r
+                    s.vel[b] += k * inv[b] * r
+            if done:
+                break
+        else:
+            raise RuntimeError("RATTLE did not converge: reduce dt")
+        for a, b, d in cons:
+            r = self._mi(s, s.pos[a] - s.pos[b])
+            self.max_violation = max(self.max_violation, abs(np.sqrt(r @ r) - d) / d)
+
+
 class Brownian(Integrator):
     """Overdamped Langevin (Euler-Maruyama) for diffusing molecules in a solvent.
 

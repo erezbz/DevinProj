@@ -177,6 +177,9 @@ class AccuracyReport:
 
         from .units import c as C_LIGHT
         beta2 = float(np.max(np.sum(s.vel ** 2, axis=1)) / C_LIGHT.value ** 2) if s.n else 0.0
+        if hasattr(integ, "max_violation"):
+            v = integ.max_violation
+            checks.append(Check("constraints", _grade(v, 1e-9, 1e-6), v, "worst relative bond-length violation (SHAKE/RATTLE)"))
         checks.append(Check("relativity", _grade(beta2, 1e-4, 1e-2), beta2,
                             f"(v/c)^2 of fastest particle: Newtonian error ~ this size (v = {np.sqrt(beta2):.3g} c)"))
 
